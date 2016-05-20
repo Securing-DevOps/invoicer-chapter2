@@ -6,6 +6,11 @@
 # DOCKER_PASS
 #
 machine:
+  environment:
+    IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
+    PATH: "/usr/local/go/bin:/usr/local/go_workspace/bin:~/.go_workspace/bin:${PATH}"
+    GOPATH: "${HOME}"
+
   services:
     - docker
 
@@ -22,6 +27,14 @@ dependencies:
         "$CIRCLE_PROJECT_REPONAME"
         "$CIRCLE_BUILD_URL"
         > version.json
+
+    # circleci doesn't close in a proper gopath by default
+    # first define the gopath, move the repo there, then build it
+    - mkdir -p $HOME/src/github.com/$CIRCLE_PROJECT_USERNAME/
+    - mkdir -p $HOME/bin
+    - mv "$HOME/$CIRCLE_PROJECT_REPONAME" "$HOME/src/github.com/$CIRCLE_PROJECT_USERNAME/"
+    - go install github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+
     - docker build -t app:build .
 
     # write the sha256 sum to an artifact to make image verification easier
@@ -30,6 +43,8 @@ dependencies:
 test:
   override:
     - docker run app:build test
+
+    - docker images --no-trunc | awk '/^app/ {print $3}' | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
 
 # appropriately tag and push the container to dockerhub
 deployment:
