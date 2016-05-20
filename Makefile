@@ -15,6 +15,8 @@ install:
 go_vendor_dependencies:
 	$(GOGETTER) github.com/gorilla/mux
 	$(GOGETTER) github.com/jinzhu/gorm
+	$(GOGETTER) github.com/jinzhu/gorm/dialects/postgres
+	$(GOGETTER) github.com/jinzhu/gorm/dialects/sqlite
 	echo 'removing .git from vendored pkg and moving them to vendor'
 	find .tmpdeps/src -type d -name ".git" ! -name ".gitignore" -exec rm -rf {} \; || exit 0
 	cp -ar .tmpdeps/src/* vendor/
