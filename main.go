@@ -5,6 +5,8 @@
 // Contributor: Julien Vehent jvehent@mozilla.com [:ulfr]
 package main
 
+//go:generate ./version.sh
+
 import (
 	"encoding/json"
 	"fmt"
@@ -56,6 +58,7 @@ func main() {
 	r.HandleFunc("/invoice", iv.postInvoice).Methods("POST")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.putInvoice).Methods("PUT")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.deleteInvoice).Methods("DELETE")
+	r.HandleFunc("/__version__", getVersion).Methods("GET")
 
 	// all set, start the http handler
 	err = http.ListenAndServe("localhost:8080", r)
@@ -168,6 +171,16 @@ func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 
 func getHeartbeat(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("I am alive"))
+}
+
+// handleVersion returns the current version of the API
+func getVersion(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(fmt.Sprintf(`{
+"source": "https://github.com/Securing-DevOps/invoicer",
+"version": "%s",
+"commit": "%s",
+"build": "https://circleci.com/gh/Securing-DevOps/invoicer/"
+}`, version, commit)))
 }
 
 func httpError(w http.ResponseWriter, errorCode int, errorMessage string, args ...interface{}) {
