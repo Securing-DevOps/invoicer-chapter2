@@ -8,7 +8,8 @@
 machine:
   environment:
     # saves some typing since circleci's checkout dir isn't in $GOPATH
-    GOPATH_BASE: "$(echo $GOPATH | cut -d ':' -f 1)/src/github.com/$CIRCLE_PROJECT_USERNAME"
+    GOPATH_HEAD: "$(echo $GOPATH | cut -d ':' -f 1)"
+    GOPATH_BASE: "$GOPATH_HEAD/src/github.com/$CIRCLE_PROJECT_USERNAME"
 
   services:
     - docker
@@ -16,12 +17,12 @@ machine:
 dependencies:
   override:
     - mkdir -p "$GOPATH_BASE"
-    - mkdir -p "$GOPATH/bin"
+    - mkdir -p "$GOPATH_HEAD/bin"
     - ln -fs ${HOME}/${CIRCLE_PROJECT_REPONAME} ${GOPATH_BASE}/
 
     - go install github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
-    - ln -fs "$(echo $GOPATH | cut -d ':' -f 1)/bin/invoicer" bin/invoicer
+    - ln -fs "$GOPATH_HEAD/bin/invoicer" bin/
 
     # create a version.json
     - >
