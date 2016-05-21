@@ -61,10 +61,7 @@ func main() {
 	r.HandleFunc("/__version__", getVersion).Methods("GET")
 
 	// all set, start the http handler
-	err = http.ListenAndServe("localhost:8080", r)
-	if err != nil {
-		panic(err)
-	}
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 type Invoice struct {
