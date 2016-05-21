@@ -16,11 +16,11 @@ datetag=$(date +%Y%m%d%H%M)
 identifier=invoicer$datetag
 mkdir -p tmp/$identifier
 
-echo "Creating stack $identifier"
+echo "Creating EBS application $identifier"
 
 # Find the ID of the default VPC
 aws ec2 describe-vpcs --filters Name=isDefault,Values=true > tmp/$identifier/defaultvpc.json || fail
-vpcid=$(grep -Poi '"vpcid": "(.+)"' tmp/$identifier/defaultvpc.json|cut -d '"' -f 4)
+vpcid=$(jq -r '.Vpcs[0].VpcId' tmp/$identifier/defaultvpc.json)
 echo "default vpc is $vpcid"
 
 # Create a security group for the database
@@ -28,7 +28,7 @@ aws ec2 create-security-group \
     --group-name $identifier \
     --description "access control to Invoicer Postgres DB" \
     --vpc-id $vpcid > tmp/$identifier/dbsg.json || fail
-dbsg=$(grep -Poi '"groupid": "(.+)"' tmp/$identifier/dbsg.json|cut -d '"' -f 4)
+dbsg=$(jq -r '.GroupId' tmp/$identifier/dbsg.json)
 echo "DB security group is $dbsg"
 
 # Create the database
@@ -48,16 +48,18 @@ aws rds create-db-instance \
     --master-username invoicer \
     --master-user-password "$dbpass" \
     --no-multi-az > tmp/$identifier/rds.json || fail
-echo "RDS Postgres database created. username=invoicer; password='$dbpass'"
+echo "RDS Postgres database is being created. username=invoicer; password='$dbpass'"
 
 # Retrieve the database hostname
 while true;
 do
-    dbhost=$(aws rds describe-db-instances --db-instance-identifier $identifier |grep -A 2 -i endpoint|grep -Poi '"Address": "(.+)"'|cut -d '"' -f 4)
-    if [ ! -z $dbhost ]; then break; fi
-    echo "database is not ready yet. waiting"
+    aws rds describe-db-instances --db-instance-identifier $identifier > tmp/$identifier/rds.json
+    dbhost=$(jq -r '.DBInstances[0].Endpoint.Address' tmp/$identifier/rds.json)
+    if [ "$dbhost" != "null" ]; then break; fi
+    echo -n '.'
     sleep 10
 done
+echo "dbhost=$dbhost"
 
 # Create an elasticbeantalk application
 aws elasticbeanstalk create-application \
@@ -67,35 +69,34 @@ echo "ElasticBeanTalk application created"
 
 # Get the name of the latest Docker solution stack
 dockerstack="$(aws elasticbeanstalk list-available-solution-stacks | \
-    grep -P '"SolutionStackName": ".+Amazon Linux.+Docker.+"' | \
-    grep -v "Multi-container" | cut -d ':' -f 2 | \
-    sed 's/"//g' | sed 's/^ //' | sort |tail -1)"
+    jq -r '.SolutionStacks[]' | grep -P '.+Amazon Linux.+Docker.+' | head -1)"
 
 # Create the EB API environment
 sed "s/POSTGRESPASSREPLACEME/$dbpass/" ebs-options.json > tmp/$identifier/ebs-options.json || fail
 sed -i "s/POSTGRESHOSTREPLACEME/$dbhost/" tmp/$identifier/ebs-options.json || fail
 aws elasticbeanstalk create-environment \
     --application-name $identifier \
-    --environment-name api$env$datetag \
-    --description "Invoicer environment" \
+    --environment-name invoicer-api \
+    --description "Invoicer API environment" \
     --tags "Key=Owner,Value=$(whoami)" \
     --solution-stack-name "$dockerstack" \
     --option-settings file://tmp/$identifier/ebs-options.json \
     --tier "Name=WebServer,Type=Standard,Version=''" > tmp/$identifier/ebcreateapienv.json || fail
-apieid=$(grep -Pi '"EnvironmentId": "(.+)"' tmp/$identifier/ebcreateapienv.json |cut -d '"' -f 4)
-echo "API environment $apieid created"
+apieid=$(jq -r '.EnvironmentId' tmp/$identifier/ebcreateapienv.json)
+echo "API environment $apieid is being created"
 
 # grab the instance ID of the API environment, then its security group, and add that to the RDS security group
 while true;
 do
     aws elasticbeanstalk describe-environment-resources --environment-id $apieid > tmp/$identifier/ebapidesc.json || fail
-    ec2id=$(grep -A 3 -i instances tmp/$identifier/ebapidesc.json | grep -Pi '"id": "(.+)"'|cut -d '"' -f 4)
-    if [ ! -z $ec2id ]; then break; fi
-    echo "stack is not ready yet. waiting"
+    ec2id=$(jq -r '.EnvironmentResources.Instances[0].Id' tmp/$identifier/ebapidesc.json)
+    if [ "$ec2id" != "null" ]; then break; fi
+    echo -n '.'
     sleep 10
 done
+echo
 aws ec2 describe-instances --instance-ids $ec2id > tmp/$identifier/${ec2id}.json || fail
-sgid=$(grep -A 4 -i SecurityGroups tmp/$identifier/${ec2id}.json | grep -Pi '"GroupId": "(.+)"' | cut -d '"' -f 4)
+sgid=$(jq -r '.Reservations[0].Instances[0].SecurityGroups[0].GroupId' tmp/$identifier/${ec2id}.json)
 aws ec2 authorize-security-group-ingress --group-id $dbsg --source-group $sgid --protocol tcp --port 5432 || fail
 echo "API security group $sgid authorized to connect to database security group $dbsg"
 
@@ -105,11 +106,24 @@ aws s3 cp ebs.json s3://$identifier/
 aws elasticbeanstalk create-application-version \
     --application-name "$identifier" \
     --version-label invoicer-api \
-    --source-bundle "S3Bucket=$identifier,S3Key=ebs.json"
+    --source-bundle "S3Bucket=$identifier,S3Key=ebs.json" > tmp/$identifier/appversion.json
 
+# Wait for the environment to be ready (green)
+echo -n "waiting for environment"
+while true; do
+    aws elasticbeanstalk describe-environments --environment-id $apieid > tmp/$identifier/$apieid.json
+    health="$(jq -r '.Environments[0].Health' tmp/$identifier/$apieid.json)"
+    if [ "$health" == "Green" ]; then break; fi
+    echo -n '.'
+    sleep 10
+done
+echo
+
+# Deploy the docker container to the instances
 aws elasticbeanstalk update-environment \
     --application-name $identifier \
     --environment-id $apieid \
-    --version-label invoicer-api
+    --version-label invoicer-api > tmp/$identifier/$apieid.json
 
-echo "Environment ready. Create the application versions in the elasticbeanstalk web console and deploy your container."
+url="$(jq -r '.CNAME' tmp/$identifier/$apieid.json)"
+echo "Environment is being deployed. Public endpoint is http://$url"
