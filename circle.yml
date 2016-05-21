@@ -8,7 +8,7 @@
 machine:
   environment:
     # saves some typing since circleci's checkout dir isn't in $GOPATH
-    GOPATH_BASE: "$GOPATH/src/github.com/$CIRCLE_PROJECT_USERNAME"
+    GOPATH_BASE: "$(echo $GOPATH | cut -d ':' -f 1)/src/github.com/$CIRCLE_PROJECT_USERNAME"
 
   services:
     - docker
