@@ -22,6 +22,7 @@ dependencies:
 
     - go install github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
+    - mkdir bin
     - ln -fs "$GOPATH_HEAD/bin/invoicer" bin/
 
     # create a version.json
