@@ -42,6 +42,10 @@ dependencies:
     # write the sha256 sum to an artifact to make image verification easier
     - docker images --no-trunc | awk '/^app/ {print $3}' | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
 
+test:
+  override:
+    - go test github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+
 # appropriately tag and push the container to dockerhub
 deployment:
   hub_latest:
