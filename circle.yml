@@ -7,53 +7,48 @@
 #
 machine:
   environment:
-    IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
-    PATH: "/usr/local/go/bin:/usr/local/go_workspace/bin:~/.go_workspace/bin:${PATH}"
-    GOPATH: "${HOME}"
+    # saves some typing since circleci's checkout dir isn't in $GOPATH
+    GOPATH_BASE: "$GOPATH/src/github.com/$CIRCLE_PROJECT_USERNAME"
 
   services:
     - docker
 
 dependencies:
   override:
-    - docker info
-
-    # create a version.json
-    - >
-        printf '{"commit":"%s","version":"%s","source":"https://github.com/%s/%s","build":"%s"}\n' 
-        "$CIRCLE_SHA1" 
-        "$CIRCLE_TAG"
-        "$CIRCLE_PROJECT_USERNAME"
-        "$CIRCLE_PROJECT_REPONAME"
-        "$CIRCLE_BUILD_URL"
-        > version.json
-
-    # circleci doesn't close in a proper gopath by default
-    # first define the gopath, move the repo there, then build it
-    - mkdir -p $HOME/src/github.com/$CIRCLE_PROJECT_USERNAME/
-    - mkdir -p $HOME/bin
-    - mv "$HOME/$CIRCLE_PROJECT_REPONAME" "$HOME/src/github.com/$CIRCLE_PROJECT_USERNAME/"
+    - mkdir -p "$GOPATH_BASE"
+    - mkdir -p "$GOPATH/bin"
+    - ln -fs ${HOME}/${CIRCLE_PROJECT_REPONAME} ${GOPATH_BASE}/
 
     - go install github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
-    - docker build -t app:build -f $HOME/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/Dockerfile
+    - docker build -t app:build .
 
     # write the sha256 sum to an artifact to make image verification easier
     - docker images --no-trunc | awk '/^app/ {print $3}' | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
 
-test:
-  override:
-    - docker run app:build test
-
-    - docker images --no-trunc | awk '/^app/ {print $3}' | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
-
 # appropriately tag and push the container to dockerhub
 deployment:
+  hub_all:
+    branch: /.*/
+    commands:
+      # create a version.json
+      - >
+          printf '{"commit":"%s","version":"%s","source":"https://github.com/%s/%s","build":"%s"}\n' 
+          "$CIRCLE_SHA1" 
+          "$CIRCLE_TAG"
+          "$CIRCLE_PROJECT_USERNAME"
+          "$CIRCLE_PROJECT_REPONAME"
+          "$CIRCLE_BUILD_URL"
+          > version.json
+
+      - cp version.json $CIRCLE_ARTIFACTS
+
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+
   hub_latest:
     branch: "master"
     commands:
       - "[ ! -z $DOCKERHUB_REPO ]"
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - "docker tag app:build ${DOCKERHUB_REPO}:latest"
       - "docker push ${DOCKERHUB_REPO}:latest"
 
