@@ -7,7 +7,6 @@
 #
 machine:
   environment:
-    # saves some typing since circleci's checkout dir isn't in $GOPATH
     GOPATH_HEAD: "$(echo $GOPATH | cut -d ':' -f 1)"
     GOPATH_BASE: "$GOPATH_HEAD/src/github.com/$CIRCLE_PROJECT_USERNAME"
 
@@ -22,7 +21,9 @@ dependencies:
 
 test:
   override:
-    - go test github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+    - >
+        go test
+        github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
 deployment:
   hub_latest:
@@ -31,15 +32,21 @@ deployment:
     branch: "master"
     commands:
       - "[ ! -z $DOCKERHUB_REPO ]"
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - >
+          docker login -e $DOCKER_EMAIL
+          -u $DOCKER_USER -p $DOCKER_PASS
       - echo ${DOCKERHUB_REPO}:${CIRCLE_TAG}
       # Go applications in the busybox container must be built statically
-      - go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+      - >
+          go install --ldflags '-extldflags "-static"'
+          github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
       - mkdir bin
       - cp "$GOPATH_HEAD/bin/invoicer" bin/
 
       - docker build -t app:build .
       # write the sha256 sum to an artifact to make image verification easier
-      - docker images --no-trunc | awk '/^app/ {print $3}' | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
+      - >
+        docker images --no-trunc | awk '/^app/ {print $3}' |
+        tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
       - docker tag app:build ${DOCKERHUB_REPO}:latest
       - docker push ${DOCKERHUB_REPO}:latest
