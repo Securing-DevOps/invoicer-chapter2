@@ -1,6 +1,5 @@
 # These environment variables must be set in CircleCI UI
 #
-# DOCKERHUB_REPO - docker hub repo, format: <username>/<repo>
 # DOCKER_EMAIL   - login info for docker hub
 # DOCKER_USER
 # DOCKER_PASS
@@ -31,11 +30,10 @@ deployment:
     # only when on the master branch
     branch: "master"
     commands:
-      - "[ ! -z $DOCKERHUB_REPO ]"
       - >
           docker login -e $DOCKER_EMAIL
           -u $DOCKER_USER -p $DOCKER_PASS
-      - echo ${DOCKERHUB_REPO}:${CIRCLE_TAG}
+      - echo securingdevops/invoicer:${CIRCLE_TAG}
       # Go applications in the busybox container must be built statically
       - >
           go install --ldflags '-extldflags "-static"'
@@ -43,10 +41,9 @@ deployment:
       - mkdir bin
       - cp "$GOPATH_HEAD/bin/invoicer" bin/
 
-      - docker build -t app:build .
+      - docker build -t securingdevops/invoicer .
       # write the sha256 sum to an artifact to make image verification easier
       - >
         docker images --no-trunc | awk '/^app/ {print $3}' |
         tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
-      - docker tag app:build ${DOCKERHUB_REPO}:latest
-      - docker push ${DOCKERHUB_REPO}:latest
+      - docker push securingdevops/invoicer
