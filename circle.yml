@@ -20,38 +20,26 @@ dependencies:
     - mkdir -p "$GOPATH_HEAD/bin"
     - ln -fs ${HOME}/${CIRCLE_PROJECT_REPONAME} ${GOPATH_BASE}/
 
-    # Go applications in the busybox container must be built statically
-    - go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
-
-    - mkdir bin
-    - cp "$GOPATH_HEAD/bin/invoicer" bin/
-
-    - docker build -t app:build .
-
-    # write the sha256 sum to an artifact to make image verification easier
-    - docker images --no-trunc | awk '/^app/ {print $3}' | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
-
 test:
   override:
     - go test github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
-# appropriately tag and push the container to dockerhub
 deployment:
   hub_latest:
+    # appropriately tag and push the container to dockerhub
+    # only when on the master branch
     branch: "master"
     commands:
       - "[ ! -z $DOCKERHUB_REPO ]"
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - echo ${DOCKERHUB_REPO}:${CIRCLE_TAG}
+      # Go applications in the busybox container must be built statically
+      - go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+      - mkdir bin
+      - cp "$GOPATH_HEAD/bin/invoicer" bin/
+
+      - docker build -t app:build .
+      # write the sha256 sum to an artifact to make image verification easier
+      - docker images --no-trunc | awk '/^app/ {print $3}' | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
       - docker tag app:build ${DOCKERHUB_REPO}:latest
       - docker push ${DOCKERHUB_REPO}:latest
-
-  hub_releases:
-    # push all tags
-    tag: /.*/
-    commands:
-      - "[ ! -z $DOCKERHUB_REPO ]"
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - echo ${DOCKERHUB_REPO}:${CIRCLE_TAG}
-      - docker tag app:build ${DOCKERHUB_REPO}:${CIRCLE_TAG}
-      - docker push ${DOCKERHUB_REPO}:${CIRCLE_TAG}
