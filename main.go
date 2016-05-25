@@ -42,7 +42,7 @@ func main() {
 			os.Getenv("INVOICER_POSTGRES_SSLMODE"),
 		))
 	} else {
-		db, err = gorm.Open("sqlite3", "/tmp/invoicer.db")
+		db, err = gorm.Open("sqlite3", "invoicer.db")
 	}
 	if err != nil {
 		panic("failed to connect database")
