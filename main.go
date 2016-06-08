@@ -98,6 +98,7 @@ func (iv *invoicer) getInvoice(w http.ResponseWriter, r *http.Request) {
 		httpError(w, http.StatusInternalServerError, "failed to retrieve invoice id %d: %s", vars["id"], err)
 		return
 	}
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonInvoice)
 }
