@@ -53,12 +53,18 @@ func main() {
 
 	// register routes
 	r := mux.NewRouter()
+	r.HandleFunc("/", getIndex).Methods("GET")
 	r.HandleFunc("/__heartbeat__", getHeartbeat).Methods("GET")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.getInvoice).Methods("GET")
 	r.HandleFunc("/invoice", iv.postInvoice).Methods("POST")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.putInvoice).Methods("PUT")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.deleteInvoice).Methods("DELETE")
 	r.HandleFunc("/__version__", getVersion).Methods("GET")
+
+	// handle static files
+	r.Handle("/statics/{staticfile}",
+		http.StripPrefix("/statics/", http.FileServer(http.Dir("./statics"))),
+	).Methods("GET")
 
 	// all set, start the http handler
 	log.Fatal(http.ListenAndServe(":8080", r))
@@ -164,6 +170,31 @@ func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	iv.db.Delete(&i1)
 	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte(fmt.Sprintf("deleted invoice %d", i1.ID)))
+}
+
+func getIndex(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(`
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Invoicer Web</title>
+        <script src="statics/jquery-1.12.4.min.js"></script>
+        <script src="statics/invoicer-cli.js"></script>
+        <link href="statics/style.css" rel="stylesheet">
+    </head>
+    <body>
+	<h1>Invoicer Web</h1>
+        <p class="desc-invoice"></p>
+        <div class="invoice-details">
+        </div>
+            <h3>Request an invoice by ID</h3>
+            <form id="invoiceGetter" method="GET">
+                <label>ID :</label>
+                <input id="invoiceid" type="text" />
+                <input type="submit" />
+            </form>
+    </body>
+</html>`))
 }
 
 func getHeartbeat(w http.ResponseWriter, r *http.Request) {
