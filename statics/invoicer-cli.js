@@ -29,16 +29,16 @@ $(document).ready(function() {
 });
 
 function getInvoice(invoiceid) {
-    $('.desc-invoice').replaceWith("Showing invoice ID " + invoiceid);
+    $('.desc-invoice').text("Showing invoice ID " + invoiceid);
     $.ajax({
         url: "/invoice/" + invoiceid,
         error: function (xhr, ajaxOptions, thrownError) {
             if(xhr.status==404) {
-                $('.invoice-details').replaceWith("<p>invoice not found</p>");
+                $('.invoice-details').text("invoice not found");
+                return;
             }
-        },
-        done: function(invoice) {
-            $('.invoice-details').replaceWith("<p>Invoice ID " + invoice.ID + " has amount $" + invoice.amount + "</p>");
         }
+    }).then(function(invoice) {
+        $('.invoice-details').text("Invoice ID " + invoice.ID + " has amount $" + invoice.amount);
     });
 }
