@@ -34,12 +34,12 @@ test:
     - docker build -t securingdevops/invoicer .
 
     # pull down the Zap baseline scanner
-    - docker pull owasp/zap2docker-weekly
+    #- docker pull owasp/zap2docker-weekly
 
     # Run zap against the invoicer
-    - docker run securingdevops/invoicer &
+    #- docker run securingdevops/invoicer &
     #- docker run -t owasp/zap2docker-weekly zap-baseline.py -t http://172.17.0.2:8080/
-    - docker kill $(docker ps |grep securingdevops/invoicer | awk '{print $1}')
+    #- docker kill $(docker ps |grep securingdevops/invoicer | awk '{print $1}')
 
 deployment:
   hub_latest:
