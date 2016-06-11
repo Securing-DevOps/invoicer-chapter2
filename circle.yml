@@ -38,7 +38,7 @@ test:
 
     # Run zap against the invoicer
     - docker run securingdevops/invoicer &
-    - docker run -t owasp/zap2docker-weekly zap-baseline.py -t http://172.17.0.2:8080/
+    #- docker run -t owasp/zap2docker-weekly zap-baseline.py -t http://172.17.0.2:8080/
     - docker kill $(docker ps |grep securingdevops/invoicer | awk '{print $1}')
 
 deployment:
