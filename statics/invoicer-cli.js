@@ -18,20 +18,24 @@ $(document).ready(function() {
 	if (invoiceid == undefined) {
 		invoiceid = "1";
 	}
-    getInvoice(invoiceid);
+    getInvoice(invoiceid, "undef");
 });
 
 $(document).ready(function() {
     $("form#invoiceGetter").submit(function(event) {
         event.preventDefault();
-        getInvoice($("#invoiceid").val());
+        getInvoice($("#invoiceid").val(), $("#CSRFToken").val());
 	});
 });
 
-function getInvoice(invoiceid) {
+function getInvoice(invoiceid, CSRFToken) {
     $('.desc-invoice').html("<p>Showing invoice ID " + invoiceid + "</p>");
     $.ajax({
         url: "/invoice/" + invoiceid,
+        beforeSend: function (request)
+        {
+            request.setRequestHeader("X-CSRF-Token", CSRFToken);
+        },
         error: function (xhr, ajaxOptions, thrownError) {
             if(xhr.status==404) {
                 $('.invoice-details').html("<p>invoice not found</p>");
