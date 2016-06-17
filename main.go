@@ -208,13 +208,17 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
         <p class="desc-invoice"></p>
         <div class="invoice-details">
         </div>
-            <h3>Request an invoice by ID</h3>
-            <form id="invoiceGetter" method="GET">
-                <label>ID :</label>
-                <input id="invoiceid" type="text" />
-                <input type="hidden" name="CSRFToken" value="` + makeCSRFToken() + `">
-                <input type="submit" />
-            </form>
+        <h3>Request an invoice by ID</h3>
+        <form id="invoiceGetter" method="GET">
+            <label>ID :</label>
+            <input id="invoiceid" type="text" />
+            <input type="hidden" name="CSRFToken" value="` + makeCSRFToken() + `">
+            <input type="submit" />
+        </form>
+        <form id="invoiceDeleter" method="DELETE">
+            <label>Delete this invoice</label>
+            <input type="submit" />
+        </form>
     </body>
 </html>`))
 }
