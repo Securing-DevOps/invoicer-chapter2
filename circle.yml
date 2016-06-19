@@ -14,9 +14,11 @@ machine:
 
 dependencies:
   override:
+    - rm -rf ${GOPATH_BASE}/
     - mkdir -p "$GOPATH_BASE"
-    - mkdir -p "$GOPATH_HEAD/bin"
-    - ln -fs ${HOME}/${CIRCLE_PROJECT_REPONAME} ${GOPATH_BASE}/
+    - mkdir -p "$GOPATH/bin"
+    - cp -r ${HOME}/${CIRCLE_PROJECT_REPONAME} ${GOPATH_BASE}/
+    - go get github.com/govend/govend
 
 test:
   override:
@@ -28,7 +30,7 @@ test:
         go install --ldflags '-extldflags "-static"'
         github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
     - mkdir bin
-    - cp "$GOPATH_HEAD/bin/invoicer" bin/
+    - cp "$GOPATH_HEAD/bin/$CIRCLE_PROJECT_REPONAME" bin/
 
     # Build a docker container for the invoicer
     - docker build -t securingdevops/invoicer .
@@ -40,6 +42,10 @@ test:
     #- docker run securingdevops/invoicer &
     #- docker run -t owasp/zap2docker-weekly zap-baseline.py -t http://172.17.0.2:8080/
     #- docker kill $(docker ps |grep securingdevops/invoicer | awk '{print $1}')
+
+    - cd ${GOPATH_BASE}/${CIRCLE_PROJECT_REPONAME}
+    - GOPATH="$GOPATH_HEAD" govend -u
+    - git diff --quiet
 
 deployment:
   hub_latest:
