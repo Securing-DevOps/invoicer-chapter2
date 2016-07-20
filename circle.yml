@@ -4,6 +4,7 @@
 # DOCKER_USER
 # DOCKER_PASS
 #
+# Read the README for more information.
 machine:
   environment:
     GOPATH_HEAD: "$(echo $GOPATH | cut -d ':' -f 1)"
