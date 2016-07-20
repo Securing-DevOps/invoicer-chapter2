@@ -5,8 +5,37 @@ A simple REST API that manages invoices.
 
 Pull the live container using `docker pull securingdevops/invoicer`.
 
-Build
------
+Get your own copy
+-----------------
+
+To try out the code in this repository, first create a fork in your own github
+account, then sign up for circleci and build the project.
+
+The build will initially fail because it lacks the Docker credentials to push
+the invoicer's image to dockerhub.
+
+Head over to hub.docker.com, create an account, then create a repository to store
+the docker containers into.
+
+Head back to CircleCi and in the "Project Setting", add the following
+"Environment Variables" with the appropriate values.
+
+- DOCKER_EMAIL
+- DOCKER_USER
+- DOCKER_PASS
+
+These variable will allow CircleCI to upload the docker container of the
+invoicer into your own account. Once added, trigger a rebuild of the CircleCI
+job and it should succeed and upload the container without issue.
+
+You can then pull and run the container from your repository as follows:
+
+```bash
+$ docker run -it securingdevops/invoicer-chapter2
+```
+
+Manual build
+------------
 
 Build a statically linked invoicer binary. Requires Go 1.6.
 
@@ -20,8 +49,11 @@ Then build the container.
 $ docker build -t securingdevops/invoicer .
 ```
 
-Configure
----------
+Database Configuration
+----------------------
+
+The invoicer will automatically create a local sqlite database by default, but
+if you want to run with postgres, follow these instructions.
 
 Create a postgres database named `invoicer` and grant user `invoicer` full
 access to it.
