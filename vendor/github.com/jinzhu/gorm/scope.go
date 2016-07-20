@@ -730,7 +730,15 @@ func (scope *Scope) orderSQL() string {
 
 	var orders []string
 	for _, order := range scope.Search.orders {
-		orders = append(orders, scope.quoteIfPossible(order))
+		if str, ok := order.(string); ok {
+			orders = append(orders, scope.quoteIfPossible(str))
+		} else if expr, ok := order.(*expr); ok {
+			exp := expr.expr
+			for _, arg := range expr.args {
+				exp = strings.Replace(exp, "?", scope.AddToVars(arg), 1)
+			}
+			orders = append(orders, exp)
+		}
 	}
 	return " ORDER BY " + strings.Join(orders, ",")
 }
@@ -1117,8 +1125,7 @@ func (scope *Scope) addIndex(unique bool, indexName string, column ...string) {
 }
 
 func (scope *Scope) addForeignKey(field string, dest string, onDelete string, onUpdate string) {
-	var keyName = fmt.Sprintf("%s_%s_%s_foreign", scope.TableName(), field, dest)
-	keyName = regexp.MustCompile("(_*[^a-zA-Z]+_*|_+)").ReplaceAllString(keyName, "_")
+	keyName := scope.Dialect().BuildForeignKeyName(scope.TableName(), field, dest)
 
 	if scope.Dialect().HasForeignKey(scope.TableName(), keyName) {
 		return
@@ -1158,17 +1165,25 @@ func (scope *Scope) autoIndex() *Scope {
 
 	for _, field := range scope.GetStructFields() {
 		if name, ok := field.TagSettings["INDEX"]; ok {
-			if name == "INDEX" {
-				name = fmt.Sprintf("idx_%v_%v", scope.TableName(), field.DBName)
+			names := strings.Split(name, ",")
+
+			for _, name := range names {
+				if name == "INDEX" || name == "" {
+					name = fmt.Sprintf("idx_%v_%v", scope.TableName(), field.DBName)
+				}
+				indexes[name] = append(indexes[name], field.DBName)
 			}
-			indexes[name] = append(indexes[name], field.DBName)
 		}
 
 		if name, ok := field.TagSettings["UNIQUE_INDEX"]; ok {
-			if name == "UNIQUE_INDEX" {
-				name = fmt.Sprintf("uix_%v_%v", scope.TableName(), field.DBName)
+			names := strings.Split(name, ",")
+
+			for _, name := range names {
+				if name == "UNIQUE_INDEX" || name == "" {
+					name = fmt.Sprintf("uix_%v_%v", scope.TableName(), field.DBName)
+				}
+				uniqueIndexes[name] = append(uniqueIndexes[name], field.DBName)
 			}
-			uniqueIndexes[name] = append(uniqueIndexes[name], field.DBName)
 		}
 	}
 
@@ -1222,6 +1237,7 @@ func (scope *Scope) getColumnAsScope(column string) *Scope {
 				fieldType = fieldType.Elem()
 			}
 
+			resultsMap := map[interface{}]bool{}
 			results := reflect.New(reflect.SliceOf(reflect.PtrTo(fieldType))).Elem()
 
 			for i := 0; i < indirectScopeValue.Len(); i++ {
@@ -1229,11 +1245,13 @@ func (scope *Scope) getColumnAsScope(column string) *Scope {
 
 				if result.Kind() == reflect.Slice {
 					for j := 0; j < result.Len(); j++ {
-						if elem := result.Index(j); elem.CanAddr() {
+						if elem := result.Index(j); elem.CanAddr() && resultsMap[elem.Addr()] != true {
+							resultsMap[elem.Addr()] = true
 							results = reflect.Append(results, elem.Addr())
 						}
 					}
-				} else if result.CanAddr() {
+				} else if result.CanAddr() && resultsMap[result.Addr()] != true {
+					resultsMap[result.Addr()] = true
 					results = reflect.Append(results, result.Addr())
 				}
 			}

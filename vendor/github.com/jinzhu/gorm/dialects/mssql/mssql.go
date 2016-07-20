@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -24,6 +25,7 @@ func init() {
 
 type mssql struct {
 	db *sql.DB
+	gorm.DefaultForeignKeyNamer
 }
 
 func (mssql) GetName() string {
@@ -111,31 +113,30 @@ func (s mssql) HasForeignKey(tableName string, foreignKeyName string) bool {
 
 func (s mssql) HasTable(tableName string) bool {
 	var count int
-	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.tables WHERE table_name = ? AND table_catalog = ?", tableName, s.currentDatabase()).Scan(&count)
+	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.tables WHERE table_name = ? AND table_catalog = ?", tableName, s.CurrentDatabase()).Scan(&count)
 	return count > 0
 }
 
 func (s mssql) HasColumn(tableName string, columnName string) bool {
 	var count int
-	s.db.QueryRow("SELECT count(*) FROM information_schema.columns WHERE table_catalog = ? AND table_name = ? AND column_name = ?", s.currentDatabase(), tableName, columnName).Scan(&count)
+	s.db.QueryRow("SELECT count(*) FROM information_schema.columns WHERE table_catalog = ? AND table_name = ? AND column_name = ?", s.CurrentDatabase(), tableName, columnName).Scan(&count)
 	return count > 0
 }
 
-func (s mssql) currentDatabase() (name string) {
+func (s mssql) CurrentDatabase() (name string) {
 	s.db.QueryRow("SELECT DB_NAME() AS [Current Database]").Scan(&name)
 	return
 }
 
-func (mssql) LimitAndOffsetSQL(limit, offset int) (sql string) {
-	if limit > 0 || offset > 0 {
-		if offset < 0 {
-			offset = 0
+func (mssql) LimitAndOffsetSQL(limit, offset interface{}) (sql string) {
+	if limit != nil {
+		if parsedLimit, err := strconv.ParseInt(fmt.Sprint(limit), 0, 0); err == nil && parsedLimit > 0 {
+			sql += fmt.Sprintf(" FETCH NEXT %d ROWS ONLY", parsedLimit)
 		}
-
-		sql += fmt.Sprintf(" OFFSET %d ROWS", offset)
-
-		if limit >= 0 {
-			sql += fmt.Sprintf(" FETCH NEXT %d ROWS ONLY", limit)
+	}
+	if offset != nil {
+		if parsedOffset, err := strconv.ParseInt(fmt.Sprint(offset), 0, 0); err == nil && parsedOffset > 0 {
+			sql += fmt.Sprintf(" OFFSET %d ROWS", parsedOffset)
 		}
 	}
 	return
