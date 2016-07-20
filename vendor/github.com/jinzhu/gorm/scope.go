@@ -730,7 +730,15 @@ func (scope *Scope) orderSQL() string {
 
 	var orders []string
 	for _, order := range scope.Search.orders {
-		orders = append(orders, scope.quoteIfPossible(order))
+		if str, ok := order.(string); ok {
+			orders = append(orders, scope.quoteIfPossible(str))
+		} else if expr, ok := order.(*expr); ok {
+			exp := expr.expr
+			for _, arg := range expr.args {
+				exp = strings.Replace(exp, "?", scope.AddToVars(arg), 1)
+			}
+			orders = append(orders, exp)
+		}
 	}
 	return " ORDER BY " + strings.Join(orders, ",")
 }
@@ -1229,6 +1237,7 @@ func (scope *Scope) getColumnAsScope(column string) *Scope {
 				fieldType = fieldType.Elem()
 			}
 
+			resultsMap := map[interface{}]bool{}
 			results := reflect.New(reflect.SliceOf(reflect.PtrTo(fieldType))).Elem()
 
 			for i := 0; i < indirectScopeValue.Len(); i++ {
@@ -1236,11 +1245,13 @@ func (scope *Scope) getColumnAsScope(column string) *Scope {
 
 				if result.Kind() == reflect.Slice {
 					for j := 0; j < result.Len(); j++ {
-						if elem := result.Index(j); elem.CanAddr() {
+						if elem := result.Index(j); elem.CanAddr() && resultsMap[elem.Addr()] != true {
+							resultsMap[elem.Addr()] = true
 							results = reflect.Append(results, elem.Addr())
 						}
 					}
-				} else if result.CanAddr() {
+				} else if result.CanAddr() && resultsMap[result.Addr()] != true {
+					resultsMap[result.Addr()] = true
 					results = reflect.Append(results, result.Addr())
 				}
 			}

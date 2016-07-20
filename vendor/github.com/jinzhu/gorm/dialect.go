@@ -35,7 +35,7 @@ type Dialect interface {
 	HasColumn(tableName string, columnName string) bool
 
 	// LimitAndOffsetSQL return generated SQL with Limit and Offset, as mssql has special case
-	LimitAndOffsetSQL(limit, offset int) string
+	LimitAndOffsetSQL(limit, offset interface{}) string
 	// SelectFromDummyTable return select values, for most dbs, `SELECT values` just works, mysql needs `SELECT value FROM DUAL`
 	SelectFromDummyTable() string
 	// LastInsertIdReturningSuffix most dbs support LastInsertId, but postgres needs to use `RETURNING`
@@ -43,6 +43,9 @@ type Dialect interface {
 
 	// BuildForeignKeyName returns a foreign key name for the given table, field and reference
 	BuildForeignKeyName(tableName, field, dest string) string
+
+	// CurrentDatabase return current database name
+	CurrentDatabase() string
 }
 
 var dialectsMap = map[string]Dialect{}

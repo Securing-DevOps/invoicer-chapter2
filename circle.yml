@@ -4,10 +4,12 @@
 # DOCKER_USER
 # DOCKER_PASS
 #
+# Read the README for more information.
 machine:
   environment:
     GOPATH_HEAD: "$(echo $GOPATH | cut -d ':' -f 1)"
     GOPATH_BASE: "$GOPATH_HEAD/src/github.com/$CIRCLE_PROJECT_USERNAME"
+    GO15VENDOREXPERIMENT: 1
 
   services:
     - docker
@@ -54,13 +56,19 @@ deployment:
     branch: "master"
     commands:
       - >
-          docker login -e $DOCKER_EMAIL
-          -u $DOCKER_USER -p $DOCKER_PASS
-      - echo securingdevops/invoicer:${CIRCLE_TAG}
+          docker login -e ${DOCKER_EMAIL}
+          -u ${DOCKER_USER} -p ${DOCKER_PASS}
+      - echo ${DOCKER_USER}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}
+      # Go applications in the busybox container must be built statically
+      - >
+          go install --ldflags '-extldflags "-static"'
+          github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+      - mkdir bin
+      - cp "$GOPATH_HEAD/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer
+
+      - docker build -t ${DOCKER_USER}/${CIRCLE_PROJECT_REPONAME} .
       # write the sha256 sum to an artifact to make image verification easier
       - >
-        docker images --no-trunc securingdevops/invoicer | 
-        awk '/^app/ {print $3}' |
+        docker images --no-trunc | awk '/^app/ {print $3}' |
         tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
-
-      - docker push securingdevops/invoicer
+      - docker push ${DOCKER_USER}/${CIRCLE_PROJECT_REPONAME}

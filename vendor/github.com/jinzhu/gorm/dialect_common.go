@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -92,7 +93,7 @@ func (commonDialect) DataTypeOf(field *StructField) string {
 
 func (s commonDialect) HasIndex(tableName string, indexName string) bool {
 	var count int
-	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = ? AND table_name = ? AND index_name = ?", s.currentDatabase(), tableName, indexName).Scan(&count)
+	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.STATISTICS WHERE table_schema = ? AND table_name = ? AND index_name = ?", s.CurrentDatabase(), tableName, indexName).Scan(&count)
 	return count > 0
 }
 
@@ -107,28 +108,30 @@ func (s commonDialect) HasForeignKey(tableName string, foreignKeyName string) bo
 
 func (s commonDialect) HasTable(tableName string) bool {
 	var count int
-	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = ? AND table_name = ?", s.currentDatabase(), tableName).Scan(&count)
+	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = ? AND table_name = ?", s.CurrentDatabase(), tableName).Scan(&count)
 	return count > 0
 }
 
 func (s commonDialect) HasColumn(tableName string, columnName string) bool {
 	var count int
-	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = ? AND table_name = ? AND column_name = ?", s.currentDatabase(), tableName, columnName).Scan(&count)
+	s.db.QueryRow("SELECT count(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = ? AND table_name = ? AND column_name = ?", s.CurrentDatabase(), tableName, columnName).Scan(&count)
 	return count > 0
 }
 
-func (s commonDialect) currentDatabase() (name string) {
+func (s commonDialect) CurrentDatabase() (name string) {
 	s.db.QueryRow("SELECT DATABASE()").Scan(&name)
 	return
 }
 
-func (commonDialect) LimitAndOffsetSQL(limit, offset int) (sql string) {
-	if limit > 0 || offset > 0 {
-		if limit >= 0 {
-			sql += fmt.Sprintf(" LIMIT %d", limit)
+func (commonDialect) LimitAndOffsetSQL(limit, offset interface{}) (sql string) {
+	if limit != nil {
+		if parsedLimit, err := strconv.ParseInt(fmt.Sprint(limit), 0, 0); err == nil && parsedLimit > 0 {
+			sql += fmt.Sprintf(" LIMIT %d", parsedLimit)
 		}
-		if offset >= 0 {
-			sql += fmt.Sprintf(" OFFSET %d", offset)
+	}
+	if offset != nil {
+		if parsedOffset, err := strconv.ParseInt(fmt.Sprint(offset), 0, 0); err == nil && parsedOffset > 0 {
+			sql += fmt.Sprintf(" OFFSET %d", parsedOffset)
 		}
 	}
 	return
