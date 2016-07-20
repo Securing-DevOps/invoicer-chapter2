@@ -8,6 +8,7 @@ machine:
   environment:
     GOPATH_HEAD: "$(echo $GOPATH | cut -d ':' -f 1)"
     GOPATH_BASE: "$GOPATH_HEAD/src/github.com/$CIRCLE_PROJECT_USERNAME"
+    GO15VENDOREXPERIMENT: 1
 
   services:
     - docker
