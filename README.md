@@ -3,7 +3,13 @@ Securing DevOps's invoicer
 
 A simple REST API that manages invoices.
 
-Pull the live container using `docker pull securingdevops/invoicer`.
+The master branch is kept at https://securing-devops.com/invoicer but if you are
+interested in chapter-specific versions of the invoicer, you may want to check out:
+
+- Chapter 2: https://securing-devops.com/ch02/invoicer
+- Chapter 3: https://securing-devops.com/ch03/invoicer
+
+To pull the live container of the master branch, use `docker pull securingdevops/invoicer`.
 
 Get your own copy
 -----------------
