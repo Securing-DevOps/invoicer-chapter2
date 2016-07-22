@@ -32,7 +32,7 @@ test:
     - >
         go install --ldflags '-extldflags "-static"'
         github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
-    - mkdir bin
+    - '[ ! -e bin ] && mkdir bin'
     - cp "$GOPATH_HEAD/bin/$CIRCLE_PROJECT_REPONAME" bin/
 
     # Build a docker container for the invoicer
