@@ -37,12 +37,12 @@ test:
     - docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .
 
     # pull down the Zap baseline scanner
-    #- docker pull owasp/zap2docker-weekly
+    - docker pull owasp/zap2docker-weekly
 
     # Run zap against the invoicer
-    #- docker run securingdevops/invoicer &
-    #- docker run -t owasp/zap2docker-weekly zap-baseline.py -t http://172.17.0.2:8080/
-    #- docker kill $(docker ps |grep securingdevops/invoicer | awk '{print $1}')
+    - docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} &
+    - docker run -t owasp/zap2docker-weekly zap-baseline.py -u https://raw.githubusercontent.com/Securing-DevOps/invoicer/master/zap-baseline.conf -t http://172.17.0.2:8080/
+    - docker kill $(docker ps |grep "${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}" | awk '{print $1}')
 
     # Run GOVEND against the invoicer to check if outdated dependencies are present
     - 'GOPATH="$GOPATH_HEAD"; ( cd ${GOPATH_BASE}/${CIRCLE_PROJECT_REPONAME} && govend -u && git diff --quiet )'
