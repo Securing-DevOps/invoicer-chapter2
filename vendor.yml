@@ -6,7 +6,7 @@ vendors:
 - path: github.com/go-sql-driver/mysql
   rev: 0b58b37b664c21f3010e836f1b931e1d0b0b0685
 - path: github.com/golang/protobuf
-  rev: c3cefd437628a0b7d31b34fe44b3a7a540e98527
+  rev: 2c1988e8c18d14b142c0b472624f71647cf39adb
 - path: github.com/gorilla/context
   rev: aed02d124ae4a0e94fea4541c8effd05bf0c8296
 - path: github.com/gorilla/mux
@@ -16,7 +16,7 @@ vendors:
 - path: github.com/gorilla/sessions
   rev: 56ba4b0a11da87516629a57408a5f7e4c8ea7b0b
 - path: github.com/jinzhu/gorm
-  rev: a646b13548ec0aa812fe805b2780f460dd2771b6
+  rev: 2f27f0f27f12f5c68ae4b12213b34fdff312dcf3
 - path: github.com/jinzhu/inflection
   rev: 8f4d3a0d04ce0b7c0cf3126fb98524246d00d102
 - path: github.com/jinzhu/now
@@ -24,16 +24,16 @@ vendors:
 - path: github.com/lib/pq
   rev: 80f8150043c80fb52dee6bc863a709cdac7ec8f8
 - path: github.com/mattn/go-sqlite3
-  rev: e118d4451349065b8e7ce0f0af32e033995363f8
+  rev: c3e9588849195eefa783417c3a53d092f6e93526
 - path: github.com/qor/inflection
   rev: 8f4d3a0d04ce0b7c0cf3126fb98524246d00d102
 - path: github.com/wader/gormstore
   rev: ee9717350abc7fc759245765c1524d8aeb357b1f
 - path: golang.org/x/crypto
-  rev: e0d166c33c321d0ff863f459a5882096e334f508
+  rev: a548aac93ed489257b9d959b40fe1e8c1e20778c
 - path: golang.org/x/net
-  rev: 075e191f18186a8ff2becaf64478e30f4545cdad
+  rev: 07b51741c1d6423d4a6abab1c49940ec09cb1aaf
 - path: golang.org/x/oauth2
-  rev: 04e1573abc896e70388bd387a69753c378d46466
+  rev: 4784bb855e56a530f1ce5d788959359ed6cb4a16
 - path: google.golang.org/appengine
-  rev: b4728023490a62e70ba739ff62aa65ffcca84210
+  rev: e951d3868b377b14f4e60efa3a301532ee3c1ebf

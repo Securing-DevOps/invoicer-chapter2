@@ -32,14 +32,6 @@ func init() {
 		panic(fmt.Sprintf("No error should happen when connecting to test database, but got err=%+v", err))
 	}
 
-	// DB.SetLogger(Logger{log.New(os.Stdout, "\r\n", 0)})
-	// DB.SetLogger(log.New(os.Stdout, "\r\n", 0))
-	if os.Getenv("DEBUG") == "true" {
-		DB.LogMode(true)
-	}
-
-	DB.DB().SetMaxIdleConns(10)
-
 	runMigration()
 }
 
@@ -72,6 +64,15 @@ func OpenTestConnection() (db *gorm.DB, err error) {
 		fmt.Println("testing sqlite3...")
 		db, err = gorm.Open("sqlite3", filepath.Join(os.TempDir(), "gorm.db"))
 	}
+
+	// db.SetLogger(Logger{log.New(os.Stdout, "\r\n", 0)})
+	// db.SetLogger(log.New(os.Stdout, "\r\n", 0))
+	if os.Getenv("DEBUG") == "true" {
+		db.LogMode(true)
+	}
+
+	db.DB().SetMaxIdleConns(10)
+
 	return
 }
 
@@ -537,6 +538,12 @@ func TestJoins(t *testing.T) {
 	DB.Joins("join emails on emails.user_id = users.id AND emails.email = ?", "join1@example.com").Joins("join credit_cards on credit_cards.user_id = users.id AND credit_cards.number = ?", "422222222222").Where("name = ?", "joins").First(&users4)
 	if len(users4) != 0 {
 		t.Errorf("should find no user when searching with unexisting credit card")
+	}
+
+	var users5 []User
+	db5 := DB.Joins("join emails on emails.user_id = users.id AND emails.email = ?", "join1@example.com").Joins("join credit_cards on credit_cards.user_id = users.id AND credit_cards.number = ?", "411111111111").Where(User{Id:1}).Where(Email{Id:1}).Not(Email{Id:10}).First(&users5)
+	if db5.Error != nil {
+		t.Errorf("Should not raise error for join where identical fields in different tables. Error: %s", db5.Error.Error())
 	}
 }
 

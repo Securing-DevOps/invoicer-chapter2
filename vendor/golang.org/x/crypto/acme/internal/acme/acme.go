@@ -48,13 +48,13 @@ const LetsEncryptURL = "https://acme-v01.api.letsencrypt.org/directory"
 // 	client := &Client{Key: key}
 //
 type Client struct {
-	// HTTPClient optionally specifies an HTTP client to use
-	// instead of http.DefaultClient.
-	HTTPClient *http.Client
-
 	// Key is the account key used to register with a CA and sign requests.
 	// Key.Public() must return a *rsa.PublicKey or *ecdsa.PublicKey.
 	Key crypto.Signer
+
+	// HTTPClient optionally specifies an HTTP client to use
+	// instead of http.DefaultClient.
+	HTTPClient *http.Client
 
 	// DirectoryURL points to the CA directory endpoint.
 	// If empty, LetsEncryptURL is used.
@@ -195,18 +195,18 @@ func (c *Client) FetchCert(ctx context.Context, url string, bundle bool) ([][]by
 	}
 }
 
-// AcceptTOS always returns true to indicate the acceptance of a CA Terms of Service
+// AcceptTOS always returns true to indicate the acceptance of a CA's Terms of Service
 // during account registration. See Register method of Client for more details.
-func AcceptTOS(string) bool { return true }
+func AcceptTOS(tosURL string) bool { return true }
 
 // Register creates a new account registration by following the "new-reg" flow.
 // It returns registered account. The a argument is not modified.
 //
-// The registration may require the caller to agree to the CA Terms of Service (TOS).
+// The registration may require the caller to agree to the CA's Terms of Service (TOS).
 // If so, and the account has not indicated the acceptance of the terms (see Account for details),
 // Register calls prompt with a TOS URL provided by the CA. Prompt should report
 // whether the caller agrees to the terms. To always accept the terms, the caller can use AcceptTOS.
-func (c *Client) Register(a *Account, prompt func(tos string) bool) (*Account, error) {
+func (c *Client) Register(a *Account, prompt func(tosURL string) bool) (*Account, error) {
 	if _, err := c.Discover(); err != nil {
 		return nil, err
 	}
@@ -229,14 +229,24 @@ func (c *Client) Register(a *Account, prompt func(tos string) bool) (*Account, e
 // GetReg retrieves an existing registration.
 // The url argument is an Account URI.
 func (c *Client) GetReg(url string) (*Account, error) {
-	a := &Account{URI: url}
-	return c.doReg(url, "reg", a)
+	a, err := c.doReg(url, "reg", nil)
+	if err != nil {
+		return nil, err
+	}
+	a.URI = url
+	return a, nil
 }
 
 // UpdateReg updates an existing registration.
 // It returns an updated account copy. The provided account is not modified.
 func (c *Client) UpdateReg(a *Account) (*Account, error) {
-	return c.doReg(a.URI, "reg", a)
+	uri := a.URI
+	a, err := c.doReg(uri, "reg", a)
+	if err != nil {
+		return nil, err
+	}
+	a.URI = uri
+	return a, nil
 }
 
 // Authorize performs the initial step in an authorization flow.
@@ -269,10 +279,10 @@ func (c *Client) Authorize(domain string) (*Authorization, error) {
 
 	var v wireAuthz
 	if err := json.NewDecoder(res.Body).Decode(&v); err != nil {
-		return nil, fmt.Errorf("Decode: %v", err)
+		return nil, fmt.Errorf("acme: invalid response: %v", err)
 	}
 	if v.Status != StatusPending {
-		return nil, fmt.Errorf("Unexpected status: %s", v.Status)
+		return nil, fmt.Errorf("acme: unexpected status: %s", v.Status)
 	}
 	return v.authorization(res.Header.Get("Location")), nil
 }
@@ -291,7 +301,7 @@ func (c *Client) GetAuthz(url string) (*Authorization, error) {
 	}
 	var v wireAuthz
 	if err := json.NewDecoder(res.Body).Decode(&v); err != nil {
-		return nil, fmt.Errorf("Decode: %v", err)
+		return nil, fmt.Errorf("acme: invalid response: %v", err)
 	}
 	return v.authorization(url), nil
 }
@@ -310,7 +320,7 @@ func (c *Client) GetChallenge(url string) (*Challenge, error) {
 	}
 	v := wireChallenge{URI: url}
 	if err := json.NewDecoder(res.Body).Decode(&v); err != nil {
-		return nil, fmt.Errorf("Decode: %v", err)
+		return nil, fmt.Errorf("acme: invalid response: %v", err)
 	}
 	return v.challenge(), nil
 }
@@ -347,7 +357,7 @@ func (c *Client) Accept(chal *Challenge) (*Challenge, error) {
 
 	var v wireChallenge
 	if err := json.NewDecoder(res.Body).Decode(&v); err != nil {
-		return nil, fmt.Errorf("Decode: %v", err)
+		return nil, fmt.Errorf("acme: invalid response: %v", err)
 	}
 	return v.challenge(), nil
 }
@@ -380,16 +390,22 @@ func (c *Client) HTTP01Handler(token string) http.Handler {
 // For more details on TLS-SNI-01 see https://tools.ietf.org/html/draft-ietf-acme-acme-01#section-7.3.
 //
 // The token argument is a Challenge.Token value.
-// The returned certificate is valid for the next 24 hours.
-func (c *Client) TLSSNI01ChallengeCert(token string) (tls.Certificate, error) {
+//
+// The returned certificate is valid for the next 24 hours and must be presented only when
+// the server name of the client hello matches exactly the returned name value.
+func (c *Client) TLSSNI01ChallengeCert(token string) (cert tls.Certificate, name string, err error) {
 	ka, err := keyAuth(c.Key.Public(), token)
 	if err != nil {
-		return tls.Certificate{}, nil
+		return tls.Certificate{}, "", err
 	}
 	b := sha256.Sum256([]byte(ka))
 	h := hex.EncodeToString(b[:])
-	name := fmt.Sprintf("%s.%s.acme.invalid", h[:32], h[32:])
-	return tlsChallengeCert(name)
+	name = fmt.Sprintf("%s.%s.acme.invalid", h[:32], h[32:])
+	cert, err = tlsChallengeCert(name)
+	if err != nil {
+		return tls.Certificate{}, "", err
+	}
+	return cert, name, nil
 }
 
 // TLSSNI02ChallengeCert creates a certificate for TLS-SNI-02 challenge response.
@@ -398,21 +414,27 @@ func (c *Client) TLSSNI01ChallengeCert(token string) (tls.Certificate, error) {
 // https://tools.ietf.org/html/draft-ietf-acme-acme-03#section-7.3.
 //
 // The token argument is a Challenge.Token value.
-// The returned certificate is valid for the next 24 hours.
-func (c *Client) TLSSNI02ChallengeCert(token string) (tls.Certificate, error) {
+//
+// The returned certificate is valid for the next 24 hours and must be presented only when
+// the server name in the client hello matches exactly the returned name value.
+func (c *Client) TLSSNI02ChallengeCert(token string) (cert tls.Certificate, name string, err error) {
 	b := sha256.Sum256([]byte(token))
 	h := hex.EncodeToString(b[:])
 	sanA := fmt.Sprintf("%s.%s.token.acme.invalid", h[:32], h[32:])
 
 	ka, err := keyAuth(c.Key.Public(), token)
 	if err != nil {
-		return tls.Certificate{}, nil
+		return tls.Certificate{}, "", err
 	}
 	b = sha256.Sum256([]byte(ka))
 	h = hex.EncodeToString(b[:])
 	sanB := fmt.Sprintf("%s.%s.ka.acme.invalid", h[:32], h[32:])
 
-	return tlsChallengeCert(sanA, sanB)
+	cert, err = tlsChallengeCert(sanA, sanB)
+	if err != nil {
+		return tls.Certificate{}, "", err
+	}
+	return cert, sanA, nil
 }
 
 func (c *Client) httpClient() *http.Client {
@@ -478,7 +500,7 @@ func (c *Client) doReg(url string, typ string, acct *Account) (*Account, error) 
 		Certificates   string
 	}
 	if err := json.NewDecoder(res.Body).Decode(&v); err != nil {
-		return nil, fmt.Errorf("Decode: %v", err)
+		return nil, fmt.Errorf("acme: invalid response: %v", err)
 	}
 	return &Account{
 		URI:            res.Header.Get("Location"),
@@ -494,7 +516,7 @@ func (c *Client) doReg(url string, typ string, acct *Account) (*Account, error) 
 func responseCert(client *http.Client, res *http.Response, bundle bool) ([][]byte, error) {
 	b, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, fmt.Errorf("ReadAll: %v", err)
+		return nil, fmt.Errorf("acme: response stream: %v", err)
 	}
 	cert := [][]byte{b}
 	if !bundle {
@@ -504,7 +526,7 @@ func responseCert(client *http.Client, res *http.Response, bundle bool) ([][]byt
 	// append ca cert
 	up := linkHeader(res.Header, "up")
 	if up == "" {
-		return nil, errors.New("rel=up link not found")
+		return nil, errors.New("acme: rel=up link not found")
 	}
 	res, err = client.Get(up)
 	if err != nil {
@@ -558,7 +580,7 @@ func fetchNonce(client *http.Client, url string) (string, error) {
 	defer resp.Body.Close()
 	enc := resp.Header.Get("replay-nonce")
 	if enc == "" {
-		return "", errors.New("nonce not found")
+		return "", errors.New("acme: nonce not found")
 	}
 	return enc, nil
 }
@@ -615,12 +637,10 @@ func tlsChallengeCert(san ...string) (tls.Certificate, error) {
 		DNSNames:              san,
 	}
 	der, err := x509.CreateCertificate(rand.Reader, &t, &t, &key.PublicKey, key)
-	if err != nil {
-		return tls.Certificate{}, err
-	}
-	cert := encodePEM("CERTIFICATE", der)
-	keyp := encodePEM("RSA PRIVATE KEY", x509.MarshalPKCS1PrivateKey(key))
-	return tls.X509KeyPair(cert, keyp)
+	return tls.Certificate{
+		Certificate: [][]byte{der},
+		PrivateKey:  key,
+	}, nil
 }
 
 // encodePEM returns b encoded as PEM with block of type typ.
