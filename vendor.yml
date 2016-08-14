@@ -1,6 +1,6 @@
 vendors:
 - path: github.com/denisenkom/go-mssqldb
-  rev: c5885153c18c8e4cdde7608f3fa65c2df212d3cb
+  rev: fbf0a491e5ec011522c8870da9b0553135e2f9da
 - path: github.com/erikstmartin/go-testdb
   rev: 8d10e4a1bae52cd8b81ffdec3445890d6dccab3d
 - path: github.com/go-sql-driver/mysql
