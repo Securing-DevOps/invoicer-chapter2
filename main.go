@@ -209,6 +209,7 @@ func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Security-Policy", "default-src 'self'; child-src 'self;")
 	w.Header().Add("X-Frame-Options", "SAMEORIGIN")
+	w.Header().Add("X-Content-Type-Options", "nosniff")
 	w.Header().Add("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
 	w.Header().Add("Public-Key-Pins", `max-age=1296000; includeSubDomains; pin-sha256="YLh1dUR9y6Kja30RrAn7JKnbQG/uEtLMkBgFF2Fuihg="; pin-sha256="++MBgDH5WGvL9Bcn5Be30cRcL0f5O+NyoXuWtQdX1aI="`)
 	w.Write([]byte(`
