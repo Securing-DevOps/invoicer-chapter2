@@ -25,8 +25,6 @@ vendors:
   rev: 80f8150043c80fb52dee6bc863a709cdac7ec8f8
 - path: github.com/mattn/go-sqlite3
   rev: c3e9588849195eefa783417c3a53d092f6e93526
-- path: github.com/qor/inflection
-  rev: 8f4d3a0d04ce0b7c0cf3126fb98524246d00d102
 - path: github.com/wader/gormstore
   rev: ee9717350abc7fc759245765c1524d8aeb357b1f
 - path: golang.org/x/crypto
