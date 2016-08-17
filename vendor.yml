@@ -6,19 +6,19 @@ vendors:
 - path: github.com/go-sql-driver/mysql
   rev: 0b58b37b664c21f3010e836f1b931e1d0b0b0685
 - path: github.com/golang/protobuf
-  rev: 2c1988e8c18d14b142c0b472624f71647cf39adb
+  rev: f592bd283e9ef86337a432eb50e592278c3d534d
 - path: github.com/gorilla/context
-  rev: aed02d124ae4a0e94fea4541c8effd05bf0c8296
+  rev: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - path: github.com/gorilla/mux
-  rev: 780415097119f6f61c55475fe59b66f3c3e9ea53
+  rev: cf79e51a62d8219d52060dfc1b4e810414ba2d15
 - path: github.com/gorilla/securecookie
-  rev: ff356348f74133a59d3e93aa24b5b4551b6fe90d
+  rev: c13558c2b1c44da35e0eb043053609a5ba3a1f19
 - path: github.com/gorilla/sessions
-  rev: 56ba4b0a11da87516629a57408a5f7e4c8ea7b0b
+  rev: 1bbba13ba476e132b5a0739b18f1653c3e57d3c1
 - path: github.com/jinzhu/gorm
-  rev: 2f27f0f27f12f5c68ae4b12213b34fdff312dcf3
+  rev: 35a2a004d880453f0bbd3716bcc63da1cb15b77b
 - path: github.com/jinzhu/inflection
-  rev: 8f4d3a0d04ce0b7c0cf3126fb98524246d00d102
+  rev: 74387dc39a75e970e7a3ae6a3386b5bd2e5c5cff
 - path: github.com/jinzhu/now
   rev: d9861969c7a7e84746d341c09020c2ef8a617f8f
 - path: github.com/lib/pq
@@ -30,10 +30,10 @@ vendors:
 - path: github.com/wader/gormstore
   rev: ee9717350abc7fc759245765c1524d8aeb357b1f
 - path: golang.org/x/crypto
-  rev: a548aac93ed489257b9d959b40fe1e8c1e20778c
+  rev: 9fbab14f903f89e23047b5971369b86380230e56
 - path: golang.org/x/net
   rev: 07b51741c1d6423d4a6abab1c49940ec09cb1aaf
 - path: golang.org/x/oauth2
-  rev: 4784bb855e56a530f1ce5d788959359ed6cb4a16
+  rev: 3b966c7f301c0c71c53d94dc632a62df0a682cd7
 - path: google.golang.org/appengine
   rev: e951d3868b377b14f4e60efa3a301532ee3c1ebf
