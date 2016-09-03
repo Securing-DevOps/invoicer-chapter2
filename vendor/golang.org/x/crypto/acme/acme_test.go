@@ -7,6 +7,8 @@ package acme
 import (
 	"bytes"
 	"crypto/rand"
+	"crypto/rsa"
+	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/base64"
@@ -112,10 +114,7 @@ func TestRegister(t *testing.T) {
 		w.Header().Add("Link", `<https://ca.tld/acme/terms>;rel="terms-of-service"`)
 		w.WriteHeader(http.StatusCreated)
 		b, _ := json.Marshal(contacts)
-		fmt.Fprintf(w, `{
-			"key":%q,
-			"contact":%s
-		}`, testKeyThumbprint, b)
+		fmt.Fprintf(w, `{"contact": %s}`, b)
 	}))
 	defer ts.Close()
 
@@ -127,7 +126,7 @@ func TestRegister(t *testing.T) {
 		return false
 	}
 
-	c := Client{Key: testKey, dir: &Directory{RegURL: ts.URL}}
+	c := Client{Key: testKeyEC, dir: &Directory{RegURL: ts.URL}}
 	a := &Account{Contact: contacts}
 	var err error
 	if a, err = c.Register(context.Background(), a, prompt); err != nil {
@@ -183,15 +182,11 @@ func TestUpdateReg(t *testing.T) {
 		w.Header().Add("Link", fmt.Sprintf(`<%s>;rel="terms-of-service"`, terms))
 		w.WriteHeader(http.StatusOK)
 		b, _ := json.Marshal(contacts)
-		fmt.Fprintf(w, `{
-			"key":%q,
-			"contact":%s,
-			"agreement":%q
-		}`, testKeyThumbprint, b, terms)
+		fmt.Fprintf(w, `{"contact":%s, "agreement":%q}`, b, terms)
 	}))
 	defer ts.Close()
 
-	c := Client{Key: testKey}
+	c := Client{Key: testKeyEC}
 	a := &Account{URI: ts.URL, Contact: contacts, AgreedTerms: terms}
 	var err error
 	if a, err = c.UpdateReg(context.Background(), a); err != nil {
@@ -248,15 +243,11 @@ func TestGetReg(t *testing.T) {
 		w.Header().Add("Link", fmt.Sprintf(`<%s>;rel="terms-of-service"`, newTerms))
 		w.WriteHeader(http.StatusOK)
 		b, _ := json.Marshal(contacts)
-		fmt.Fprintf(w, `{
-			"key":%q,
-			"contact":%s,
-			"agreement":%q
-		}`, testKeyThumbprint, b, terms)
+		fmt.Fprintf(w, `{"contact":%s, "agreement":%q}`, b, terms)
 	}))
 	defer ts.Close()
 
-	c := Client{Key: testKey}
+	c := Client{Key: testKeyEC}
 	a, err := c.GetReg(context.Background(), ts.URL)
 	if err != nil {
 		t.Fatal(err)
@@ -328,7 +319,7 @@ func TestAuthorize(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	cl := Client{Key: testKey, dir: &Directory{AuthzURL: ts.URL}}
+	cl := Client{Key: testKeyEC, dir: &Directory{AuthzURL: ts.URL}}
 	auth, err := cl.Authorize(context.Background(), "example.com")
 	if err != nil {
 		t.Fatal(err)
@@ -379,7 +370,24 @@ func TestAuthorize(t *testing.T) {
 	}
 }
 
-func TestPollAuthz(t *testing.T) {
+func TestAuthorizeValid(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "HEAD" {
+			w.Header().Set("replay-nonce", "nonce")
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+		w.Write([]byte(`{"status":"valid"}`))
+	}))
+	defer ts.Close()
+	client := Client{Key: testKey, dir: &Directory{AuthzURL: ts.URL}}
+	_, err := client.Authorize(context.Background(), "example.com")
+	if err != nil {
+		t.Errorf("err = %v", err)
+	}
+}
+
+func TestGetAuthorization(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			t.Errorf("r.Method = %q; want GET", r.Method)
@@ -407,8 +415,8 @@ func TestPollAuthz(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	cl := Client{Key: testKey}
-	auth, err := cl.GetAuthz(context.Background(), ts.URL)
+	cl := Client{Key: testKeyEC}
+	auth, err := cl.GetAuthorization(context.Background(), ts.URL)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -455,6 +463,95 @@ func TestPollAuthz(t *testing.T) {
 	}
 }
 
+func TestWaitAuthorization(t *testing.T) {
+	var count int
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		count++
+		w.Header().Set("retry-after", "0")
+		if count > 1 {
+			fmt.Fprintf(w, `{"status":"valid"}`)
+			return
+		}
+		fmt.Fprintf(w, `{"status":"pending"}`)
+	}))
+	defer ts.Close()
+
+	type res struct {
+		authz *Authorization
+		err   error
+	}
+	done := make(chan res)
+	defer close(done)
+	go func() {
+		var client Client
+		a, err := client.WaitAuthorization(context.Background(), ts.URL)
+		done <- res{a, err}
+	}()
+
+	select {
+	case <-time.After(5 * time.Second):
+		t.Fatal("WaitAuthz took too long to return")
+	case res := <-done:
+		if res.err != nil {
+			t.Fatalf("res.err =  %v", res.err)
+		}
+		if res.authz == nil {
+			t.Fatal("res.authz is nil")
+		}
+	}
+}
+
+func TestWaitAuthorizationInvalid(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `{"status":"invalid"}`)
+	}))
+	defer ts.Close()
+
+	res := make(chan error)
+	defer close(res)
+	go func() {
+		var client Client
+		_, err := client.WaitAuthorization(context.Background(), ts.URL)
+		res <- err
+	}()
+
+	select {
+	case <-time.After(3 * time.Second):
+		t.Fatal("WaitAuthz took too long to return")
+	case err := <-res:
+		if err == nil {
+			t.Error("err is nil")
+		}
+	}
+}
+
+func TestWaitAuthorizationCancel(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("retry-after", "60")
+		fmt.Fprintf(w, `{"status":"pending"}`)
+	}))
+	defer ts.Close()
+
+	res := make(chan error)
+	defer close(res)
+	go func() {
+		var client Client
+		ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+		defer cancel()
+		_, err := client.WaitAuthorization(ctx, ts.URL)
+		res <- err
+	}()
+
+	select {
+	case <-time.After(time.Second):
+		t.Fatal("WaitAuthz took too long to return")
+	case err := <-res:
+		if err == nil {
+			t.Error("err is nil")
+		}
+	}
+}
+
 func TestPollChallenge(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
@@ -470,7 +567,7 @@ func TestPollChallenge(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	cl := Client{Key: testKey}
+	cl := Client{Key: testKeyEC}
 	chall, err := cl.GetChallenge(context.Background(), ts.URL)
 	if err != nil {
 		t.Fatal(err)
@@ -514,7 +611,7 @@ func TestAcceptChallenge(t *testing.T) {
 		if j.Type != "http-01" {
 			t.Errorf(`type = %q; want "http-01"`, j.Type)
 		}
-		keyAuth := "token1." + testKeyThumbprint
+		keyAuth := "token1." + testKeyECThumbprint
 		if j.Auth != keyAuth {
 			t.Errorf(`keyAuthorization = %q; want %q`, j.Auth, keyAuth)
 		}
@@ -531,7 +628,7 @@ func TestAcceptChallenge(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	cl := Client{Key: testKey}
+	cl := Client{Key: testKeyEC}
 	c, err := cl.Accept(context.Background(), &Challenge{
 		URI:   ts.URL,
 		Token: "token1",
@@ -599,7 +696,7 @@ func TestNewCert(t *testing.T) {
 			BasicConstraintsValid: true,
 		}
 
-		sampleCert, err := x509.CreateCertificate(rand.Reader, &template, &template, &testKey.PublicKey, testKey)
+		sampleCert, err := x509.CreateCertificate(rand.Reader, &template, &template, &testKeyEC.PublicKey, testKeyEC)
 		if err != nil {
 			t.Fatalf("Error creating certificate: %v", err)
 		}
@@ -617,12 +714,12 @@ func TestNewCert(t *testing.T) {
 			Organization: []string{"goacme"},
 		},
 	}
-	csrb, err := x509.CreateCertificateRequest(rand.Reader, &csr, testKey)
+	csrb, err := x509.CreateCertificateRequest(rand.Reader, &csr, testKeyEC)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	c := Client{Key: testKey, dir: &Directory{CertURL: ts.URL}}
+	c := Client{Key: testKeyEC, dir: &Directory{CertURL: ts.URL}}
 	cert, certURL, err := c.CreateCert(context.Background(), csrb, notAfter.Sub(notBefore), false)
 	if err != nil {
 		t.Fatal(err)
@@ -772,7 +869,7 @@ func TestRevokeCert(t *testing.T) {
 	}))
 	defer ts.Close()
 	client := &Client{
-		Key: testKey,
+		Key: testKeyEC,
 		dir: &Directory{RevokeURL: ts.URL},
 	}
 	ctx := context.Background()
@@ -871,11 +968,11 @@ func TestErrorResponse(t *testing.T) {
 func TestTLSSNI01ChallengeCert(t *testing.T) {
 	const (
 		token = "evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA"
-		// echo -n <token.testKeyThumbprint> | shasum -a 256
-		san = "b6ddc3df57802969e2e0b88eb548d4be.febc5bd6cf3690eb526081b5d10deda4.acme.invalid"
+		// echo -n <token.testKeyECThumbprint> | shasum -a 256
+		san = "dbbd5eefe7b4d06eb9d1d9f5acb4c7cd.a27d320e4b30332f0b6cb441734ad7b0.acme.invalid"
 	)
 
-	client := &Client{Key: testKey}
+	client := &Client{Key: testKeyEC}
 	tlscert, name, err := client.TLSSNI01ChallengeCert(token)
 	if err != nil {
 		t.Fatal(err)
@@ -901,11 +998,11 @@ func TestTLSSNI02ChallengeCert(t *testing.T) {
 		token = "evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA"
 		// echo -n evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA | shasum -a 256
 		sanA = "7ea0aaa69214e71e02cebb18bb867736.09b730209baabf60e43d4999979ff139.token.acme.invalid"
-		// echo -n <token.testKeyThumbprint> | shasum -a 256
-		sanB = "b6ddc3df57802969e2e0b88eb548d4be.febc5bd6cf3690eb526081b5d10deda4.ka.acme.invalid"
+		// echo -n <token.testKeyECThumbprint> | shasum -a 256
+		sanB = "dbbd5eefe7b4d06eb9d1d9f5acb4c7cd.a27d320e4b30332f0b6cb441734ad7b0.ka.acme.invalid"
 	)
 
-	client := &Client{Key: testKey}
+	client := &Client{Key: testKeyEC}
 	tlscert, name, err := client.TLSSNI02ChallengeCert(token)
 	if err != nil {
 		t.Fatal(err)
@@ -929,14 +1026,55 @@ func TestTLSSNI02ChallengeCert(t *testing.T) {
 	}
 }
 
+func TestTLSChallengeCertRSA(t *testing.T) {
+	key, err := rsa.GenerateKey(rand.Reader, 512)
+	if err != nil {
+		t.Fatal(err)
+	}
+	client := &Client{Key: testKeyEC}
+	cert1, _, err := client.TLSSNI01ChallengeCert("token", WithKey(key))
+	if err != nil {
+		t.Fatal(err)
+	}
+	cert2, _, err := client.TLSSNI02ChallengeCert("token", WithKey(key))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i, tlscert := range []tls.Certificate{cert1, cert2} {
+		// verify generated cert private key
+		tlskey, ok := tlscert.PrivateKey.(*rsa.PrivateKey)
+		if !ok {
+			t.Errorf("%d: tlscert.PrivateKey is %T; want *rsa.PrivateKey", i, tlscert.PrivateKey)
+			continue
+		}
+		if tlskey.D.Cmp(key.D) != 0 {
+			t.Errorf("%d: tlskey.D = %v; want %v", i, tlskey.D, key.D)
+		}
+		// verify generated cert public key
+		x509Cert, err := x509.ParseCertificate(tlscert.Certificate[0])
+		if err != nil {
+			t.Errorf("%d: %v", i, err)
+			continue
+		}
+		tlspub, ok := x509Cert.PublicKey.(*rsa.PublicKey)
+		if !ok {
+			t.Errorf("%d: x509Cert.PublicKey is %T; want *rsa.PublicKey", i, x509Cert.PublicKey)
+			continue
+		}
+		if tlspub.N.Cmp(key.N) != 0 {
+			t.Errorf("%d: tlspub.N = %v; want %v", i, tlspub.N, key.N)
+		}
+	}
+}
+
 func TestHTTP01Challenge(t *testing.T) {
 	const (
 		token = "xxx"
-		// thumbprint is precomputed for testKey in jws_test.go
-		value   = token + "." + testKeyThumbprint
+		// thumbprint is precomputed for testKeyEC in jws_test.go
+		value   = token + "." + testKeyECThumbprint
 		urlpath = "/.well-known/acme-challenge/" + token
 	)
-	client := &Client{Key: testKey}
+	client := &Client{Key: testKeyEC}
 	val, err := client.HTTP01ChallengeResponse(token)
 	if err != nil {
 		t.Fatal(err)
@@ -946,5 +1084,46 @@ func TestHTTP01Challenge(t *testing.T) {
 	}
 	if path := client.HTTP01ChallengePath(token); path != urlpath {
 		t.Errorf("path = %q; want %q", path, urlpath)
+	}
+}
+
+func TestDNS01ChallengeRecord(t *testing.T) {
+	// echo -n xxx.<testKeyECThumbprint> | \
+	//      openssl dgst -binary -sha256 | \
+	//      base64 | tr -d '=' | tr '/+' '_-'
+	const value = "8DERMexQ5VcdJ_prpPiA0mVdp7imgbCgjsG4SqqNMIo"
+
+	client := &Client{Key: testKeyEC}
+	val, err := client.DNS01ChallengeRecord("xxx")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if val != value {
+		t.Errorf("val = %q; want %q", val, value)
+	}
+}
+
+func TestBackoff(t *testing.T) {
+	tt := []struct{ min, max time.Duration }{
+		{time.Second, 2 * time.Second},
+		{2 * time.Second, 3 * time.Second},
+		{4 * time.Second, 5 * time.Second},
+		{8 * time.Second, 9 * time.Second},
+	}
+	for i, test := range tt {
+		d := backoff(i, time.Minute)
+		if d < test.min || test.max < d {
+			t.Errorf("%d: d = %v; want between %v and %v", i, d, test.min, test.max)
+		}
+	}
+
+	min, max := time.Second, 2*time.Second
+	if d := backoff(-1, time.Minute); d < min || max < d {
+		t.Errorf("d = %v; want between %v and %v", d, min, max)
+	}
+
+	bound := 10 * time.Second
+	if d := backoff(100, bound); d != bound {
+		t.Errorf("d = %v; want %v", d, bound)
 	}
 }
