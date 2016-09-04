@@ -24,7 +24,7 @@ vendors:
 - path: github.com/lib/pq
   rev: 50761b0867bd1d9d069276790bcd4a3bccf2324a
 - path: github.com/mattn/go-sqlite3
-  rev: b5c99a720374818b629fd1fbf6d2cbb4fb9a5644
+  rev: e87c35082bf4c56768d8d7ed501396a9c166f0ff
 - path: github.com/wader/gormstore
   rev: ee9717350abc7fc759245765c1524d8aeb357b1f
 - path: golang.org/x/crypto
