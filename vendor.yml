@@ -4,34 +4,34 @@ vendors:
 - path: github.com/erikstmartin/go-testdb
   rev: 8d10e4a1bae52cd8b81ffdec3445890d6dccab3d
 - path: github.com/go-sql-driver/mysql
-  rev: 0b58b37b664c21f3010e836f1b931e1d0b0b0685
+  rev: 2a6c6079c7eff49a7e9d641e109d922f124a3e4c
 - path: github.com/golang/protobuf
-  rev: 1f49d83d9aa00e6ce4fc8258c71cc7786aec968a
+  rev: 98fa357170587e470c5f27d3c3ea0947b71eb455
 - path: github.com/gorilla/context
   rev: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - path: github.com/gorilla/mux
-  rev: 0a192a193177452756c362c20087ddafcf6829c4
+  rev: 757bef944d0f21880861c2dd9c871ca543023cba
 - path: github.com/gorilla/securecookie
-  rev: c13558c2b1c44da35e0eb043053609a5ba3a1f19
+  rev: fa5329f913702981df43dcb2a380bac429c810b5
 - path: github.com/gorilla/sessions
-  rev: 7ab2742f1e374be6675e9a4eca54fe529221ae3a
+  rev: ca9ada44574153444b00d3fd9c8559e4cc95f896
 - path: github.com/jinzhu/gorm
-  rev: f26fa242cc1bf884f9a4f98849f70fb8e73f441f
+  rev: 4a540f3ac83a6765b8876be67994ecde022c6198
 - path: github.com/jinzhu/inflection
   rev: 74387dc39a75e970e7a3ae6a3386b5bd2e5c5cff
 - path: github.com/jinzhu/now
   rev: d9861969c7a7e84746d341c09020c2ef8a617f8f
 - path: github.com/lib/pq
-  rev: 50761b0867bd1d9d069276790bcd4a3bccf2324a
+  rev: ae8357db35d721c58dcdc911318b55bef6b1b001
 - path: github.com/mattn/go-sqlite3
-  rev: e87c35082bf4c56768d8d7ed501396a9c166f0ff
+  rev: 86681de00adef4f8040947b7d35f97000fc5a230
 - path: github.com/wader/gormstore
-  rev: ee9717350abc7fc759245765c1524d8aeb357b1f
+  rev: 4ba3bcdc3beeca96fbb3b810c8f80dace1529582
 - path: golang.org/x/crypto
-  rev: 9e590154d2353f3f5e1b24da7275686040dcf491
+  rev: b2fa06b6af4b7c9bfeb8569ab7b17f04550717bf
 - path: golang.org/x/net
-  rev: 1358eff22f0dd0c54fc521042cc607f6ff4b531a
+  rev: 73058b0420c0c24a7f9ec3eb6f624ac85d2ed035
 - path: golang.org/x/oauth2
-  rev: 3c3a985cb79f52a3190fbc056984415ca6763d01
+  rev: 25b4fb1468cb89700c7c060cb99f30581a61f5e3
 - path: google.golang.org/appengine
-  rev: 4f7eeb5305a4ba1966344836ba4af9996b7b4e05
+  rev: 46239ca616842c00f41b8cbc6bbf2bd6ffbfcdad

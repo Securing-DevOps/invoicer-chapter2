@@ -81,10 +81,16 @@ func TestStringPrimaryKey(t *testing.T) {
 		ID   string `gorm:"primary_key"`
 		Name string
 	}
+	DB.DropTable(&UUIDStruct{})
 	DB.AutoMigrate(&UUIDStruct{})
 
 	data := UUIDStruct{ID: "uuid", Name: "hello"}
-	if err := DB.Save(&data).Error; err != nil || data.ID != "uuid" {
+	if err := DB.Save(&data).Error; err != nil || data.ID != "uuid" || data.Name != "hello" {
+		t.Errorf("string primary key should not be populated")
+	}
+
+	data = UUIDStruct{ID: "uuid", Name: "hello world"}
+	if err := DB.Save(&data).Error; err != nil || data.ID != "uuid" || data.Name != "hello world" {
 		t.Errorf("string primary key should not be populated")
 	}
 }
@@ -309,8 +315,14 @@ func TestNullValuesWithFirstOrCreate(t *testing.T) {
 	}
 
 	var nv2 NullValue
-	if err := DB.Where(nv1).FirstOrCreate(&nv2).Error; err != nil {
-		t.Errorf("Should not raise any error, but got %v", err)
+	result := DB.Where(nv1).FirstOrCreate(&nv2)
+
+	if result.RowsAffected != 1 {
+		t.Errorf("RowsAffected should be 1 after create some record")
+	}
+
+	if result.Error != nil {
+		t.Errorf("Should not raise any error, but got %v", result.Error)
 	}
 
 	if nv2.Name.String != "first_or_create" || nv2.Gender.String != "M" {
@@ -365,9 +377,9 @@ func TestTransaction(t *testing.T) {
 }
 
 func TestRow(t *testing.T) {
-	user1 := User{Name: "RowUser1", Age: 1, Birthday: now.MustParse("2000-1-1")}
-	user2 := User{Name: "RowUser2", Age: 10, Birthday: now.MustParse("2010-1-1")}
-	user3 := User{Name: "RowUser3", Age: 20, Birthday: now.MustParse("2020-1-1")}
+	user1 := User{Name: "RowUser1", Age: 1, Birthday: parseTime("2000-1-1")}
+	user2 := User{Name: "RowUser2", Age: 10, Birthday: parseTime("2010-1-1")}
+	user3 := User{Name: "RowUser3", Age: 20, Birthday: parseTime("2020-1-1")}
 	DB.Save(&user1).Save(&user2).Save(&user3)
 
 	row := DB.Table("users").Where("name = ?", user2.Name).Select("age").Row()
@@ -379,9 +391,9 @@ func TestRow(t *testing.T) {
 }
 
 func TestRows(t *testing.T) {
-	user1 := User{Name: "RowsUser1", Age: 1, Birthday: now.MustParse("2000-1-1")}
-	user2 := User{Name: "RowsUser2", Age: 10, Birthday: now.MustParse("2010-1-1")}
-	user3 := User{Name: "RowsUser3", Age: 20, Birthday: now.MustParse("2020-1-1")}
+	user1 := User{Name: "RowsUser1", Age: 1, Birthday: parseTime("2000-1-1")}
+	user2 := User{Name: "RowsUser2", Age: 10, Birthday: parseTime("2010-1-1")}
+	user3 := User{Name: "RowsUser3", Age: 20, Birthday: parseTime("2020-1-1")}
 	DB.Save(&user1).Save(&user2).Save(&user3)
 
 	rows, err := DB.Table("users").Where("name = ? or name = ?", user2.Name, user3.Name).Select("name, age").Rows()
@@ -403,9 +415,9 @@ func TestRows(t *testing.T) {
 }
 
 func TestScanRows(t *testing.T) {
-	user1 := User{Name: "ScanRowsUser1", Age: 1, Birthday: now.MustParse("2000-1-1")}
-	user2 := User{Name: "ScanRowsUser2", Age: 10, Birthday: now.MustParse("2010-1-1")}
-	user3 := User{Name: "ScanRowsUser3", Age: 20, Birthday: now.MustParse("2020-1-1")}
+	user1 := User{Name: "ScanRowsUser1", Age: 1, Birthday: parseTime("2000-1-1")}
+	user2 := User{Name: "ScanRowsUser2", Age: 10, Birthday: parseTime("2010-1-1")}
+	user3 := User{Name: "ScanRowsUser3", Age: 20, Birthday: parseTime("2020-1-1")}
 	DB.Save(&user1).Save(&user2).Save(&user3)
 
 	rows, err := DB.Table("users").Where("name = ? or name = ?", user2.Name, user3.Name).Select("name, age").Rows()
@@ -433,9 +445,9 @@ func TestScanRows(t *testing.T) {
 }
 
 func TestScan(t *testing.T) {
-	user1 := User{Name: "ScanUser1", Age: 1, Birthday: now.MustParse("2000-1-1")}
-	user2 := User{Name: "ScanUser2", Age: 10, Birthday: now.MustParse("2010-1-1")}
-	user3 := User{Name: "ScanUser3", Age: 20, Birthday: now.MustParse("2020-1-1")}
+	user1 := User{Name: "ScanUser1", Age: 1, Birthday: parseTime("2000-1-1")}
+	user2 := User{Name: "ScanUser2", Age: 10, Birthday: parseTime("2010-1-1")}
+	user3 := User{Name: "ScanUser3", Age: 20, Birthday: parseTime("2020-1-1")}
 	DB.Save(&user1).Save(&user2).Save(&user3)
 
 	type result struct {
@@ -463,9 +475,9 @@ func TestScan(t *testing.T) {
 }
 
 func TestRaw(t *testing.T) {
-	user1 := User{Name: "ExecRawSqlUser1", Age: 1, Birthday: now.MustParse("2000-1-1")}
-	user2 := User{Name: "ExecRawSqlUser2", Age: 10, Birthday: now.MustParse("2010-1-1")}
-	user3 := User{Name: "ExecRawSqlUser3", Age: 20, Birthday: now.MustParse("2020-1-1")}
+	user1 := User{Name: "ExecRawSqlUser1", Age: 1, Birthday: parseTime("2000-1-1")}
+	user2 := User{Name: "ExecRawSqlUser2", Age: 10, Birthday: parseTime("2010-1-1")}
+	user3 := User{Name: "ExecRawSqlUser3", Age: 20, Birthday: parseTime("2020-1-1")}
 	DB.Save(&user1).Save(&user2).Save(&user3)
 
 	type result struct {
@@ -541,7 +553,7 @@ func TestJoins(t *testing.T) {
 	}
 
 	var users5 []User
-	db5 := DB.Joins("join emails on emails.user_id = users.id AND emails.email = ?", "join1@example.com").Joins("join credit_cards on credit_cards.user_id = users.id AND credit_cards.number = ?", "411111111111").Where(User{Id:1}).Where(Email{Id:1}).Not(Email{Id:10}).First(&users5)
+	db5 := DB.Joins("join emails on emails.user_id = users.id AND emails.email = ?", "join1@example.com").Joins("join credit_cards on credit_cards.user_id = users.id AND credit_cards.number = ?", "411111111111").Where(User{Id: 1}).Where(Email{Id: 1}).Not(Email{Id: 10}).First(&users5)
 	if db5.Error != nil {
 		t.Errorf("Should not raise error for join where identical fields in different tables. Error: %s", db5.Error.Error())
 	}
@@ -605,11 +617,12 @@ func TestTimeWithZone(t *testing.T) {
 
 	for index, vtime := range times {
 		name := "time_with_zone_" + strconv.Itoa(index)
-		user := User{Name: name, Birthday: vtime}
+		user := User{Name: name, Birthday: &vtime}
 
 		if !DialectHasTzSupport() {
 			// If our driver dialect doesn't support TZ's, just use UTC for everything here.
-			user.Birthday = vtime.UTC()
+			utcBirthday := user.Birthday.UTC()
+			user.Birthday = &utcBirthday
 		}
 
 		DB.Save(&user)
@@ -748,11 +761,22 @@ func TestDdlErrors(t *testing.T) {
 	}
 }
 
+func TestOpenWithOneParameter(t *testing.T) {
+	db, err := gorm.Open("dialect")
+	if db != nil {
+		t.Error("Open with one parameter returned non nil for db")
+	}
+	if err == nil {
+		t.Error("Open with one parameter returned err as nil")
+	}
+}
+
 func BenchmarkGorm(b *testing.B) {
 	b.N = 2000
 	for x := 0; x < b.N; x++ {
 		e := strconv.Itoa(x) + "benchmark@example.org"
-		email := BigEmail{Email: e, UserAgent: "pc", RegisteredAt: time.Now()}
+		now := time.Now()
+		email := BigEmail{Email: e, UserAgent: "pc", RegisteredAt: &now}
 		// Insert
 		DB.Save(&email)
 		// Query
@@ -776,7 +800,8 @@ func BenchmarkRawSql(b *testing.B) {
 	for x := 0; x < b.N; x++ {
 		var id int64
 		e := strconv.Itoa(x) + "benchmark@example.org"
-		email := BigEmail{Email: e, UserAgent: "pc", RegisteredAt: time.Now()}
+		now := time.Now()
+		email := BigEmail{Email: e, UserAgent: "pc", RegisteredAt: &now}
 		// Insert
 		DB.QueryRow(insertSql, email.UserId, email.Email, email.UserAgent, email.RegisteredAt, time.Now(), time.Now()).Scan(&id)
 		// Query
@@ -787,4 +812,9 @@ func BenchmarkRawSql(b *testing.B) {
 		// Delete
 		DB.Exec(deleteSql, id)
 	}
+}
+
+func parseTime(str string) *time.Time {
+	t := now.MustParse(str)
+	return &t
 }

@@ -21,6 +21,7 @@ import (
 	"math/big"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"time"
 
@@ -109,6 +110,7 @@ func decodePayload(v interface{}, r io.Reader) error {
 func TestGetCertificate(t *testing.T) {
 	const domain = "example.org"
 	man := &Manager{Prompt: AcceptTOS}
+	defer man.stopRenew()
 
 	// echo token-02 | shasum -a 256
 	// then divide result in 2 parts separated by dot
@@ -244,6 +246,23 @@ func TestGetCertificate(t *testing.T) {
 	}
 }
 
+func TestAccountKeyCache(t *testing.T) {
+	cache := make(memCache)
+	m := Manager{Cache: cache}
+	ctx := context.Background()
+	k1, err := m.accountKey(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	k2, err := m.accountKey(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(k1, k2) {
+		t.Errorf("account keys don't match: k1 = %#v; k2 = %#v", k1, k2)
+	}
+}
+
 func TestCache(t *testing.T) {
 	privKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
@@ -264,7 +283,8 @@ func TestCache(t *testing.T) {
 	}
 
 	cache := make(memCache)
-	man := Manager{Cache: cache}
+	man := &Manager{Cache: cache}
+	defer man.stopRenew()
 	if err := man.cachePut("example.org", tlscert); err != nil {
 		t.Fatalf("man.cachePut: %v", err)
 	}

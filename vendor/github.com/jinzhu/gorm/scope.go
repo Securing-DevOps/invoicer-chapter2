@@ -454,10 +454,10 @@ func (scope *Scope) quoteIfPossible(str string) string {
 func (scope *Scope) scan(rows *sql.Rows, columns []string, fields []*Field) {
 	var (
 		ignored            interface{}
-		selectFields       []*Field
 		values             = make([]interface{}, len(columns))
+		selectFields       []*Field
 		selectedColumnsMap = map[string]int{}
-		resetFields        = map[*Field]int{}
+		resetFields        = map[int]*Field{}
 	)
 
 	for index, column := range columns {
@@ -476,18 +476,21 @@ func (scope *Scope) scan(rows *sql.Rows, columns []string, fields []*Field) {
 					reflectValue := reflect.New(reflect.PtrTo(field.Struct.Type))
 					reflectValue.Elem().Set(field.Field.Addr())
 					values[index] = reflectValue.Interface()
-					resetFields[field] = index
+					resetFields[index] = field
 				}
 
 				selectedColumnsMap[column] = fieldIndex
-				break
+
+				if field.IsNormal {
+					break
+				}
 			}
 		}
 	}
 
 	scope.Err(rows.Scan(values...))
 
-	for field, index := range resetFields {
+	for index, field := range resetFields {
 		if v := reflect.ValueOf(values[index]).Elem().Elem(); v.IsValid() {
 			field.Field.Set(v)
 		}
@@ -527,7 +530,7 @@ func (scope *Scope) buildWhereCondition(clause map[string]interface{}) (str stri
 		newScope := scope.New(value)
 		for _, field := range newScope.Fields() {
 			if !field.IsIgnored && !field.IsBlank {
-				sqls = append(sqls, fmt.Sprintf("(%v.%v = %v)", newScope.QuotedTableName(), scope.Quote(field.DBName), scope.AddToVars(field.Field.Interface())))
+				sqls = append(sqls, fmt.Sprintf("(%v.%v = %v)", scope.QuotedTableName(), scope.Quote(field.DBName), scope.AddToVars(field.Field.Interface())))
 			}
 		}
 		return strings.Join(sqls, " AND ")
@@ -599,7 +602,7 @@ func (scope *Scope) buildNotCondition(clause map[string]interface{}) (str string
 		var newScope = scope.New(value)
 		for _, field := range newScope.Fields() {
 			if !field.IsBlank {
-				sqls = append(sqls, fmt.Sprintf("(%v.%v <> %v)", newScope.QuotedTableName(), scope.Quote(field.DBName), scope.AddToVars(field.Field.Interface())))
+				sqls = append(sqls, fmt.Sprintf("(%v.%v <> %v)", scope.QuotedTableName(), scope.Quote(field.DBName), scope.AddToVars(field.Field.Interface())))
 			}
 		}
 		return strings.Join(sqls, " AND ")
@@ -861,7 +864,6 @@ func (scope *Scope) updatedAttrsWithValues(value interface{}) (results map[strin
 				if field.IsNormal {
 					hasUpdate = true
 					if err == ErrUnaddressable {
-						fmt.Println(err)
 						results[field.DBName] = value
 					} else {
 						results[field.DBName] = field.Field.Interface()
@@ -962,8 +964,13 @@ func (scope *Scope) changeableField(field *Field) bool {
 }
 
 func (scope *Scope) shouldSaveAssociations() bool {
-	if saveAssociations, ok := scope.Get("gorm:save_associations"); ok && !saveAssociations.(bool) {
-		return false
+	if saveAssociations, ok := scope.Get("gorm:save_associations"); ok {
+		if v, ok := saveAssociations.(bool); ok && !v {
+			return false
+		}
+		if v, ok := saveAssociations.(string); ok && (v != "skip") {
+			return false
+		}
 	}
 	return true && !scope.HasError()
 }
@@ -997,7 +1004,7 @@ func (scope *Scope) related(value interface{}, foreignKeys ...string) *Scope {
 					}
 
 					if relationship.PolymorphicType != "" {
-						query = query.Where(fmt.Sprintf("%v = ?", scope.Quote(relationship.PolymorphicDBName)), scope.TableName())
+						query = query.Where(fmt.Sprintf("%v = ?", scope.Quote(relationship.PolymorphicDBName)), relationship.PolymorphicValue)
 					}
 					scope.Err(query.Find(value).Error)
 				}
