@@ -36,16 +36,18 @@ test:
     - cp "$GOPATH_HEAD/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer
     - docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .
 
-    # pull down the Zap baseline scanner
-    - docker pull owasp/zap2docker-weekly
-
     # Run zap against the invoicer
-    - docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} &
     - |
-        docker run -t owasp/zap2docker-weekly zap-baseline.py -u https://raw.githubusercontent.com/Securing-DevOps/invoicer/master/zap-baseline.conf -t http://172.17.0.2:8080/
-        if [ $? -ne 0 ]; then
+        docker pull owasp/zap2docker-weekly
+        docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} &
+        ip="$(docker inspect $(docker ps |tail -1 | awk '{print $1}') | jq -r '.[0].NetworkSettings.IPAddress')"
+        timeout 300 docker run -t owasp/zap2docker-weekly zap-baseline.py \
+               -u https://raw.githubusercontent.com/Securing-DevOps/invoicer/master/zap-baseline.conf \
+               -t http://${ip}:8080/
+        code=$?
+        if [ $code -ne 0 ]; then
             cat ~/.ZAP_D/zap.log
-            exit $?
+            exit $code
         fi
 
     # Run GOVEND against the invoicer to check if outdated dependencies are present
