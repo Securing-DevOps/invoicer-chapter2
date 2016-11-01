@@ -4,7 +4,7 @@ vendors:
 - path: github.com/erikstmartin/go-testdb
   rev: 8d10e4a1bae52cd8b81ffdec3445890d6dccab3d
 - path: github.com/go-sql-driver/mysql
-  rev: 2a6c6079c7eff49a7e9d641e109d922f124a3e4c
+  rev: ce924a41eea897745442daaa1739089b0f3f561d
 - path: github.com/golang/protobuf
   rev: 98fa357170587e470c5f27d3c3ea0947b71eb455
 - path: github.com/gorilla/context
@@ -28,9 +28,9 @@ vendors:
 - path: github.com/wader/gormstore
   rev: 4ba3bcdc3beeca96fbb3b810c8f80dace1529582
 - path: golang.org/x/crypto
-  rev: b2fa06b6af4b7c9bfeb8569ab7b17f04550717bf
+  rev: 9477e0b78b9ac3d0b03822fd95422e2fe07627cd
 - path: golang.org/x/net
-  rev: 73058b0420c0c24a7f9ec3eb6f624ac85d2ed035
+  rev: 541150ac4f433e755f5663eba5d888c2fa347343
 - path: golang.org/x/oauth2
   rev: 25b4fb1468cb89700c7c060cb99f30581a61f5e3
 - path: google.golang.org/appengine
