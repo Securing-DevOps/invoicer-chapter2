@@ -47,8 +47,9 @@ test:
         docker pull owasp/zap2docker-weekly
         ip="$(docker inspect $(docker ps |tail -1 | awk '{print $1}') | jq -r '.[0].NetworkSettings.IPAddress')"
         timeout 300 docker run -t owasp/zap2docker-weekly zap-baseline.py \
-               -u https://raw.githubusercontent.com/Securing-DevOps/invoicer/master/zap-baseline.conf \
-               -t http://${ip}:8080/
+            -u https://raw.githubusercontent.com/Securing-DevOps/invoicer/master/zap-baseline.conf \
+            -t http://${ip}:8080/ \
+            -m 3 -i -s -l FAIL
         code=$?
         if [ $code -ne 0 ]; then
             cat ~/.ZAP_D/zap.log
