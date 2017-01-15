@@ -7,7 +7,7 @@ import (
 // DefaultCallback default callbacks defined by gorm
 var DefaultCallback = &Callback{}
 
-// Callback is a struct that contains all CURD callbacks
+// Callback is a struct that contains all CRUD callbacks
 //   Field `creates` contains callbacks will be call when creating object
 //   Field `updates` contains callbacks will be call when updating object
 //   Field `deletes` contains callbacks will be call when deleting object
@@ -208,7 +208,7 @@ func sortProcessors(cps []*CallbackProcessor) []*func(scope *Scope) {
 	return sortedFuncs
 }
 
-// reorder all registered processors, and reset CURD callbacks
+// reorder all registered processors, and reset CRUD callbacks
 func (c *Callback) reorder() {
 	var creates, updates, deletes, queries, rowQueries []*CallbackProcessor
 
