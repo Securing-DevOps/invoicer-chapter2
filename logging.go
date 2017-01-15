@@ -17,7 +17,7 @@ type accessLog struct {
 }
 
 func (al *accessLog) String() string {
-	al.Type = "access-log"
+	al.Type = "request"
 	msg, _ := json.Marshal(al)
 	return string(msg)
 }
@@ -37,7 +37,7 @@ func (al *appLog) String() string {
 }
 
 func (al *appLog) log(r *http.Request) {
-	al.Type = "action-log"
+	al.Type = "action"
 	val := r.Context().Value(ctxReqID)
 	if val != nil {
 		al.RequestID = val.(string)
