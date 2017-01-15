@@ -49,7 +49,7 @@ test:
         timeout 300 docker run -t owasp/zap2docker-weekly zap-baseline.py \
             -u https://raw.githubusercontent.com/Securing-DevOps/invoicer/master/zap-baseline.conf \
             -t http://${ip}:8080/ \
-            -m 3 -i -s -l FAIL
+            -m 3 -i
         code=$?
         if [ $code -ne 0 ]; then
             cat ~/.ZAP_D/zap.log
