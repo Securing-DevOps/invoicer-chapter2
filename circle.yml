@@ -10,7 +10,7 @@ machine:
     GOPATH_HEAD: "$(echo $GOPATH | cut -d ':' -f 1)"
     GOPATH_BASE: "$GOPATH_HEAD/src/github.com/$CIRCLE_PROJECT_USERNAME"
     GO15VENDOREXPERIMENT: 1
-    DOCKER_REPO: "$(if [ $CIRCLE_PROJECT_USERNAME == 'Securing-DevOps' ]; then echo securingdevops; else echo $DOCKER_USER; fi)"
+    DOCKER_REPO: "securingdevops"
 
   services:
     - docker
@@ -34,12 +34,17 @@ test:
         github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
     - '[ ! -e bin ] && mkdir bin'
     - cp "$GOPATH_HEAD/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer
-    - docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .
+    - docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .:
+        environment:
+          DOCKER_REPO: "$(if [ $CIRCLE_PROJECT_USERNAME == 'Securing-DevOps' ]; then echo securingdevops; else echo $DOCKER_USER; fi)"
+
+    - docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} & :
+        environment:
+          DOCKER_REPO: "$(if [ $CIRCLE_PROJECT_USERNAME == 'Securing-DevOps' ]; then echo securingdevops; else echo $DOCKER_USER; fi)"
 
     # Run zap against the invoicer
     - |
         docker pull owasp/zap2docker-weekly
-        docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} &
         ip="$(docker inspect $(docker ps |tail -1 | awk '{print $1}') | jq -r '.[0].NetworkSettings.IPAddress')"
         timeout 300 docker run -t owasp/zap2docker-weekly zap-baseline.py \
                -u https://raw.githubusercontent.com/Securing-DevOps/invoicer/master/zap-baseline.conf \
@@ -66,4 +71,6 @@ deployment:
       - >
         docker images --no-trunc | awk '/^app/ {print $3}' |
         tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
-      - docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}
+      - docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}:
+          environment:
+            DOCKER_REPO: "$(if [ $CIRCLE_PROJECT_USERNAME == 'Securing-DevOps' ]; then echo securingdevops; else echo $DOCKER_USER; fi)"
