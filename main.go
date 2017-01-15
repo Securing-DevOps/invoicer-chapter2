@@ -27,8 +27,15 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/wader/gormstore"
+	"go.mozilla.org/mozlog"
 	"golang.org/x/oauth2"
 )
+
+func init() {
+	// initialize the logger
+	mozlog.Logger.LoggerName = "invoicer"
+	log.SetFlags(0)
+}
 
 type invoicer struct {
 	db    *gorm.DB
@@ -65,7 +72,6 @@ func main() {
 
 	iv.db = db
 	iv.db.AutoMigrate(&Invoice{}, &Charge{})
-	iv.db.LogMode(true)
 
 	//initialize CSRF Token
 	CSRFKey = make([]byte, 128)
@@ -93,8 +99,14 @@ func main() {
 		http.StripPrefix("/statics/", http.FileServer(http.Dir("./statics"))),
 	).Methods("GET")
 
-	// all set, start the http handler
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080",
+		HandleMiddlewares(
+			r,
+			addRequestID(),
+			logRequest(),
+			setResponseHeaders(),
+		),
+	))
 }
 
 type Invoice struct {
@@ -122,32 +134,34 @@ func (iv *invoicer) getInvoice(w http.ResponseWriter, r *http.Request) {
 	iv.db.First(&i1, id)
 	fmt.Printf("%+v\n", i1)
 	if i1.ID == 0 {
-		httpError(w, http.StatusNotFound, "No invoice id %s", vars["id"])
+		httpError(w, r, http.StatusNotFound, "No invoice id %s", vars["id"])
 		return
 	}
 	iv.db.Where("invoice_id = ?", i1.ID).Find(&i1.Charges)
 	jsonInvoice, err := json.Marshal(i1)
 	if err != nil {
-		httpError(w, http.StatusInternalServerError, "failed to retrieve invoice id %d: %s", vars["id"], err)
+		httpError(w, r, http.StatusInternalServerError, "failed to retrieve invoice id %d: %s", vars["id"], err)
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonInvoice)
+	al := appLog{Message: fmt.Sprintf("retrieved invoice %d", i1.ID), Action: "get-invoice"}
+	al.log(r)
 }
 
 func (iv *invoicer) postInvoice(w http.ResponseWriter, r *http.Request) {
 	log.Println("posting new invoice")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		httpError(w, http.StatusBadRequest, "failed to read request body: %s", err)
+		httpError(w, r, http.StatusBadRequest, "failed to read request body: %s", err)
 		return
 	}
 	var i1 Invoice
 	err = json.Unmarshal(body, &i1)
 	if err != nil {
-		httpError(w, http.StatusBadRequest, "failed to parse request body: %s", err)
+		httpError(w, r, http.StatusBadRequest, "failed to parse request body: %s", err)
 		return
 	}
 	// make sure the IDs are null before inserting
@@ -158,9 +172,10 @@ func (iv *invoicer) postInvoice(w http.ResponseWriter, r *http.Request) {
 	}
 	iv.db.Create(&i1)
 	iv.db.Last(&i1)
-	log.Printf("%+v\n", i1)
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(fmt.Sprintf("created invoice %d", i1.ID)))
+	al := appLog{Message: fmt.Sprintf("created invoice %d", i1.ID), Action: "post-invoice"}
+	al.log(r)
 }
 
 func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
@@ -169,17 +184,17 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 	var i1 Invoice
 	iv.db.First(&i1, vars["id"])
 	if i1.ID == 0 {
-		httpError(w, http.StatusNotFound, "No invoice id %s", vars["id"])
+		httpError(w, r, http.StatusNotFound, "No invoice id %s", vars["id"])
 		return
 	}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		httpError(w, http.StatusBadRequest, "failed to read request body: %s", err)
+		httpError(w, r, http.StatusBadRequest, "failed to read request body: %s", err)
 		return
 	}
 	err = json.Unmarshal(body, &i1)
 	if err != nil {
-		httpError(w, http.StatusBadRequest, "failed to parse request body: %s", err)
+		httpError(w, r, http.StatusBadRequest, "failed to parse request body: %s", err)
 		return
 	}
 	iv.db.Save(&i1)
@@ -187,6 +202,8 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%+v\n", i1)
 	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte(fmt.Sprintf("updated invoice %d", i1.ID)))
+	al := appLog{Message: fmt.Sprintf("updated invoice %d", i1.ID), Action: "put-invoice"}
+	al.log(r)
 }
 
 func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
@@ -204,14 +221,12 @@ func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	iv.db.Delete(&i1)
 	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte(fmt.Sprintf("deleted invoice %d", i1.ID)))
+	al := appLog{Message: fmt.Sprintf("deleted invoice %d", i1.ID), Action: "delete-invoice"}
+	al.log(r)
 }
 
 func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Security-Policy", "default-src 'self'; child-src 'self;")
-	w.Header().Add("X-Frame-Options", "SAMEORIGIN")
-	w.Header().Add("X-Content-Type-Options", "nosniff")
-	w.Header().Add("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
-	w.Header().Add("Public-Key-Pins", `max-age=1296000; includeSubDomains; pin-sha256="YLh1dUR9y6Kja30RrAn7JKnbQG/uEtLMkBgFF2Fuihg="; pin-sha256="++MBgDH5WGvL9Bcn5Be30cRcL0f5O+NyoXuWtQdX1aI="`)
+	log.Println("serving index page")
 	w.Write([]byte(`
 <!DOCTYPE html>
 <html>
@@ -255,12 +270,6 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 "commit": "%s",
 "build": "https://circleci.com/gh/Securing-DevOps/invoicer/"
 }`, version, commit)))
-}
-
-func httpError(w http.ResponseWriter, errorCode int, errorMessage string, args ...interface{}) {
-	log.Printf("%d: %s", errorCode, fmt.Sprintf(errorMessage, args...))
-	http.Error(w, fmt.Sprintf(errorMessage, args...), errorCode)
-	return
 }
 
 var CSRFKey []byte
@@ -307,22 +316,19 @@ func (iv *invoicer) getAuthenticate(w http.ResponseWriter, r *http.Request) {
 // Function that handles the callback from the IDP
 func (iv *invoicer) getOAuth2Callback(w http.ResponseWriter, r *http.Request) {
 	if !checkCSRFToken(r.FormValue("state")) {
-		w.WriteHeader(http.StatusNotAcceptable)
-		w.Write([]byte("Failed to verify oauth state via CSRF token '" + r.FormValue("state") + "'"))
+		httpError(w, r, http.StatusNotAcceptable, "Failed to verify oauth state via CSRF token %q", r.FormValue("state"))
 		return
 	}
 	token, err := oauthCfg.Exchange(oauth2.NoContext, r.FormValue("code"))
 	if err != nil {
-		w.WriteHeader(http.StatusNotAcceptable)
-		w.Write([]byte("Failed to obtain token from oauth code " + r.FormValue("code")))
+		httpError(w, r, http.StatusNotAcceptable, "Failed to obtain token from oauth code %q", r.FormValue("code"))
 		return
 	}
 
 	client := oauthCfg.Client(oauth2.NoContext, token)
 	resp, err := client.Get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json`)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Failed to retrieve user information from IDP"))
+		httpError(w, r, http.StatusInternalServerError, "Failed to retrieve user information from IDP")
 		return
 	}
 	buf := make([]byte, 10240)
@@ -339,8 +345,7 @@ func (iv *invoicer) getOAuth2Callback(w http.ResponseWriter, r *http.Request) {
 	// Create a session, save it and return a cookie
 	session, err := iv.store.Get(r, "session")
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Failed to create session for user"))
+		httpError(w, r, http.StatusInternalServerError, "Failed to create session for user")
 		return
 	}
 	sid := makeCSRFToken()
