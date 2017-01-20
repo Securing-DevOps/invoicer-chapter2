@@ -56,7 +56,6 @@ func (m *MozLogger) Write(l []byte) (int, error) {
 // AppLog implements Mozilla logging standard
 type AppLog struct {
 	Timestamp  int64
-	Time       string
 	Type       string
 	Logger     string
 	Hostname   string `json:",omitempty"`
@@ -68,30 +67,16 @@ type AppLog struct {
 
 // NewAppLog returns a loggable struct
 func NewAppLog(loggerName string, msg []byte) *AppLog {
-	var (
-		err    error
-		isJson = false
-		fields = make(map[string]interface{})
-	)
-	if len(msg) > 1 && msg[0] == '{' {
-		isJson = true
-		err = json.Unmarshal(msg, &fields)
-	}
-	// if the msg is not json or unmarshalling it failed,
-	// store it as a string under the `msg` field
-	if !isJson || err != nil {
-		fields["msg"] = string(bytes.TrimSpace(msg))
-	}
-	now := time.Now().UTC()
 	return &AppLog{
-		Timestamp:  now.UnixNano(),
-		Time:       now.Format(time.RFC3339),
+		Timestamp:  time.Now().UnixNano(),
 		Type:       "app.log",
 		Logger:     loggerName,
 		Hostname:   hostname,
 		EnvVersion: "2.0",
 		Pid:        os.Getpid(),
-		Fields:     fields,
+		Fields: map[string]interface{}{
+			"msg": string(bytes.TrimSpace(msg)),
+		},
 	}
 }
 
