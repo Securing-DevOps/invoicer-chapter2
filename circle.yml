@@ -38,7 +38,8 @@ test:
         environment:
           DOCKER_REPO: "$(if [ $CIRCLE_PROJECT_USERNAME == 'Securing-DevOps' ]; then echo securingdevops; else echo $DOCKER_USER; fi)"
 
-    - docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} & :
+    - docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}:
+        background: true
         environment:
           DOCKER_REPO: "$(if [ $CIRCLE_PROJECT_USERNAME == 'Securing-DevOps' ]; then echo securingdevops; else echo $DOCKER_USER; fi)"
 
