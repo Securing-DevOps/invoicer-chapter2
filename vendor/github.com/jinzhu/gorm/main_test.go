@@ -58,8 +58,13 @@ func OpenTestConnection() (db *gorm.DB, err error) {
 		fmt.Println("testing foundation...")
 		db, err = gorm.Open("foundation", "dbname=gorm port=15432 sslmode=disable")
 	case "mssql":
+		// CREATE LOGIN gorm WITH PASSWORD = 'LoremIpsum86';
+		// CREATE DATABASE gorm;
+		// USE gorm;
+		// CREATE USER gorm FROM LOGIN gorm;
+		// sp_changedbowner 'gorm';
 		fmt.Println("testing mssql...")
-		db, err = gorm.Open("mssql", "server=SERVER_HERE;database=rogue;user id=USER_HERE;password=PW_HERE;port=1433")
+		db, err = gorm.Open("mssql", "sqlserver://gorm:LoremIpsum86@localhost:1433?database=gorm")
 	default:
 		fmt.Println("testing sqlite3...")
 		db, err = gorm.Open("sqlite3", filepath.Join(os.TempDir(), "gorm.db"))
@@ -461,8 +466,10 @@ func TestScan(t *testing.T) {
 		t.Errorf("Scan into struct should work")
 	}
 
-	var doubleAgeRes result
-	DB.Table("users").Select("age + age as age").Where("name = ?", user3.Name).Scan(&doubleAgeRes)
+	var doubleAgeRes = &result{}
+	if err := DB.Table("users").Select("age + age as age").Where("name = ?", user3.Name).Scan(&doubleAgeRes).Error; err != nil {
+		t.Errorf("Scan to pointer of pointer")
+	}
 	if doubleAgeRes.Age != res.Age*2 {
 		t.Errorf("Scan double age as age")
 	}
@@ -814,11 +821,11 @@ func BenchmarkGorm(b *testing.B) {
 	for x := 0; x < b.N; x++ {
 		e := strconv.Itoa(x) + "benchmark@example.org"
 		now := time.Now()
-		email := BigEmail{Email: e, UserAgent: "pc", RegisteredAt: &now}
+		email := EmailWithIdx{Email: e, UserAgent: "pc", RegisteredAt: &now}
 		// Insert
 		DB.Save(&email)
 		// Query
-		DB.First(&BigEmail{}, "email = ?", e)
+		DB.First(&EmailWithIdx{}, "email = ?", e)
 		// Update
 		DB.Model(&email).UpdateColumn("email", "new-"+e)
 		// Delete
@@ -839,7 +846,7 @@ func BenchmarkRawSql(b *testing.B) {
 		var id int64
 		e := strconv.Itoa(x) + "benchmark@example.org"
 		now := time.Now()
-		email := BigEmail{Email: e, UserAgent: "pc", RegisteredAt: &now}
+		email := EmailWithIdx{Email: e, UserAgent: "pc", RegisteredAt: &now}
 		// Insert
 		DB.QueryRow(insertSql, email.UserId, email.Email, email.UserAgent, email.RegisteredAt, time.Now(), time.Now()).Scan(&id)
 		// Query
@@ -853,6 +860,6 @@ func BenchmarkRawSql(b *testing.B) {
 }
 
 func parseTime(str string) *time.Time {
-	t := now.MustParse(str)
+	t := now.New(time.Now().UTC()).MustParse(str)
 	return &t
 }

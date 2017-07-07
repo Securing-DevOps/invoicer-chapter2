@@ -6,13 +6,13 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"golang.org/x/net/context" // use the "x/net/context" for backwards compatibility.
 	"io"
 	"math"
 	"net"
 	"reflect"
 	"strings"
 	"time"
-	"golang.org/x/net/context" // use the "x/net/context" for backwards compatibility.
 )
 
 var driverInstance = &MssqlDriver{processQueryText: true}
@@ -206,6 +206,10 @@ type queryNotifSub struct {
 }
 
 func (c *MssqlConn) Prepare(query string) (driver.Stmt, error) {
+	if len(query) > 10 && strings.EqualFold(query[:10], "INSERTBULK") {
+		return c.prepareCopyIn(query)
+	}
+
 	return c.prepareContext(context.Background(), query)
 }
 
@@ -320,15 +324,16 @@ func (s *MssqlStmt) queryContext(ctx context.Context, args []namedValue) (driver
 
 func (s *MssqlStmt) processQueryResponse(ctx context.Context) (res driver.Rows, err error) {
 	tokchan := make(chan tokenStruct, 5)
+	ctx, cancel := context.WithCancel(ctx)
 	go processResponse(ctx, s.c.sess, tokchan)
 	// process metadata
 	var cols []columnStruct
 loop:
 	for tok := range tokchan {
 		switch token := tok.(type) {
-		// by ignoring DONE token we effectively
-		// skip empty result-sets
-		// this improves results in queryes like that:
+		// By ignoring DONE token we effectively
+		// skip empty result-sets.
+		// This improves results in queries like that:
 		// set nocount on; select 1
 		// see TestIgnoreEmptyResults test
 		//case doneStruct:
@@ -344,7 +349,7 @@ loop:
 			return nil, token
 		}
 	}
-	res = &MssqlRows{sess: s.c.sess, tokchan: tokchan, cols: cols}
+	res = &MssqlRows{sess: s.c.sess, tokchan: tokchan, cols: cols, cancel: cancel}
 	return
 }
 
@@ -389,9 +394,12 @@ type MssqlRows struct {
 	tokchan chan tokenStruct
 
 	nextCols []columnStruct
+
+	cancel func()
 }
 
 func (rc *MssqlRows) Close() error {
+	rc.cancel()
 	for _ = range rc.tokchan {
 	}
 	rc.tokchan = nil

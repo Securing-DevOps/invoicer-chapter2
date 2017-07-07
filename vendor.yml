@@ -1,47 +1,47 @@
 vendors:
 - path: github.com/davecgh/go-spew
-  rev: 346938d642f2ec3594ed81d874461961cd0faa76
+  rev: 782f4967f2dc4564575ca782fe2d04090b5faca8
 - path: github.com/denisenkom/go-mssqldb
-  rev: 370263e74ba8f78a6a3fa15202e934f1be4eccd4
+  rev: a8b933e3527b526484b3b4de754ce7c179e8bfd0
 - path: github.com/erikstmartin/go-testdb
   rev: 8d10e4a1bae52cd8b81ffdec3445890d6dccab3d
 - path: github.com/go-sql-driver/mysql
-  rev: 2e00b5cd70399450106cec6431c2e2ce3cae5034
+  rev: bf7f34fef176d890dfcc6e94319ac747291bc09a
 - path: github.com/golang/protobuf
-  rev: 8ee79997227bf9b34611aee7946ae64735e6fd93
+  rev: 6a1fa9404c0aebf36c879bc50152edcc953910d2
 - path: github.com/gorilla/context
   rev: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - path: github.com/gorilla/mux
-  rev: 757bef944d0f21880861c2dd9c871ca543023cba
+  rev: ac112f7d75a0714af1bd86ab17749b31f7809640
 - path: github.com/gorilla/securecookie
-  rev: fa5329f913702981df43dcb2a380bac429c810b5
+  rev: e59506cc896acb7f7bf732d4fdf5e25f7ccd8983
 - path: github.com/gorilla/sessions
-  rev: 83c8db3bdc9be789e57e3756ffbcffd2d7d40176
+  rev: 8b6b4cd75f07f7ee036eb37b8127bd40ab1efc49
 - path: github.com/jinzhu/gorm
-  rev: c62e9bcabea2b3ed5e3a8bc1602cd38f8ad477f9
+  rev: 2a1463811ee1dc85d168fd639a2d4251d030e6e5
 - path: github.com/jinzhu/inflection
   rev: 1c35d901db3da928c72a72d8458480cc9ade058f
 - path: github.com/jinzhu/now
-  rev: 95f61531f9021a162633b50777cc1263d3064641
+  rev: d939ba741945c047cac69c329c5fb0d6b4a06520
 - path: github.com/lib/pq
-  rev: 8df6253d1317616f36b0c3740eb30c239a7372cb
+  rev: 8837942c3e09574accbc5f150e2c5e057189cace
 - path: github.com/mattn/go-sqlite3
-  rev: eff6379ba09b2fca7aa8216f2132d4c170ed9d46
+  rev: 9cbb0970444f7ee9ccc65376394a504150b25de1
 - path: github.com/pmezard/go-difflib
   rev: 792786c7400a136282c1664665ae0a8db921c6c2
 - path: github.com/stretchr/testify
-  rev: 2402e8e7a02fc811447d11f881aa9746cdc57983
+  rev: f6abca593680b2315d2075e0f5e2a9751e3f431a
 - path: github.com/wader/gormstore
-  rev: 4ba3bcdc3beeca96fbb3b810c8f80dace1529582
+  rev: a066dd77f804fa7d7af7c770180a2013c0ee4190
 - path: go.mozilla.org/mozlog
-  rev: f4350d8f1cad600a1200703365a185c2009bf5e1
+  rev: 4bb13139d40339f59bf140d0f5f28be83b07cc58
 - path: golang.org/x/crypto
-  rev: 2f8be38b9a7533b8763d48273737ff6e90428a96
+  rev: a48ac81e47fd6f9ed1258f3b60ae9e75f93cb7ed
 - path: golang.org/x/net
-  rev: f2499483f923065a842d38eb4c7f1927e6fc6e6d
+  rev: 054b33e6527139ad5b1ec2f6232c3b175bd9a30c
 - path: golang.org/x/oauth2
-  rev: 314dd2c0bf3ebd592ec0d20847d27e79d0dbe8dd
+  rev: cce311a261e6fcf29de72ca96827bdb0b7d9c9e6
 - path: golang.org/x/sync
-  rev: 450f422ab23cf9881c94e2db30cac0eb1b7cf80c
+  rev: f52d1811a62927559de87708c8913c1650ce4f26
 - path: google.golang.org/appengine
-  rev: 9e2ad0873f358c54296ccdc5116b0652c98226d1
+  rev: d11fc8a8dccf41ab5bd3c51a3ea52051240e325c
