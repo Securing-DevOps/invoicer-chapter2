@@ -18,7 +18,8 @@ func TestFirstAndLast(t *testing.T) {
 	DB.First(&user1)
 	DB.Order("id").Limit(1).Find(&user2)
 
-	DB.Last(&user3)
+	ptrOfUser3 := &user3
+	DB.Last(&ptrOfUser3)
 	DB.Order("id desc").Limit(1).Find(&user4)
 	if user1.Id != user2.Id || user3.Id != user4.Id {
 		t.Errorf("First and Last should by order by primary key")
@@ -221,7 +222,7 @@ func TestSearchWithStruct(t *testing.T) {
 	}
 
 	DB.First(&user, User{Name: user1.Name})
-	if user.Id == 0 || user.Name != user.Name {
+	if user.Id == 0 || user.Name != user1.Name {
 		t.Errorf("Search first record with inline struct")
 	}
 
@@ -325,7 +326,7 @@ func TestOrderAndPluck(t *testing.T) {
 	scopedb := DB.Model(&User{}).Where("name like ?", "%OrderPluckUser%")
 
 	var user User
-	scopedb.Order(gorm.Expr("name = ? DESC", "OrderPluckUser2")).First(&user)
+	scopedb.Order(gorm.Expr("case when name = ? then 0 else 1 end", "OrderPluckUser2")).First(&user)
 	if user.Name != "OrderPluckUser2" {
 		t.Errorf("Order with sql expression")
 	}
@@ -357,6 +358,11 @@ func TestOrderAndPluck(t *testing.T) {
 		}
 	} else {
 		t.Errorf("Order with multiple orders")
+	}
+
+	var ages6 []int64
+	if err := scopedb.Order("").Pluck("age", &ages6).Error; err != nil {
+		t.Errorf("An empty string as order clause produces invalid queries")
 	}
 
 	DB.Model(User{}).Select("name, age").Find(&[]User{})
