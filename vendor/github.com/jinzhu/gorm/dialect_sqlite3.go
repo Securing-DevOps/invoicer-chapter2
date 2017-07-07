@@ -12,7 +12,6 @@ type sqlite3 struct {
 }
 
 func init() {
-	RegisterDialect("sqlite", &sqlite3{})
 	RegisterDialect("sqlite3", &sqlite3{})
 }
 
@@ -55,7 +54,7 @@ func (s *sqlite3) DataTypeOf(field *StructField) string {
 				sqlType = "datetime"
 			}
 		default:
-			if _, ok := dataValue.Interface().([]byte); ok {
+			if IsByteArrayOrSlice(dataValue) {
 				sqlType = "blob"
 			}
 		}

@@ -58,12 +58,20 @@ func TestCreate(t *testing.T) {
 	}
 }
 
+type AutoIncrementUser struct {
+	User
+	Sequence uint `gorm:"AUTO_INCREMENT"`
+}
+
 func TestCreateWithAutoIncrement(t *testing.T) {
 	if dialect := os.Getenv("GORM_DIALECT"); dialect != "postgres" {
 		t.Skip("Skipping this because only postgres properly support auto_increment on a non-primary_key column")
 	}
-	user1 := User{}
-	user2 := User{}
+
+	DB.AutoMigrate(&AutoIncrementUser{})
+
+	user1 := AutoIncrementUser{}
+	user2 := AutoIncrementUser{}
 
 	DB.Create(&user1)
 	DB.Create(&user2)
@@ -126,7 +134,7 @@ func TestAnonymousScanner(t *testing.T) {
 		t.Errorf("Should be able to get anonymous scanner")
 	}
 
-	if !user2.IsAdmin() {
+	if !user2.Role.IsAdmin() {
 		t.Errorf("Should be able to get anonymous scanner")
 	}
 }
@@ -175,6 +183,6 @@ func TestOmitWithCreate(t *testing.T) {
 
 	if queryuser.BillingAddressID.Int64 != 0 || queryuser.ShippingAddressId == 0 ||
 		queryuser.CreditCard.ID != 0 || len(queryuser.Emails) != 0 {
-		t.Errorf("Should not create omited relationships")
+		t.Errorf("Should not create omitted relationships")
 	}
 }
