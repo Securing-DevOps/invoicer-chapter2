@@ -13,7 +13,7 @@ fail() {
 export AWS_DEFAULT_REGION=us-east-1
 
 datetag=$(date +%Y%m%d%H%M)
-identifier=invoicer$datetag
+identifier=$(whoami)-invoicer-$datetag
 mkdir -p tmp/$identifier
 
 echo "Creating EBS application $identifier"
@@ -76,7 +76,7 @@ sed "s/POSTGRESPASSREPLACEME/$dbpass/" ebs-options.json > tmp/$identifier/ebs-op
 sed -i "s/POSTGRESHOSTREPLACEME/$dbhost/" tmp/$identifier/ebs-options.json || fail
 aws elasticbeanstalk create-environment \
     --application-name $identifier \
-    --environment-name invoicer-api \
+    --environment-name $identifier-invoicer-api \
     --description "Invoicer API environment" \
     --tags "Key=Owner,Value=$(whoami)" \
     --solution-stack-name "$dockerstack" \
@@ -102,11 +102,11 @@ echo "API security group $sgid authorized to connect to database security group 
 
 # Upload the application version
 aws s3 mb s3://$identifier
-aws s3 cp ebs.json s3://$identifier/
+aws s3 cp app-version.json s3://$identifier/
 aws elasticbeanstalk create-application-version \
     --application-name "$identifier" \
-    --version-label invoicer-api \
-    --source-bundle "S3Bucket=$identifier,S3Key=ebs.json" > tmp/$identifier/appversion.json
+    --version-label $identifier-invoicer-api \
+    --source-bundle "S3Bucket=$identifier,S3Key=app-version.json" > tmp/$identifier/appversion.json
 
 # Wait for the environment to be ready (green)
 echo -n "waiting for environment"
@@ -123,7 +123,7 @@ echo
 aws elasticbeanstalk update-environment \
     --application-name $identifier \
     --environment-id $apieid \
-    --version-label invoicer-api > tmp/$identifier/$apieid.json
+    --version-label $identifier-invoicer-api > tmp/$identifier/$apieid.json
 
 url="$(jq -r '.CNAME' tmp/$identifier/$apieid.json)"
 echo "Environment is being deployed. Public endpoint is http://$url"
