@@ -43,6 +43,6 @@ function getInvoice(invoiceid, CSRFToken) {
             }
         }
     }).then(function(invoice) {
-        $('.invoice-details').html("<p>Invoice ID " + invoice.ID + " has amount $" + invoice.amount + " and description '" + invoice.charges[0].description + "'</p>");
+        $('.invoice-details').html("<p>Invoice #" + invoice.ID + "<br />Amount: $" + invoice.amount + "<br />Type: " + invoice.charges[0].type + "<br />Description: '" + invoice.charges[0].description + "'</p>");
     });
 }
