@@ -42,7 +42,7 @@ aws rds create-db-instance \
     --allocated-storage "$dbstorage" \
     --db-instance-class "$dbinstclass" \
     --engine postgres \
-    --engine-version 9.4.5 \
+    --engine-version 9.6.2 \
     --auto-minor-version-upgrade \
     --publicly-accessible \
     --master-username invoicer \
@@ -102,11 +102,11 @@ echo "API security group $sgid authorized to connect to database security group 
 
 # Upload the application version
 aws s3 mb s3://$identifier
-aws s3 cp ebs.json s3://$identifier/
+aws s3 cp app-version.json s3://$identifier/
 aws elasticbeanstalk create-application-version \
     --application-name "$identifier" \
     --version-label invoicer-api \
-    --source-bundle "S3Bucket=$identifier,S3Key=ebs.json" > tmp/$identifier/appversion.json
+    --source-bundle "S3Bucket=$identifier,S3Key=app-version.json" > tmp/$identifier/app-version-s3.json
 
 # Wait for the environment to be ready (green)
 echo -n "waiting for environment"
