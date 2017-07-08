@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"testing"
+
+	"github.com/jinzhu/gorm"
 )
 
 func TestScannableSlices(t *testing.T) {
@@ -48,7 +50,8 @@ type RecordWithSlice struct {
 type ExampleStringSlice []string
 
 func (l ExampleStringSlice) Value() (driver.Value, error) {
-	return json.Marshal(l)
+	bytes, err := json.Marshal(l)
+	return string(bytes), err
 }
 
 func (l *ExampleStringSlice) Scan(input interface{}) error {
@@ -70,7 +73,8 @@ type ExampleStruct struct {
 type ExampleStructSlice []ExampleStruct
 
 func (l ExampleStructSlice) Value() (driver.Value, error) {
-	return json.Marshal(l)
+	bytes, err := json.Marshal(l)
+	return string(bytes), err
 }
 
 func (l *ExampleStructSlice) Scan(input interface{}) error {
@@ -81,5 +85,55 @@ func (l *ExampleStructSlice) Scan(input interface{}) error {
 		return json.Unmarshal(value, l)
 	default:
 		return errors.New("not supported")
+	}
+}
+
+type ScannerDataType struct {
+	Street string `sql:"TYPE:varchar(24)"`
+}
+
+func (ScannerDataType) Value() (driver.Value, error) {
+	return nil, nil
+}
+
+func (*ScannerDataType) Scan(input interface{}) error {
+	return nil
+}
+
+type ScannerDataTypeTestStruct struct {
+	Field1          int
+	ScannerDataType *ScannerDataType `sql:"TYPE:json"`
+}
+
+type ScannerDataType2 struct {
+	Street string `sql:"TYPE:varchar(24)"`
+}
+
+func (ScannerDataType2) Value() (driver.Value, error) {
+	return nil, nil
+}
+
+func (*ScannerDataType2) Scan(input interface{}) error {
+	return nil
+}
+
+type ScannerDataTypeTestStruct2 struct {
+	Field1          int
+	ScannerDataType *ScannerDataType2
+}
+
+func TestScannerDataType(t *testing.T) {
+	scope := gorm.Scope{Value: &ScannerDataTypeTestStruct{}}
+	if field, ok := scope.FieldByName("ScannerDataType"); ok {
+		if DB.Dialect().DataTypeOf(field.StructField) != "json" {
+			t.Errorf("data type for scanner is wrong")
+		}
+	}
+
+	scope = gorm.Scope{Value: &ScannerDataTypeTestStruct2{}}
+	if field, ok := scope.FieldByName("ScannerDataType"); ok {
+		if DB.Dialect().DataTypeOf(field.StructField) != "varchar(24)" {
+			t.Errorf("data type for scanner is wrong")
+		}
 	}
 }

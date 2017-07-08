@@ -68,20 +68,6 @@ type AppLog struct {
 
 // NewAppLog returns a loggable struct
 func NewAppLog(loggerName string, msg []byte) *AppLog {
-	var (
-		err    error
-		isJson = false
-		fields = make(map[string]interface{})
-	)
-	if len(msg) > 1 && msg[0] == '{' {
-		isJson = true
-		err = json.Unmarshal(msg, &fields)
-	}
-	// if the msg is not json or unmarshalling it failed,
-	// store it as a string under the `msg` field
-	if !isJson || err != nil {
-		fields["msg"] = string(bytes.TrimSpace(msg))
-	}
 	now := time.Now().UTC()
 	return &AppLog{
 		Timestamp:  now.UnixNano(),
@@ -91,7 +77,9 @@ func NewAppLog(loggerName string, msg []byte) *AppLog {
 		Hostname:   hostname,
 		EnvVersion: "2.0",
 		Pid:        os.Getpid(),
-		Fields:     fields,
+		Fields: map[string]interface{}{
+			"msg": string(bytes.TrimSpace(msg)),
+		},
 	}
 }
 

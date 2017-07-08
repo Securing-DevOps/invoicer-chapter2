@@ -13,7 +13,7 @@ fail() {
 export AWS_DEFAULT_REGION=us-east-1
 
 datetag=$(date +%Y%m%d%H%M)
-identifier=invoicer$datetag
+identifier=$(whoami)-invoicer-$datetag
 mkdir -p tmp/$identifier
 
 echo "Creating EBS application $identifier"
@@ -76,7 +76,7 @@ sed "s/POSTGRESPASSREPLACEME/$dbpass/" ebs-options.json > tmp/$identifier/ebs-op
 sed -i "s/POSTGRESHOSTREPLACEME/$dbhost/" tmp/$identifier/ebs-options.json || fail
 aws elasticbeanstalk create-environment \
     --application-name $identifier \
-    --environment-name invoicer-api \
+    --environment-name $identifier-invoicer-api \
     --description "Invoicer API environment" \
     --tags "Key=Owner,Value=$(whoami)" \
     --solution-stack-name "$dockerstack" \
@@ -123,7 +123,7 @@ echo
 aws elasticbeanstalk update-environment \
     --application-name $identifier \
     --environment-id $apieid \
-    --version-label invoicer-api > tmp/$identifier/$apieid.json
+    --version-label $identifier-invoicer-api > tmp/$identifier/$apieid.json
 
 url="$(jq -r '.CNAME' tmp/$identifier/$apieid.json)"
 echo "Environment is being deployed. Public endpoint is http://$url"
