@@ -50,6 +50,14 @@ aws rds create-db-instance \
     --no-multi-az > tmp/$identifier/rds.json || fail
 echo "RDS Postgres database is being created. username=invoicer; password='$dbpass'"
 
+# tagging rds instance
+aws rds add-tags-to-resource \
+    --resource-name $(jq -r '.DBInstances[0].DBInstanceArn' tmp/$identifier/rds.json) \
+    --tags "Key=environment-name,Value=invoicer-api"
+aws rds add-tags-to-resource
+    --resource-name $(jq -r '.DBInstances[0].DBInstanceArn' tmp/$identifier/rds.json) \
+    --tags "Key=Owner,Value=$(whoami)"
+
 # Retrieve the database hostname
 while true;
 do
