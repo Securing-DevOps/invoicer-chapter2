@@ -5,6 +5,8 @@
 # DOCKER_PASS
 #
 # Read the README for more information.
+#
+# Not sure what the GO15VENDOREXPERIMENT or DOCKER_REPO are used for, they aren't in the book...
 machine:
   environment:
     GOPATH_HEAD: "$(echo $GOPATH | cut -d ':' -f 1)"
