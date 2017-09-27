@@ -3,22 +3,32 @@ Securing DevOps's invoicer
 
 A simple REST API that manages invoices.
 
+This is the code for Chapter 2 of Securing DevOps. It only contains the code and
+scripts relevant to the basic setup of the invoicer application and
+infrastructure.
+
 The master branch is kept at https://securing-devops.com/invoicer but if you are
-interested in chapter-specific versions of the invoicer, you may want to check out:
-
-- Chapter 2: https://securing-devops.com/ch02/invoicer
-- Chapter 3: https://securing-devops.com/ch03/invoicer
-
-To pull the live container of the master branch, use `docker pull securingdevops/invoicer`.
+interested in chapter-specific versions of the invoicer.
 
 Get your own copy
 -----------------
 
 To try out the code in this repository, first create a fork in your own github
-account, then sign up for circleci and build the project.
+account. Now before you do anything, edit the file in `.circleci/config.yml` and
+replace the `working_directory` parameter with your own namespace.
 
-The build will initially fail because it lacks the Docker credentials to push
-the invoicer's image to dockerhub.
+For example:
+```yaml
+    working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
+```
+would become:
+```yaml
+    working_directory: /go/src/github.com/jvehent/invoicer-chapter2
+```
+
+Then, sign up for circleci and build the project.The build will initially fail
+because it lacks the Docker credentials to push the invoicer's image to
+dockerhub.
 
 Head over to hub.docker.com, create an account, then create a repository to store
 the docker containers into.
@@ -38,6 +48,40 @@ You can then pull and run the container from your repository as follows:
 
 ```bash
 $ docker run -it securingdevops/invoicer-chapter2
+```
+
+Build the AWS infrastructure
+----------------------------
+
+The script `create_ebs_env.sh` creates a complete AWS infrastructure ready to
+host the invoicer. The script first creates a database, then an elastic
+beanstalk environment, and finally deploys the docker container of
+invoicer-chapter2. All you need to get started is creating an AWS account, then
+create a local profile (see chapter 2 for details) and run the following:
+
+```bash
+$ export AWS_PROFILE=cloudservices-aws-dev
+
+$ export AWS_REGION=eu-west-1
+
+$ ./create_ebs_env.sh
+```
+
+The script will outputs resources name and credentials for the new environment.
+```
+Creating EBS application ulfr-invoicer-201709231530
+default vpc is vpc-c02b81a5
+DB security group is sg-fc20478f
+RDS Postgres database is being created. username=invoicer; password='i0l2jSQ5WkK_441c8dXwlYods9'
+..................dbhost=ulfr-invoicer-201709231530.czvvrkdqhklf.us-east-1.rds.amazonaws.com
+ElasticBeanTalk application created
+API environment e-qp2pyjhhma is being created
+.....
+API security group sg-732d4a00 authorized to connect to database security group sg-fc20478f
+make_bucket: ulfr-invoicer-201709231530
+upload: ./app-version.json to s3://ulfr-invoicer-201709231530/app-version.json
+waiting for environment....................
+Environment is being deployed. Public endpoint is http://ulfr-invoicer-201709231530-invoicer-api.egmh2pupxy.us-east-1.elasticbeanstalk.com
 ```
 
 Manual build
@@ -82,14 +126,14 @@ Run
 ---
 
 ```bash
-$ docker run -it
--e INVOICER_USE_POSTGRES="yes"
--e INVOICER_POSTGRES_USER="invoicer"
--e INVOICER_POSTGRES_PASSWORD="invoicer"
--e INVOICER_POSTGRES_HOST="172.17.0.1"
--e INVOICER_POSTGRES_DB="invoicer"
--e INVOICER_POSTGRES_SSLMODE="disable"
-securingdevops/invoicer
+$ docker run -it \
+    -e INVOICER_USE_POSTGRES="yes" \
+    -e INVOICER_POSTGRES_USER="invoicer" \
+    -e INVOICER_POSTGRES_PASSWORD="invoicer" \
+    -e INVOICER_POSTGRES_HOST="172.17.0.1" \
+    -e INVOICER_POSTGRES_DB="invoicer" \
+    -e INVOICER_POSTGRES_SSLMODE="disable" \
+    securingdevops/invoicer-chapter2
 ```
 
 Use
