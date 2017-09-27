@@ -10,7 +10,7 @@ fail() {
     exit 1
 }
 
-export AWS_DEFAULT_REGION=us-east-1
+export AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
 
 datetag=$(date +%Y%m%d%H%M)
 identifier=$(whoami)-invoicer-$datetag
@@ -50,14 +50,6 @@ aws rds create-db-instance \
     --no-multi-az > tmp/$identifier/rds.json || fail
 echo "RDS Postgres database is being created. username=invoicer; password='$dbpass'"
 
-# tagging rds instance
-aws rds add-tags-to-resource \
-    --resource-name $(jq -r '.DBInstances[0].DBInstanceArn' tmp/$identifier/rds.json) \
-    --tags "Key=environment-name,Value=invoicer-api"
-aws rds add-tags-to-resource
-    --resource-name $(jq -r '.DBInstances[0].DBInstanceArn' tmp/$identifier/rds.json) \
-    --tags "Key=Owner,Value=$(whoami)"
-
 # Retrieve the database hostname
 while true;
 do
@@ -68,6 +60,14 @@ do
     sleep 10
 done
 echo "dbhost=$dbhost"
+
+# tagging rds instance
+aws rds add-tags-to-resource \
+    --resource-name $(jq -r '.DBInstances[0].DBInstanceArn' tmp/$identifier/rds.json) \
+    --tags "Key=environment-name,Value=invoicer-api"
+aws rds add-tags-to-resource \
+    --resource-name $(jq -r '.DBInstances[0].DBInstanceArn' tmp/$identifier/rds.json) \
+    --tags "Key=Owner,Value=$(whoami)"
 
 # Create an elasticbeantalk application
 aws elasticbeanstalk create-application \
@@ -131,7 +131,7 @@ echo
 aws elasticbeanstalk update-environment \
     --application-name $identifier \
     --environment-id $apieid \
-    --version-label $identifier-invoicer-api > tmp/$identifier/$apieid.json
+    --version-label invoicer-api > tmp/$identifier/$apieid.json
 
 url="$(jq -r '.CNAME' tmp/$identifier/$apieid.json)"
 echo "Environment is being deployed. Public endpoint is http://$url"
