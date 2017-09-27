@@ -1,52 +1,30 @@
 package mssql
 
-import (
-	"database/sql/driver"
-	"errors"
-	"io"
-	"testing"
-)
+import "testing"
 
-type netError struct{}
-
-func (e netError) Timeout() bool {
-	return true
+func TestBadOpen(t *testing.T) {
+	drv := driverWithProcess(t)
+	_, err := drv.open("port=bad")
+	if err == nil {
+		t.Fail()
+	}
 }
 
-func (e netError) Temporary() bool {
-	return true
-}
-
-func (e netError) Error() string {
-	return "dummy network error"
-}
-
-func TestCheckBadConn(t *testing.T) {
-	err := errors.New("not a network error")
-	tests := []struct {
-		name     string
-		err      error
-		expected error
+func TestIsProc(t *testing.T) {
+	list := []struct {
+		s  string
+		is bool
 	}{
-		{
-			name:     "network error",
-			err:      netError{},
-			expected: driver.ErrBadConn,
-		}, {
-			name:     "EOF",
-			err:      io.EOF,
-			expected: driver.ErrBadConn,
-		}, {
-			name:     "not an I/O error",
-			err:      err,
-			expected: err,
-		},
+		{"proc", true},
+		{"select 1;", false},
+		{"[proc 1]", true},
+		{"[proc\n1]", false},
 	}
 
-	for _, tt := range tests {
-		actual := CheckBadConn(tt.err)
-		if actual != tt.expected {
-			t.Error("%s: unexpected error.", tt.name)
+	for _, item := range list {
+		got := isProc(item.s)
+		if got != item.is {
+			t.Errorf("for %q, got %t want %t", item.s, got, item.is)
 		}
 	}
 }

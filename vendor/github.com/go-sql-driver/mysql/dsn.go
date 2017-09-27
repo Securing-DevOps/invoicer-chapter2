@@ -15,6 +15,8 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -28,28 +30,31 @@ var (
 
 // Config is a configuration parsed from a DSN string
 type Config struct {
-	User         string            // Username
-	Passwd       string            // Password (requires User)
-	Net          string            // Network type
-	Addr         string            // Network address (requires Net)
-	DBName       string            // Database name
-	Params       map[string]string // Connection parameters
-	Collation    string            // Connection collation
-	Loc          *time.Location    // Location for time.Time values
-	TLSConfig    string            // TLS configuration name
-	tls          *tls.Config       // TLS configuration
-	Timeout      time.Duration     // Dial timeout
-	ReadTimeout  time.Duration     // I/O read timeout
-	WriteTimeout time.Duration     // I/O write timeout
+	User             string            // Username
+	Passwd           string            // Password (requires User)
+	Net              string            // Network type
+	Addr             string            // Network address (requires Net)
+	DBName           string            // Database name
+	Params           map[string]string // Connection parameters
+	Collation        string            // Connection collation
+	Loc              *time.Location    // Location for time.Time values
+	MaxAllowedPacket int               // Max packet size allowed
+	TLSConfig        string            // TLS configuration name
+	tls              *tls.Config       // TLS configuration
+	Timeout          time.Duration     // Dial timeout
+	ReadTimeout      time.Duration     // I/O read timeout
+	WriteTimeout     time.Duration     // I/O write timeout
 
 	AllowAllFiles           bool // Allow all files to be used with LOAD DATA LOCAL INFILE
 	AllowCleartextPasswords bool // Allows the cleartext client side plugin
+	AllowNativePasswords    bool // Allows the native password authentication method
 	AllowOldPasswords       bool // Allows the old insecure password method
 	ClientFoundRows         bool // Return number of matching rows instead of rows changed
 	ColumnsWithAlias        bool // Prepend table alias to column names
 	InterpolateParams       bool // Interpolate placeholders into query string
 	MultiStatements         bool // Allow multiple statements in one query
 	ParseTime               bool // Parse time values to time.Time
+	RejectReadOnly          bool // Reject read-only connections
 	Strict                  bool // Return warnings as errors
 }
 
@@ -96,6 +101,15 @@ func (cfg *Config) FormatDSN() string {
 		} else {
 			hasParam = true
 			buf.WriteString("?allowCleartextPasswords=true")
+		}
+	}
+
+	if !cfg.AllowNativePasswords {
+		if hasParam {
+			buf.WriteString("&allowNativePasswords=false")
+		} else {
+			hasParam = true
+			buf.WriteString("?allowNativePasswords=false")
 		}
 	}
 
@@ -183,6 +197,15 @@ func (cfg *Config) FormatDSN() string {
 		buf.WriteString(cfg.ReadTimeout.String())
 	}
 
+	if cfg.RejectReadOnly {
+		if hasParam {
+			buf.WriteString("&rejectReadOnly=true")
+		} else {
+			hasParam = true
+			buf.WriteString("?rejectReadOnly=true")
+		}
+	}
+
 	if cfg.Strict {
 		if hasParam {
 			buf.WriteString("&strict=true")
@@ -222,9 +245,25 @@ func (cfg *Config) FormatDSN() string {
 		buf.WriteString(cfg.WriteTimeout.String())
 	}
 
+	if cfg.MaxAllowedPacket > 0 {
+		if hasParam {
+			buf.WriteString("&maxAllowedPacket=")
+		} else {
+			hasParam = true
+			buf.WriteString("?maxAllowedPacket=")
+		}
+		buf.WriteString(strconv.Itoa(cfg.MaxAllowedPacket))
+
+	}
+
 	// other params
 	if cfg.Params != nil {
-		for param, value := range cfg.Params {
+		var params []string
+		for param := range cfg.Params {
+			params = append(params, param)
+		}
+		sort.Strings(params)
+		for _, param := range params {
 			if hasParam {
 				buf.WriteByte('&')
 			} else {
@@ -234,7 +273,7 @@ func (cfg *Config) FormatDSN() string {
 
 			buf.WriteString(param)
 			buf.WriteByte('=')
-			buf.WriteString(url.QueryEscape(value))
+			buf.WriteString(url.QueryEscape(cfg.Params[param]))
 		}
 	}
 
@@ -245,8 +284,9 @@ func (cfg *Config) FormatDSN() string {
 func ParseDSN(dsn string) (cfg *Config, err error) {
 	// New config with some default values
 	cfg = &Config{
-		Loc:       time.UTC,
-		Collation: defaultCollation,
+		Loc:                  time.UTC,
+		Collation:            defaultCollation,
+		AllowNativePasswords: true,
 	}
 
 	// [user[:password]@][net[(addr)]]/dbname[?param1=value1&paramN=valueN]
@@ -336,6 +376,9 @@ func ParseDSN(dsn string) (cfg *Config, err error) {
 		}
 
 	}
+	if cfg.Net == "tcp" {
+		cfg.Addr = ensureHavePort(cfg.Addr)
+	}
 
 	return
 }
@@ -364,6 +407,14 @@ func parseDSNParams(cfg *Config, params string) (err error) {
 		case "allowCleartextPasswords":
 			var isBool bool
 			cfg.AllowCleartextPasswords, isBool = readBool(value)
+			if !isBool {
+				return errors.New("invalid bool value: " + value)
+			}
+
+		// Use native password authentication
+		case "allowNativePasswords":
+			var isBool bool
+			cfg.AllowNativePasswords, isBool = readBool(value)
 			if !isBool {
 				return errors.New("invalid bool value: " + value)
 			}
@@ -441,6 +492,14 @@ func parseDSNParams(cfg *Config, params string) (err error) {
 				return
 			}
 
+		// Reject read-only connections
+		case "rejectReadOnly":
+			var isBool bool
+			cfg.RejectReadOnly, isBool = readBool(value)
+			if !isBool {
+				return errors.New("invalid bool value: " + value)
+			}
+
 		// Strict mode
 		case "strict":
 			var isBool bool
@@ -463,6 +522,10 @@ func parseDSNParams(cfg *Config, params string) (err error) {
 				if boolValue {
 					cfg.TLSConfig = "true"
 					cfg.tls = &tls.Config{}
+					host, _, err := net.SplitHostPort(cfg.Addr)
+					if err == nil {
+						cfg.tls.ServerName = host
+					}
 				} else {
 					cfg.TLSConfig = "false"
 				}
@@ -475,7 +538,7 @@ func parseDSNParams(cfg *Config, params string) (err error) {
 					return fmt.Errorf("invalid value for TLS config name: %v", err)
 				}
 
-				if tlsConfig, ok := tlsConfigRegister[name]; ok {
+				if tlsConfig := getTLSConfigClone(name); tlsConfig != nil {
 					if len(tlsConfig.ServerName) == 0 && !tlsConfig.InsecureSkipVerify {
 						host, _, err := net.SplitHostPort(cfg.Addr)
 						if err == nil {
@@ -496,7 +559,11 @@ func parseDSNParams(cfg *Config, params string) (err error) {
 			if err != nil {
 				return
 			}
-
+		case "maxAllowedPacket":
+			cfg.MaxAllowedPacket, err = strconv.Atoi(value)
+			if err != nil {
+				return
+			}
 		default:
 			// lazy init
 			if cfg.Params == nil {
@@ -510,4 +577,11 @@ func parseDSNParams(cfg *Config, params string) (err error) {
 	}
 
 	return
+}
+
+func ensureHavePort(addr string) string {
+	if _, _, err := net.SplitHostPort(addr); err != nil {
+		return net.JoinHostPort(addr, "3306")
+	}
+	return addr
 }

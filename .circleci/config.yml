@@ -3,7 +3,7 @@ jobs:
   build:
     # Variable expansion in working_directory not supported at this time
     # You will need to modify the code below to reflect your github account/repo setup
-    working_directory: /go/src/github.com/eeble/invoicer-chapter3
+    working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter3
     docker:
       - image: circleci/golang:1.8
     environment:
@@ -17,25 +17,19 @@ jobs:
 
       - run: echo 'export GOPATH_HEAD="$(echo ${GOPATH}|cut -d ':' -f 1)"' >> $BASH_ENV
       - run: echo 'export GOPATH_BASE="${GOPATH_HEAD}/src/github.com/${CIRCLE_PROJECT_USERNAME}"' >> $BASH_ENV
-      - run: echo 'DOCKER_REPO="$(if [ ${CIRCLE_PROJECT_USERNAME} == 'Securing-DevOps' ]; then echo securingdevops; else echo $DOCKER_USER; fi)"' >> $BASH_ENV
+      - run: echo 'export DOCKER_REPO="$(if [ ${CIRCLE_PROJECT_USERNAME} == 'Securing-DevOps' ]; then echo securingdevops; else echo $DOCKER_USER; fi)"' >> $BASH_ENV
       - run: mkdir -p "${GOPATH_BASE}"
       - run: mkdir -p "${GOPATH_HEAD}/bin"
       - run: go get github.com/govend/govend
-      #- run: ln -fs "${HOME}/${CIRCLE_PROJECT_REPONAME}" "${GOPATH_BASE}/"
-          
-          
-          
-      - run:
-          name: GO test application
-          command: go test github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
 
       - run:
-          name: Prepare application for OWASP ZAP testing
+          name: Build application container
           command: |
             go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
             [ ! -e bin ] && mkdir bin;
             cp "${GOPATH_HEAD}/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
             docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
+
       - run:
           name: Run application in background
           command: |
@@ -43,24 +37,33 @@ jobs:
           background: true
 
       - run:
-          name: OWASP ZAP testing of application
+          name: ZAP baseline test of application
+          # Only fail on error code 1, which indicates at least one FAIL was found.
+          # error codes 2 & 3 indicate WARN or other, and should not break the run
           command: |
-            docker run -t owasp/zap2docker-weekly zap-baseline.py -u https://raw.githubusercontent.com/Securing-DevOps/invoicer/master/zap-baseline.conf -t http://172.17.0.2:8080/
+            (
+            docker pull owasp/zap2docker-weekly && \
+            docker run -t owasp/zap2docker-weekly zap-baseline.py \
+                -u https://raw.githubusercontent.com/${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}/master/zap-baseline.conf \
+                -t http://172.17.0.2:8080/ || \
+            if [ $? -ne 1 ]; then exit 0; else exit 1; fi;
+            )
 
       - run:
-          name: Run govend
+          name: Test dependencies are up to date
           command: 'GOPATH="${GOPATH_HEAD}"; ( cd ${GOPATH_BASE}/${CIRCLE_PROJECT_REPONAME} && govend -u && git diff --quiet )'
 
       - deploy:
+          # Push application container to dockerhub
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            docker login -u ${DOCKER_USER} -p ${DOCKER_PASS};
-            echo ${DOCKER_USER}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG};
-            go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
-            mkdir bin;
-            cp "$GOPATH_HEAD/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
-            docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
-            docker images --no-trunc | awk '/^app/ {print $3}' | sudo tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt;
-            docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME};
+                docker login -u ${DOCKER_USER} -p ${DOCKER_PASS};
+                echo ${DOCKER_USER}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG};
+                go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
+                mkdir bin;
+                cp "$GOPATH_HEAD/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
+                docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
+                docker images --no-trunc | awk '/^app/ {print $3}' | sudo tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt;
+                docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME};
             fi
             

@@ -33,5 +33,5 @@ showcoverage: test
 generate:
 	$(GO) generate
 
-.PHONY: all test generate clean
+.PHONY: all test generate clean vendor
 
