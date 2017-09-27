@@ -10,10 +10,10 @@ fail() {
     exit 1
 }
 
-export AWS_DEFAULT_REGION=us-east-1
+export AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
 
 datetag=$(date +%Y%m%d%H%M)
-identifier=invoicer$datetag
+identifier=$(whoami)-invoicer-$datetag
 mkdir -p tmp/$identifier
 
 echo "Creating EBS application $identifier"
@@ -42,7 +42,7 @@ aws rds create-db-instance \
     --allocated-storage "$dbstorage" \
     --db-instance-class "$dbinstclass" \
     --engine postgres \
-    --engine-version 9.4.5 \
+    --engine-version 9.6.2 \
     --auto-minor-version-upgrade \
     --publicly-accessible \
     --master-username invoicer \
@@ -61,6 +61,14 @@ do
 done
 echo "dbhost=$dbhost"
 
+# tagging rds instance
+aws rds add-tags-to-resource \
+    --resource-name $(jq -r '.DBInstances[0].DBInstanceArn' tmp/$identifier/rds.json) \
+    --tags "Key=environment-name,Value=invoicer-api"
+aws rds add-tags-to-resource \
+    --resource-name $(jq -r '.DBInstances[0].DBInstanceArn' tmp/$identifier/rds.json) \
+    --tags "Key=Owner,Value=$(whoami)"
+
 # Create an elasticbeantalk application
 aws elasticbeanstalk create-application \
     --application-name $identifier \
@@ -76,7 +84,7 @@ sed "s/POSTGRESPASSREPLACEME/$dbpass/" ebs-options.json > tmp/$identifier/ebs-op
 sed -i "s/POSTGRESHOSTREPLACEME/$dbhost/" tmp/$identifier/ebs-options.json || fail
 aws elasticbeanstalk create-environment \
     --application-name $identifier \
-    --environment-name invoicer-api \
+    --environment-name $identifier-invoicer-api \
     --description "Invoicer API environment" \
     --tags "Key=Owner,Value=$(whoami)" \
     --solution-stack-name "$dockerstack" \
@@ -102,11 +110,11 @@ echo "API security group $sgid authorized to connect to database security group 
 
 # Upload the application version
 aws s3 mb s3://$identifier
-aws s3 cp ebs.json s3://$identifier/
+aws s3 cp app-version.json s3://$identifier/
 aws elasticbeanstalk create-application-version \
     --application-name "$identifier" \
     --version-label invoicer-api \
-    --source-bundle "S3Bucket=$identifier,S3Key=ebs.json" > tmp/$identifier/appversion.json
+    --source-bundle "S3Bucket=$identifier,S3Key=app-version.json" > tmp/$identifier/app-version-s3.json
 
 # Wait for the environment to be ready (green)
 echo -n "waiting for environment"
@@ -127,3 +135,4 @@ aws elasticbeanstalk update-environment \
 
 url="$(jq -r '.CNAME' tmp/$identifier/$apieid.json)"
 echo "Environment is being deployed. Public endpoint is http://$url"
+
