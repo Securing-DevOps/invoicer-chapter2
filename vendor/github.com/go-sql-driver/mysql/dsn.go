@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -103,12 +104,12 @@ func (cfg *Config) FormatDSN() string {
 		}
 	}
 
-	if cfg.AllowNativePasswords {
+	if !cfg.AllowNativePasswords {
 		if hasParam {
-			buf.WriteString("&allowNativePasswords=true")
+			buf.WriteString("&allowNativePasswords=false")
 		} else {
 			hasParam = true
-			buf.WriteString("?allowNativePasswords=true")
+			buf.WriteString("?allowNativePasswords=false")
 		}
 	}
 
@@ -257,7 +258,12 @@ func (cfg *Config) FormatDSN() string {
 
 	// other params
 	if cfg.Params != nil {
-		for param, value := range cfg.Params {
+		var params []string
+		for param := range cfg.Params {
+			params = append(params, param)
+		}
+		sort.Strings(params)
+		for _, param := range params {
 			if hasParam {
 				buf.WriteByte('&')
 			} else {
@@ -267,7 +273,7 @@ func (cfg *Config) FormatDSN() string {
 
 			buf.WriteString(param)
 			buf.WriteByte('=')
-			buf.WriteString(url.QueryEscape(value))
+			buf.WriteString(url.QueryEscape(cfg.Params[param]))
 		}
 	}
 
@@ -278,8 +284,9 @@ func (cfg *Config) FormatDSN() string {
 func ParseDSN(dsn string) (cfg *Config, err error) {
 	// New config with some default values
 	cfg = &Config{
-		Loc:       time.UTC,
-		Collation: defaultCollation,
+		Loc:                  time.UTC,
+		Collation:            defaultCollation,
+		AllowNativePasswords: true,
 	}
 
 	// [user[:password]@][net[(addr)]]/dbname[?param1=value1&paramN=valueN]
@@ -368,6 +375,9 @@ func ParseDSN(dsn string) (cfg *Config, err error) {
 			return nil, errors.New("default addr for network '" + cfg.Net + "' unknown")
 		}
 
+	}
+	if cfg.Net == "tcp" {
+		cfg.Addr = ensureHavePort(cfg.Addr)
 	}
 
 	return
@@ -567,4 +577,11 @@ func parseDSNParams(cfg *Config, params string) (err error) {
 	}
 
 	return
+}
+
+func ensureHavePort(addr string) string {
+	if _, _, err := net.SplitHostPort(addr); err != nil {
+		return net.JoinHostPort(addr, "3306")
+	}
+	return addr
 }

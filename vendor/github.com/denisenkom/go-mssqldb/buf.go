@@ -1,11 +1,9 @@
 package mssql
 
 import (
-	"database/sql/driver"
 	"encoding/binary"
 	"errors"
 	"io"
-	"net"
 )
 
 type packetType uint8
@@ -53,19 +51,6 @@ func newTdsBuffer(bufsize uint16, transport io.ReadWriteCloser) *tdsBuffer {
 	return w
 }
 
-func checkBadConn(err error) error {
-	if err == io.EOF {
-		return driver.ErrBadConn
-	}
-
-	switch err.(type) {
-	case net.Error:
-		return driver.ErrBadConn
-	default:
-		return err
-	}
-}
-
 func (rw *tdsBuffer) ResizeBuffer(packetsizei int) {
 	if len(rw.rbuf) != packetsizei {
 		newbuf := make([]byte, packetsizei)
@@ -84,15 +69,15 @@ func (w *tdsBuffer) PackageSize() uint32 {
 }
 
 func (w *tdsBuffer) flush() (err error) {
-	// writing packet size
+	// Write packet size.
 	binary.BigEndian.PutUint16(w.wbuf[2:], w.wpos)
 
-	// writing packet into underlying transport
+	// Write packet into underlying transport.
 	if _, err = w.transport.Write(w.wbuf[:w.wpos]); err != nil {
 		return err
 	}
 
-	// execute afterFirst hook if it is set
+	// Execute afterFirst hook if it is set.
 	if w.afterFirst != nil {
 		w.afterFirst()
 		w.afterFirst = nil
@@ -152,7 +137,7 @@ func (r *tdsBuffer) readNextPacket() error {
 	var err error
 	err = binary.Read(r.transport, binary.BigEndian, &header)
 	if err != nil {
-		return checkBadConn(err)
+		return err
 	}
 	offset := uint16(binary.Size(header))
 	if int(header.Size) > len(r.rbuf) {
@@ -163,7 +148,7 @@ func (r *tdsBuffer) readNextPacket() error {
 	}
 	_, err = io.ReadFull(r.transport, r.rbuf[offset:header.Size])
 	if err != nil {
-		return checkBadConn(err)
+		return err
 	}
 	r.rpos = offset
 	r.rsize = header.Size
@@ -206,7 +191,7 @@ func (r *tdsBuffer) byte() byte {
 func (r *tdsBuffer) ReadFull(buf []byte) {
 	_, err := io.ReadFull(r, buf[:])
 	if err != nil {
-		badStreamPanic(checkBadConn(err))
+		badStreamPanic(err)
 	}
 }
 
