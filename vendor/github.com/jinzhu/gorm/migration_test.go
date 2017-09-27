@@ -18,7 +18,7 @@ type User struct {
 	UserNum           Num
 	Name              string `sql:"size:255"`
 	Email             string
-	Birthday          time.Time     // Time
+	Birthday          *time.Time    // Time
 	CreatedAt         time.Time     // CreatedAt: Time of record is created, will be insert automatically
 	UpdatedAt         time.Time     // UpdatedAt: Time of record is updated, will be updated automatically
 	Emails            []Email       // Embedded structs
@@ -31,9 +31,8 @@ type User struct {
 	Languages         []Language `gorm:"many2many:user_languages;"`
 	CompanyID         *int
 	Company           Company
-	Role
+	Role              Role
 	PasswordHash      []byte
-	Sequence          uint                  `gorm:"AUTO_INCREMENT"`
 	IgnoreMe          int64                 `sql:"-"`
 	IgnoreStringSlice []string              `sql:"-"`
 	Ignored           struct{ Name string } `sql:"-"`
@@ -66,7 +65,7 @@ type CreditCard struct {
 	UserId    sql.NullInt64
 	CreatedAt time.Time `sql:"not null"`
 	UpdatedAt time.Time
-	DeletedAt *time.Time
+	DeletedAt *time.Time `sql:"column:deleted_time"`
 }
 
 type Email struct {
@@ -117,7 +116,7 @@ type Company struct {
 }
 
 type Role struct {
-	Name string
+	Name string `gorm:"size:256"`
 }
 
 func (role *Role) Scan(value interface{}) error {
@@ -180,6 +179,9 @@ type Post struct {
 type Category struct {
 	gorm.Model
 	Name string
+
+	Categories []Category
+	CategoryID *uint
 }
 
 type Comment struct {
@@ -252,11 +254,10 @@ func runMigration() {
 		DB.Exec(fmt.Sprintf("drop table %v;", table))
 	}
 
-	values := []interface{}{&Short{}, &ReallyLongThingThatReferencesShort{}, &ReallyLongTableNameToTestMySQLNameLengthLimit{}, &NotSoLongTableName{}, &Product{}, &Email{}, &Address{}, &CreditCard{}, &Company{}, &Role{}, &Language{}, &HNPost{}, &EngadgetPost{}, &Animal{}, &User{}, &JoinTable{}, &Post{}, &Category{}, &Comment{}, &Cat{}, &Dog{}, &Toy{}}
+	values := []interface{}{&Short{}, &ReallyLongThingThatReferencesShort{}, &ReallyLongTableNameToTestMySQLNameLengthLimit{}, &NotSoLongTableName{}, &Product{}, &Email{}, &Address{}, &CreditCard{}, &Company{}, &Role{}, &Language{}, &HNPost{}, &EngadgetPost{}, &Animal{}, &User{}, &JoinTable{}, &Post{}, &Category{}, &Comment{}, &Cat{}, &Dog{}, &Hamster{}, &Toy{}, &ElementWithIgnoredField{}}
 	for _, value := range values {
 		DB.DropTable(value)
 	}
-
 	if err := DB.AutoMigrate(values...).Error; err != nil {
 		panic(fmt.Sprintf("No error should happen when create table, but got %+v", err))
 	}
@@ -331,38 +332,36 @@ func TestIndexes(t *testing.T) {
 	}
 }
 
-type BigEmail struct {
+type EmailWithIdx struct {
 	Id           int64
 	UserId       int64
-	Email        string    `sql:"index:idx_email_agent"`
-	UserAgent    string    `sql:"index:idx_email_agent"`
-	RegisteredAt time.Time `sql:"unique_index"`
+	Email        string     `sql:"index:idx_email_agent"`
+	UserAgent    string     `sql:"index:idx_email_agent"`
+	RegisteredAt *time.Time `sql:"unique_index"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
 
-func (b BigEmail) TableName() string {
-	return "emails"
-}
-
 func TestAutoMigration(t *testing.T) {
 	DB.AutoMigrate(&Address{})
-	if err := DB.Table("emails").AutoMigrate(&BigEmail{}).Error; err != nil {
+	DB.DropTable(&EmailWithIdx{})
+	if err := DB.AutoMigrate(&EmailWithIdx{}).Error; err != nil {
 		t.Errorf("Auto Migrate should not raise any error")
 	}
 
-	DB.Save(&BigEmail{Email: "jinzhu@example.org", UserAgent: "pc", RegisteredAt: time.Now()})
+	now := time.Now()
+	DB.Save(&EmailWithIdx{Email: "jinzhu@example.org", UserAgent: "pc", RegisteredAt: &now})
 
-	scope := DB.NewScope(&BigEmail{})
+	scope := DB.NewScope(&EmailWithIdx{})
 	if !scope.Dialect().HasIndex(scope.TableName(), "idx_email_agent") {
 		t.Errorf("Failed to create index")
 	}
 
-	if !scope.Dialect().HasIndex(scope.TableName(), "uix_emails_registered_at") {
+	if !scope.Dialect().HasIndex(scope.TableName(), "uix_email_with_idxes_registered_at") {
 		t.Errorf("Failed to create index")
 	}
 
-	var bigemail BigEmail
+	var bigemail EmailWithIdx
 	DB.First(&bigemail, "user_agent = ?", "pc")
 	if bigemail.Email != "jinzhu@example.org" || bigemail.UserAgent != "pc" || bigemail.RegisteredAt.IsZero() {
 		t.Error("Big Emails should be saved and fetched correctly")
@@ -383,7 +382,7 @@ func TestMultipleIndexes(t *testing.T) {
 	}
 
 	DB.AutoMigrate(&MultipleIndexes{})
-	if err := DB.AutoMigrate(&BigEmail{}).Error; err != nil {
+	if err := DB.AutoMigrate(&EmailWithIdx{}).Error; err != nil {
 		t.Errorf("Auto Migrate should not raise any error")
 	}
 

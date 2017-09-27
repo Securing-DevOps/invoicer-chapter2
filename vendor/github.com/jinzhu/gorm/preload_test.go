@@ -90,7 +90,36 @@ func TestPreload(t *testing.T) {
 			}
 		} else if len(user.Emails) != 0 {
 			t.Errorf("should not preload any emails for other users when with condition")
+		} else if user.Emails == nil {
+			t.Errorf("should return an empty slice to indicate zero results")
 		}
+	}
+}
+
+func TestAutoPreload(t *testing.T) {
+	user1 := getPreloadUser("auto_user1")
+	DB.Save(user1)
+
+	preloadDB := DB.Set("gorm:auto_preload", true).Where("role = ?", "Preload")
+	var user User
+	preloadDB.Find(&user)
+	checkUserHasPreloadData(user, t)
+
+	user2 := getPreloadUser("auto_user2")
+	DB.Save(user2)
+
+	var users []User
+	preloadDB.Find(&users)
+
+	for _, user := range users {
+		checkUserHasPreloadData(user, t)
+	}
+
+	var users2 []*User
+	preloadDB.Find(&users2)
+
+	for _, user := range users2 {
+		checkUserHasPreloadData(*user, t)
 	}
 }
 
@@ -592,8 +621,14 @@ func TestNestedPreload9(t *testing.T) {
 		},
 		Level2_1: Level2_1{
 			Level1s: []Level1{
-				{Value: "value3-3"},
-				{Value: "value4-4"},
+				{
+					Value:   "value3-3",
+					Level0s: []Level0{},
+				},
+				{
+					Value:   "value4-4",
+					Level0s: []Level0{},
+				},
 			},
 		},
 	}
@@ -656,7 +691,8 @@ func TestNestedPreload10(t *testing.T) {
 			},
 		},
 		{
-			Value: "bar 2",
+			Value:    "bar 2",
+			LevelA3s: []*LevelA3{},
 		},
 	}
 	for _, levelA2 := range want {
@@ -789,7 +825,7 @@ func TestNestedPreload12(t *testing.T) {
 }
 
 func TestManyToManyPreloadWithMultiPrimaryKeys(t *testing.T) {
-	if dialect := os.Getenv("GORM_DIALECT"); dialect == "" || dialect == "sqlite" {
+	if dialect := os.Getenv("GORM_DIALECT"); dialect == "" || dialect == "sqlite" || dialect == "mssql" {
 		return
 	}
 

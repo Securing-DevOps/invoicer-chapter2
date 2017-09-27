@@ -872,3 +872,36 @@ func TestLongForeignKey(t *testing.T) {
 func TestLongForeignKeyWithShortDest(t *testing.T) {
 	testForeignKey(t, &ReallyLongThingThatReferencesShort{}, "ShortID", &Short{}, "ID")
 }
+
+func TestHasManyChildrenWithOneStruct(t *testing.T) {
+	category := Category{
+		Name: "main",
+		Categories: []Category{
+			{Name: "sub1"},
+			{Name: "sub2"},
+		},
+	}
+
+	DB.Save(&category)
+}
+
+func TestSkipSaveAssociation(t *testing.T) {
+	type Company struct {
+		gorm.Model
+		Name string
+	}
+
+	type User struct {
+		gorm.Model
+		Name      string
+		CompanyID uint
+		Company   Company `gorm:"save_associations:false"`
+	}
+	DB.AutoMigrate(&Company{}, &User{})
+
+	DB.Save(&User{Name: "jinzhu", Company: Company{Name: "skip_save_association"}})
+
+	if !DB.Where("name = ?", "skip_save_association").First(&Company{}).RecordNotFound() {
+		t.Errorf("Company skip_save_association should not been saved")
+	}
+}

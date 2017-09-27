@@ -32,8 +32,18 @@ func beforeCreateCallback(scope *Scope) {
 func updateTimeStampForCreateCallback(scope *Scope) {
 	if !scope.HasError() {
 		now := NowFunc()
-		scope.SetColumn("CreatedAt", now)
-		scope.SetColumn("UpdatedAt", now)
+
+		if createdAtField, ok := scope.FieldByName("CreatedAt"); ok {
+			if createdAtField.IsBlank {
+				createdAtField.Set(now)
+			}
+		}
+
+		if updatedAtField, ok := scope.FieldByName("UpdatedAt"); ok {
+			if updatedAtField.IsBlank {
+				updatedAtField.Set(now)
+			}
+		}
 	}
 }
 
@@ -117,8 +127,13 @@ func createCallback(scope *Scope) {
 				}
 			}
 		} else {
-			if err := scope.SQLDB().QueryRow(scope.SQL, scope.SQLVars...).Scan(primaryField.Field.Addr().Interface()); scope.Err(err) == nil {
-				scope.db.RowsAffected = 1
+			if primaryField.Field.CanAddr() {
+				if err := scope.SQLDB().QueryRow(scope.SQL, scope.SQLVars...).Scan(primaryField.Field.Addr().Interface()); scope.Err(err) == nil {
+					primaryField.IsBlank = false
+					scope.db.RowsAffected = 1
+				}
+			} else {
+				scope.Err(ErrUnaddressable)
 			}
 		}
 	}
