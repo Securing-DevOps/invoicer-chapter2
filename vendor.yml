@@ -18,7 +18,7 @@ vendors:
 - path: github.com/gorilla/sessions
   rev: b61c93cb7f67533c8bfbb5ea450efc07e5833c5e
 - path: github.com/jinzhu/gorm
-  rev: b1885a643b4977c9089d77eb07c0fd96591f94b8
+  rev: 3a9e91ab372120a0e35b518430255308e3d8d5ea
 - path: github.com/jinzhu/inflection
   rev: 1c35d901db3da928c72a72d8458480cc9ade058f
 - path: github.com/jinzhu/now
@@ -26,7 +26,7 @@ vendors:
 - path: github.com/lib/pq
   rev: b77235e3890a962fe8a6f8c4c7198679ca7814e7
 - path: github.com/mattn/go-sqlite3
-  rev: 05548ff55570cdb9ac72ff4a25a3b5e77a6fb7e5
+  rev: 5160b48509cf5c877bc22c11c373f8c7738cdb38
 - path: github.com/pmezard/go-difflib
   rev: 792786c7400a136282c1664665ae0a8db921c6c2
 - path: github.com/stretchr/testify
@@ -36,11 +36,11 @@ vendors:
 - path: go.mozilla.org/mozlog
   rev: 4bb13139d40339f59bf140d0f5f28be83b07cc58
 - path: golang.org/x/crypto
-  rev: 847319b7fc94cab682988f93da778204da164588
+  rev: 76eec36fa14229c4b25bb894c2d0e591527af429
 - path: golang.org/x/net
   rev: 0a9397675ba34b2845f758fe3cd68828369c6517
 - path: golang.org/x/oauth2
-  rev: 13449ad91cb26cb47661c1b080790392170385fd
+  rev: bb50c06baba3d0c76f9d125c0719093e315b5b44
 - path: golang.org/x/sync
   rev: 8e0aa688b654ef28caa72506fa5ec8dba9fc7690
 - path: google.golang.org/appengine
