@@ -1,4 +1,4 @@
-Securing DevOps's invoicer
+# Securing DevOps's invoicer
 ==========================
 
 A simple REST API that manages invoices.
@@ -10,7 +10,20 @@ infrastructure.
 The master branch is kept at https://securing-devops.com/invoicer but if you are
 interested in chapter-specific versions of the invoicer.
 
-Get your own copy
+
+## Running locally
+-----------------
+
+The book was only concerned with getting things running in the cloud. It does not
+provide enough information to debug problems locally if something goes wrong. These
+instructions should fill that gap.
+
+1. Install golang
+2. Set the $GOPATH variable to where you would like it
+3. Clone the repository
+4. Change all files to point to your repository and follow along in cloud
+
+## Get your own copy
 -----------------
 
 To try out the code in this repository, first create a fork in your own github
