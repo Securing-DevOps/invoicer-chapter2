@@ -1,5 +1,4 @@
-# Securing DevOps's invoicer
-==========================
+# Actionable Lab's invoicer (Clone of Securing DevOps)
 
 A simple REST API that manages invoices.
 
@@ -11,20 +10,8 @@ The master branch is kept at https://securing-devops.com/invoicer but if you are
 interested in chapter-specific versions of the invoicer.
 
 
-## Running locally
------------------
-
-The book was only concerned with getting things running in the cloud. It does not
-provide enough information to debug problems locally if something goes wrong. These
-instructions should fill that gap.
-
-1. Install golang
-2. Set the $GOPATH variable to where you would like it
-3. Clone the repository
-4. Change all files to point to your repository and follow along in cloud
 
 ## Get your own copy
------------------
 
 To try out the code in this repository, first create a fork in your own github
 account. Now before you do anything, edit the file in `.circleci/config.yml` and
@@ -32,11 +19,11 @@ replace the `working_directory` parameter with your own namespace.
 
 For example:
 ```yaml
-    working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
+    working_directory: /go/src/github.com/actionable-labs/invoicer-chapter2
 ```
 would become:
 ```yaml
-    working_directory: /go/src/github.com/jvehent/invoicer-chapter2
+    working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
 ```
 
 Then, sign up for circleci and build the project.The build will initially fail
@@ -64,7 +51,6 @@ $ docker run -it securingdevops/invoicer-chapter2
 ```
 
 Build the AWS infrastructure
-----------------------------
 
 The script `create_ebs_env.sh` creates a complete AWS infrastructure ready to
 host the invoicer. The script first creates a database, then an elastic
@@ -97,6 +83,17 @@ waiting for environment....................
 Environment is being deployed. Public endpoint is http://ulfr-invoicer-201709231530-invoicer-api.egmh2pupxy.us-east-1.elasticbeanstalk.com
 ```
 
+Setup for Manual build/run
+---------------
+
+**Actionable Labs** The book was only concerned with getting things running in the 
+cloud. It does not provide enough information to debug problems locally if something 
+goes wrong. These instructions should fill that gap.
+
+1. Install golang
+2. Set the $GOPATH variable to where you would like it
+3. Clone the repository
+
 Manual build
 ------------
 
@@ -109,7 +106,7 @@ $ go build --ldflags '-extldflags "-static"' -o bin/invoicer .
 
 Then build the container.
 ```bash
-$ docker build -t securingdevops/invoicer .
+$ docker build -t actionablelabs/invoicer .
 ```
 
 Database Configuration

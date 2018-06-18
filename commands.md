@@ -1,6 +1,105 @@
 
 
+### Notes for next time
+
+I am having difficulty getting the postgresl image working. This is similar to the 
+use with my weight tracker app, so check that for guidance. In that app, I created
+an init script (included in this directory). Although that shouldn't be necessary,
+I suggest trying that for this. 
+
+### Take inventory 
+    clear
+    sudo docker network list | grep secdevops
+    sudo docker volume list | grep secdevops
+    sudo docker container list -a | grep -E "NAMES|secdevops"
+    echo $PGSQLID
+
+    sudo docker image list
+
+### Running the database container
+
+    # run the database container
+    # https://hub.docker.com/_/postgres/
+    sudo docker run \
+      --name secdevops-pgsql \
+      --mount source=secdevops_pgsql,target=/var/lib/postgresql/data/pgdata \
+      --network secdevops-net \
+      -p 5432:5432 \
+      -e POSTGRES_USER=invoicer \
+      -e POSTGRES_PASSWORD=Password1 \
+      -e POSTGRES_DB=invoicer \
+      -e PGDATA=/var/lib/postgresql/data/pgdata \
+      --rm \
+      -d \
+      postgres
     
+    # run bash in the database container
+    sudo docker exec -it secdevops-pgsql bash
+
+### While logged into database container
+
+    psql --username "$POSTGRES_USER" --dbname "$POSTGRES_DB"
+
+### Running pgadmin4
+
+    #sudo docker pull dpage/pgadmin4
+    sudo docker run \
+      -it -p 5002:80 \
+      --name pgadmin_dock \
+      --network secdevops-net \
+      -e "PGADMIN_DEFAULT_EMAIL=user@domain.com" \
+      -e "PGADMIN_DEFAULT_PASSWORD=Password1" \
+      --rm \
+      dpage/pgadmin4
+
+### Running the invoicer-chapter2 example
+
+    PGSQLID="172.19.0.2"
+
+    sudo docker run -it \
+      -e INVOICER_USE_POSTGRES="yes" \
+      -e INVOICER_POSTGRES_USER="invoicer" \
+      -e INVOICER_POSTGRES_PASSWORD="Password1" \
+      -e INVOICER_POSTGRES_HOST=$PGSQLID \
+      -e INVOICER_POSTGRES_DB="invoicer" \
+      -e INVOICER_POSTGRES_SSLMODE="disable" \
+      --network secdevops-net \
+      --rm \
+      actionablelabs/invoicer-chapter2
+
+    sudo docker run -it \
+      --name secdevops-invoicer \
+      -e INVOICER_USE_POSTGRES="" \
+      -e INVOICER_POSTGRES_USER="invoicer" \
+      -e INVOICER_POSTGRES_PASSWORD="Password1" \
+      -e INVOICER_POSTGRES_HOST=$PGSQLID \
+      -e INVOICER_POSTGRES_DB="invoicer" \
+      -e INVOICER_POSTGRES_SSLMODE="disable" \
+      --network secdevops-net \
+      --rm \
+      -d \
+      actionablelabs/invoicer-chapter2
+
+    # run bash in the database container
+    sudo docker exec -it -u root -w /root secdevops-invoicer /bin/sh 
+ 
+
+    sudo docker exec -it secdevops-invoicer /bin/sh
+
+### Teardown
+    sudo docker volume rm secdevops_pgsql 
+    sudo docker volume create secdevops_pgsql 
+
+    sudo docker container stop secdevops-pgsql
+
+    sudo docker container rm secdevops-pgsql
+
+    sudo docker container stop secdevops_pgsql_www
+
+    sudo docker container rm secdevops_pgsql_www
+
+### Create a netowrk
+    sudo docker network create --driver bridge secdevops-net
 
 ### Install invoicer as per book
     
@@ -12,6 +111,12 @@
     mkdir -p bin/invoicer
     cp "$GOPATH/bin/invoicer-chapter2" bin/invoicer
     
+    sudo docker build --no-cache -t actionablelabs/invoicer-chapter2 .
+
+### While logged into database container
+
+    psql --username "$POSTGRES_USER" --dbname "$POSTGRES_DB"
+
 ### Report status of docker containers locally
 
     clear
