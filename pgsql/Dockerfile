@@ -1,4 +1,4 @@
 FROM postgres:alpine
 
-COPY initdb.d/initwtdb.sh /docker-entrypoint-initdb.d/
+COPY initdb.d/initdb.sh /docker-entrypoint-initdb.d/
 

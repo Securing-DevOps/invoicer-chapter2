@@ -56,18 +56,6 @@ cat tmp/$identifier/eb-events*.json |less
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 clear
 echo "Creating EBS application $identifier"
 # Find the ID of the default VPC

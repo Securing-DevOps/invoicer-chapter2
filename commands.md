@@ -25,13 +25,14 @@ I suggest trying that for this.
       --mount source=secdevops_pgsql,target=/var/lib/postgresql/data/pgdata \
       --network secdevops-net \
       -p 5432:5432 \
-      -e POSTGRES_USER=invoicer \
-      -e POSTGRES_PASSWORD=Password1 \
-      -e POSTGRES_DB=invoicer \
+      -e POSTGRES_USER='invoicer' \
+      -e POSTGRES_PASSWORD='Password1' \
+      -e POSTGRES_DB='invoicer' \
       -e PGDATA=/var/lib/postgresql/data/pgdata \
       --rm \
       -d \
-      postgres
+      invoicer_pgsql:latest
+
     
     # run bash in the database container
     sudo docker exec -it secdevops-pgsql bash
@@ -100,6 +101,12 @@ I suggest trying that for this.
 
 ### Create a netowrk
     sudo docker network create --driver bridge secdevops-net
+
+
+### Build invoicer db image
+
+    pushd pgsql
+    sudo docker build -t invoicer_pgsql .
 
 ### Install invoicer as per book
     
