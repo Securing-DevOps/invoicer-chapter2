@@ -64,6 +64,9 @@
                 | jq '.[0].NetworkSettings.Networks."secdevops-net".IPAddress') \
                 | tr -d '"'
 
+    PGSQLID=secdevops-pgsql
+
+    # Run with postgresdatabase
     sudo docker run \
       --name secdevops-invoicer \
       -p 8080:8080 \
@@ -78,14 +81,10 @@
       -d \
       actionablelabs/invoicer-chapter2 
 
-    sudo docker run -it \
+    # Run with sqlite database
+    sudo docker run \
       --name secdevops-invoicer \
-      -e INVOICER_USE_POSTGRES="" \
-      -e INVOICER_POSTGRES_USER="invoicer" \
-      -e INVOICER_POSTGRES_PASSWORD="Password1" \
-      -e INVOICER_POSTGRES_HOST=$PGSQLID \
-      -e INVOICER_POSTGRES_DB="invoicer" \
-      -e INVOICER_POSTGRES_SSLMODE="disable" \
+      -p 8080:8080 \
       --network secdevops-net \
       --rm \
       -d \
@@ -93,7 +92,6 @@
 
     # run bash in the database container
     sudo docker exec -it -u root -w /root secdevops-invoicer /bin/sh 
- 
 
     sudo docker exec -it secdevops-invoicer /bin/sh
 
@@ -105,9 +103,9 @@
 
     sudo docker container rm secdevops-pgsql
 
-    sudo docker container stop secdevops_pgsql_www
+    sudo docker container stop secdevops_invoicer
 
-    sudo docker container rm secdevops_pgsql_www
+    sudo docker container rm secdevops_invoicer
 
 ### Create a netowrk
     sudo docker network create --driver bridge secdevops-net
