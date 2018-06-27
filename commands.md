@@ -2,10 +2,6 @@
 
 ### Notes for next time
 
-I am having difficulty getting the postgresl image working. This is similar to the 
-use with my weight tracker app, so check that for guidance. In that app, I created
-an init script (included in this directory). Although that shouldn't be necessary,
-I suggest trying that for this. 
 
 ### Take inventory 
     clear
@@ -13,6 +9,8 @@ I suggest trying that for this.
     sudo docker volume list | grep secdevops
     sudo docker container list -a | grep -E "NAMES|secdevops"
     echo $PGSQLID
+
+    PS1="#> "
 
     sudo docker image list
 
@@ -45,19 +43,30 @@ I suggest trying that for this.
 
     #sudo docker pull dpage/pgadmin4
     sudo docker run \
-      -it -p 5002:80 \
+      -p 5002:80 \
       --name pgadmin_dock \
       --network secdevops-net \
       -e "PGADMIN_DEFAULT_EMAIL=user@domain.com" \
       -e "PGADMIN_DEFAULT_PASSWORD=Password1" \
       --rm \
+      -d \
       dpage/pgadmin4
 
 ### Running the invoicer-chapter2 example
 
     PGSQLID="172.19.0.2"
 
-    sudo docker run -it \
+    PGSQLID=$(sudo docker container inspect secdevops-pgsql \
+                | jq '.[0].NetworkSettings.Networks."secdevops-net".IPAddress' \
+                | tr -d '"')
+
+    echo $(sudo docker container inspect secdevops-pgsql \
+                | jq '.[0].NetworkSettings.Networks."secdevops-net".IPAddress') \
+                | tr -d '"'
+
+    sudo docker run \
+      --name secdevops-invoicer \
+      -p 8080:8080 \
       -e INVOICER_USE_POSTGRES="yes" \
       -e INVOICER_POSTGRES_USER="invoicer" \
       -e INVOICER_POSTGRES_PASSWORD="Password1" \
@@ -66,7 +75,8 @@ I suggest trying that for this.
       -e INVOICER_POSTGRES_SSLMODE="disable" \
       --network secdevops-net \
       --rm \
-      actionablelabs/invoicer-chapter2
+      -d \
+      actionablelabs/invoicer-chapter2 
 
     sudo docker run -it \
       --name secdevops-invoicer \
