@@ -6,4 +6,4 @@ COPY bin/invoicer /bin/invoicer
 WORKDIR /app
 USER app
 EXPOSE 8080
-ENTRYPOINT /bin/invoicer/invoicer-chapter2
+ENTRYPOINT /bin/invoicer

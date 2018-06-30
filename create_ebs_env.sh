@@ -29,11 +29,11 @@ mkdir -p tmp/$identifier
 exit
 
 # Notes. We left off with this.
-identifier=psgivens-invoicer-201806120644
-datetag="201806120644"
+#identifier=psgivens-invoicer-201806120644
+#datetag="201806120644"
 
 # The latest events can be found at 
-cat tmp/$identifier/eb-events*.json |less
+#cat tmp/$identifier/eb-events*.json |less
 
 
 
@@ -93,9 +93,10 @@ echo "RDS Postgres database is being created. username=invoicer; password='$dbpa
 # Retrieve the database hostname
 while true;
 do
-    clear
     echo "aws rds describe-db-instances --db-instance-identifier $identifier"
     aws rds describe-db-instances --db-instance-identifier $identifier > tmp/$identifier/rds.json
+    clear
+    echo "aws rds describe-db-instances --db-instance-identifier $identifier"
     cat tmp/$identifier/rds.json
     dbhost=$(jq -r '.DBInstances[0].Endpoint.Address' tmp/$identifier/rds.json)
     dbstatus=$(jq -r '.DBInstances[0].DBInstanceStatus' tmp/$identifier/rds.json)
@@ -135,6 +136,7 @@ echo "dockerstack is '$dockerstack'"
 # Create the EB API environment
 sed "s/POSTGRESPASSREPLACEME/$dbpass/" ebs-options.json > tmp/$identifier/ebs-options.json || fail
 sed -i "s/POSTGRESHOSTREPLACEME/$dbhost/" tmp/$identifier/ebs-options.json || fail
+cat tmp/$identifier/ebs-options.json 
 
 aws elasticbeanstalk create-environment \
     --application-name $identifier \
@@ -151,9 +153,9 @@ echo "API environment $apieid is being created"
 # grab the instance ID of the API environment, then its security group, and add that to the RDS security group
 while true;
 do
+    aws elasticbeanstalk describe-environment-resources --environment-id $apieid > tmp/$identifier/ebapidesc.json || fail
     clear
     echo "aws elasticbeanstalk describe-environment-resources --environment-id $apieid"
-    aws elasticbeanstalk describe-environment-resources --environment-id $apieid > tmp/$identifier/ebapidesc.json || fail
     cat tmp/$identifier/ebapidesc.json
     ec2id=$(jq -r '.EnvironmentResources.Instances[0].Id' tmp/$identifier/ebapidesc.json)
     date
@@ -180,9 +182,9 @@ aws elasticbeanstalk create-application-version \
 # Wait for the environment to be ready (green)
 echo -n "waiting for environment"
 while true; do
+    aws elasticbeanstalk describe-environments --environment-id $apieid > tmp/$identifier/$apieid.json
     clear
     echo "aws elasticbeanstalk describe-environments --environment-id $apieid"
-    aws elasticbeanstalk describe-environments --environment-id $apieid > tmp/$identifier/$apieid.json
     cat tmp/$identifier/$apieid.json
     health="$(jq -r '.Environments[0].Health' tmp/$identifier/$apieid.json)"
     date
@@ -198,8 +200,6 @@ aws elasticbeanstalk update-environment \
     --application-name $identifier \
     --environment-id $apieid \
     --version-label invoicer-api > tmp/$identifier/$apieid.json
-
-
 
 
 

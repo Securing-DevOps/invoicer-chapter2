@@ -5,6 +5,9 @@
 
 ### Take inventory 
     clear
+    ./status.sh 
+
+    clear
     sudo docker network list | grep secdevops
     sudo docker volume list | grep secdevops
     sudo docker container list -a | grep -E "NAMES|secdevops"
@@ -78,7 +81,8 @@
       -e INVOICER_POSTGRES_SSLMODE="disable" \
       --network secdevops-net \
       --rm \
-      -d \
+      -it \
+      --entrypoint sh \
       actionablelabs/invoicer-chapter2 
 
     # Run with sqlite database
@@ -123,7 +127,7 @@
     go install --ldflags '-extldflags "-static"' \
       github.com/actionable-labs/invoicer-chapter2
     
-    mkdir -p bin/invoicer
+    mkdir -p bin
     cp "$GOPATH/bin/invoicer-chapter2" bin/invoicer
     
     sudo docker build --no-cache -t actionablelabs/invoicer-chapter2 .
