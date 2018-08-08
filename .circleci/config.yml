@@ -3,7 +3,7 @@ jobs:
  build:
   # Variable expansion in working_directory not supported at this time
   # You will need to modify the code below to reflect your github account/repo setup
-  working_directory: /go/src/github.com/ruprict/SecuringDevops/invoicer-chapter2
+  working_directory: /go/src/github.com/ruprict/invoicer-chapter2
   docker:
    - image: circleci/golang:1.10
   steps:
@@ -30,7 +30,7 @@ jobs:
    - run:
       name: Testing application
       command: |
-          ls github.com/ && go test \
+          go test \
           github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
    - deploy:
