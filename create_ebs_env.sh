@@ -35,6 +35,7 @@ echo "DB security group is $dbsg"
 dbinstclass="db.t2.micro"
 dbstorage=5
 dbpass=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null| tr -dc _A-Z-a-z-0-9)
+dbpass=$(date |md5 | head -c8; echo)
 aws rds create-db-instance \
     --db-name invoicer \
     --db-instance-identifier "$identifier" \
@@ -77,14 +78,14 @@ echo "ElasticBeanTalk application created"
 
 # Get the name of the latest Docker solution stack
 dockerstack="$(aws elasticbeanstalk list-available-solution-stacks | \
-    jq -r '.SolutionStacks[]' | grep -P '.+Amazon Linux.+Docker.+' | head -1)"
+    jq -r '.SolutionStacks[]' | egrep '.+Amazon Linux.+Docker.+' | head -1)"
 
 # Create the EB API environment
 sed "s/POSTGRESPASSREPLACEME/$dbpass/" ebs-options.json > tmp/$identifier/ebs-options.json || fail
-sed -i "s/POSTGRESHOSTREPLACEME/$dbhost/" tmp/$identifier/ebs-options.json || fail
+sed -i '' -e "s/POSTGRESHOSTREPLACEME/$dbhost/" tmp/$identifier/ebs-options.json
 aws elasticbeanstalk create-environment \
     --application-name $identifier \
-    --environment-name $identifier-invoicer-api \
+    --environment-name invoicer-api-$datetag \
     --description "Invoicer API environment" \
     --tags "Key=Owner,Value=$(whoami)" \
     --solution-stack-name "$dockerstack" \

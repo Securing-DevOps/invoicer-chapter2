@@ -1,15 +1,26 @@
-{
-  "AWSEBDockerrunVersion": "1",
-  "Image": {
-    "Name": "docker.io/securingdevops/invoicer",
-    "Update": "true"
-  },
-  "Ports": [
-    {
-      "ContainerPort": "8080"
+{ "AWSEBDockerrunVersion": 2,
+  "volumes": [],
+  "containerDefinitions": [
+    { "name": "invoicer",
+      "image": "docker.io/ruprict/invoicer:v0.1",
+      "environment": [],
+      "essential": true,
+      "memory": 128,
+      "portMappings":[
+        {
+          "hostPort": 80,
+          "containerPort": 8080
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "geg-invoicer",
+          "awslogs-region": "us-east-2",
+          "awslogs-stream-prefix": "invoicer"
+        }
+      },
+      "mountPoints": [ ]
     }
-  ],
-  "Volumes": [
-  ],
-  "Logging": "/var/log/nginx"
+  ]
 }

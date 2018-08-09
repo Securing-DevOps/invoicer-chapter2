@@ -1,14 +1,17 @@
 FROM golang:latest
-RUN addgroup --gid 10001 app
-RUN adduser --gid 10001 --uid 10001 \
-    --home /app --shell /sbin/nologin \
-    --disabled-password app
-
-RUN mkdir /app/statics/
-ADD statics /app/statics/
-
-COPY bin/invoicer /app/invoicer
-USER app
 EXPOSE 8080
-WORKDIR /app
-ENTRYPOINT /app/invoicer
+
+RUN  mkdir -p /go/src \
+  && mkdir -p /go/bin \
+  && mkdir -p /go/pkg
+ENV GOPATH=/go
+ENV PATH=$GOPATH/bin:$PATH
+
+# now copy your app to the proper build path
+RUN mkdir -p $GOPATH/src/app
+ADD . $GOPATH/src/app
+
+# should be able to build now
+WORKDIR $GOPATH/src/app
+RUN go build -o invoicer .
+ENTRYPOINT ["/go/src/app/invoicer"]
