@@ -26,7 +26,7 @@ import (
 )
 
 func init() {
-	// initialize the logger - change 2
+	// initialize the logger - change 3
 	mozlog.Logger.LoggerName = "invoicer"
 	log.SetFlags(0)
 }
