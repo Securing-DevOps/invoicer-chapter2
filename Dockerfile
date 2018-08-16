@@ -2,7 +2,8 @@ FROM golang:latest
 RUN addgroup --gid 10001 app
 RUN adduser --gid 10001 --uid 10001 \
     --home /app --shell /sbin/nologin \
-    --disabled-password app
+    --disabled-password \
+    --gecos "First Last,RoomNumber,WorkPhone,HomePhone" app
 
 RUN mkdir /app/statics/
 ADD statics /app/statics/
