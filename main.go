@@ -42,7 +42,7 @@ func main() {
 		err error
 	)
 	var db *gorm.DB
-	if yes == yes {
+	if 1 == 1 {
 		log.Println("Opening postgres connection")
 		db, err = gorm.Open("postgres", "host=invoicer-db.ce3eekxasv2x.eu-west-2.rds.amazonaws.com port=5432 user=invoicer dbname=invoicer password=Xu97#T?!")
 	} else {
