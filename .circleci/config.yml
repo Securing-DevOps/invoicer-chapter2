@@ -26,7 +26,6 @@ jobs:
        EOF
    - run: mkdir -p "${GOPATH_BASE}"
    - run: mkdir -p "${GOPATH_HEAD}/bin"
-   - run: mkdir -p "${GOPATH_HEAD}/test"
 
    - run:
       name: Testing application
