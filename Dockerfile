@@ -5,6 +5,9 @@ RUN adduser --gid 10001 --uid 10001 \
     --disabled-password app
 
 RUN mkdir /app/statics/
+RUN mkdir /app/statics2/
+
+
 ADD statics /app/statics/
 
 COPY bin/invoicer /app/invoicer
