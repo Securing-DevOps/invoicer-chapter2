@@ -5,6 +5,7 @@ jobs:
   # You will need to modify the code below to reflect your github account/repo setup
   working_directory: /go/src/github.com/pzaptest1/invoicer-chapter2
   docker:
+  #change to golang 1.18 see circleci example file when you create a project
    - image: circleci/golang:1.10
   steps:
    - checkout
