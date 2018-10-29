@@ -3,7 +3,6 @@ jobs:
  build:
   # Variable expansion in working_directory not supported at this time
   # You will need to modify the code below to reflect your github account/repo setup
-  # push
   working_directory: /go/src/github.com/nrmoorthy/invoicer-chapter2
   docker:
    - image: circleci/golang:1.11.1
