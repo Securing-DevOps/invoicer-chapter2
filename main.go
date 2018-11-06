@@ -10,7 +10,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"html"
 	"io/ioutil"
 	"log"
 	"net/http"
