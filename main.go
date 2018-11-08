@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
-	"io/ioutil"
+	//"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -68,11 +68,13 @@ func main() {
 	r.HandleFunc("/", iv.getIndex).Methods("GET")
 	r.HandleFunc("/__heartbeat__", getHeartbeat).Methods("GET")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.getInvoice).Methods("GET")
+	/*
 	r.HandleFunc("/invoice", iv.postInvoice).Methods("POST")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.putInvoice).Methods("PUT")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.deleteInvoice).Methods("DELETE")
 	r.HandleFunc("/invoice/delete/{id:[0-9]+}", iv.deleteInvoice).Methods("GET")
 	r.HandleFunc("/__version__", getVersion).Methods("GET")
+	*/
 
 	// handle static files
 	r.Handle("/statics/{staticfile}",
