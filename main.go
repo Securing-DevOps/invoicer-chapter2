@@ -140,7 +140,7 @@ func (iv *invoicer) postInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var i1 Invoice
-	err = json.Unmarshal(body, &i1)
+	err = json.Unmarshal(html.EscapeString(body), &i1)
 	if err != nil {
 		httpError(w, r, http.StatusBadRequest, "failed to parse request body: %s", err)
 		return
@@ -173,7 +173,7 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 		httpError(w, r, http.StatusBadRequest, "failed to read request body: %s", err)
 		return
 	}
-	err = json.Unmarshal(body, &i1)
+	err = json.Unmarshal(html.EscapeString(body), &i1)
 	if err != nil {
 		httpError(w, r, http.StatusBadRequest, "failed to parse request body: %s", err)
 		return
@@ -191,7 +191,7 @@ func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	log.Println("deleting invoice", vars["id"])
 	var i1 Invoice
-	id, _ := strconv.Atoi(vars["id"])
+	id, _ := strconv.Atoi(html.EscapeString(vars["id"]))
 	iv.db.Where("invoice_id = ?", id).Delete(Charge{})
 	i1.ID = uint(id)
 	iv.db.Delete(&i1)
