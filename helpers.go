@@ -1,10 +1,9 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	"math/rand"
-	//"net/http"
-	//test
+	"net/http"
 	"time"
 )
 
