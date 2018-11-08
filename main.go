@@ -140,7 +140,7 @@ func (iv *invoicer) postInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var i1 Invoice
-	err = json.Unmarshal(html.EscapeString(body), &i1)
+	err = json.Unmarshal(body, &i1)
 	if err != nil {
 		httpError(w, r, http.StatusBadRequest, "failed to parse request body: %s", err)
 		return
@@ -173,7 +173,7 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 		httpError(w, r, http.StatusBadRequest, "failed to read request body: %s", err)
 		return
 	}
-	err = json.Unmarshal(html.EscapeString(body), &i1)
+	err = json.Unmarshal(body, &i1)
 	if err != nil {
 		httpError(w, r, http.StatusBadRequest, "failed to parse request body: %s", err)
 		return
