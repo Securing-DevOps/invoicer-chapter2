@@ -110,7 +110,7 @@ func (iv *invoicer) getInvoice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	log.Println("getting invoice id", vars["id"])
 	var i1 Invoice
-	id, _ := strconv.Atoi(html.EscapeString(vars["id"])
+	id, _ := strconv.Atoi(html.EscapeString(vars["id"]))
 	iv.db.First(&i1, id)
 	fmt.Printf("%+v\n", i1)
 	if i1.ID == 0 {
