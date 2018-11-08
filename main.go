@@ -131,7 +131,7 @@ func (iv *invoicer) getInvoice(w http.ResponseWriter, r *http.Request) {
 	al := appLog{Message: fmt.Sprintf("retrieved invoice %d", i1.ID), Action: "get-invoice"}
 	al.log(r)
 }
-
+/*
 func (iv *invoicer) postInvoice(w http.ResponseWriter, r *http.Request) {
 	log.Println("posting new invoice")
 	body, err := ioutil.ReadAll(r.Body)
@@ -200,7 +200,7 @@ func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	al := appLog{Message: fmt.Sprintf("deleted invoice %d", i1.ID), Action: "delete-invoice"}
 	al.log(r)
 }
-
+*/
 func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
 	log.Println("serving index page")
 	w.Header().Add("Content-Security-Policy", "default-src 'self';child-src 'self';")
@@ -237,6 +237,7 @@ func getHeartbeat(w http.ResponseWriter, r *http.Request) {
 }
 
 // handleVersion returns the current version of the API
+/*
 func getVersion(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf(`{
 "source": "https://github.com/Securing-DevOps/invoicer",
@@ -245,3 +246,4 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 "build": "https://circleci.com/gh/Securing-DevOps/invoicer/"
 }`, version, commit)))
 }
+*/
