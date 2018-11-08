@@ -10,6 +10,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -110,6 +111,7 @@ func (iv *invoicer) getInvoice(w http.ResponseWriter, r *http.Request) {
 	log.Println("getting invoice id", vars["id"])
 	var i1 Invoice
 	id, _ := strconv.Atoi(vars["id"])
+	id := html.EscapeString(id)
 	iv.db.First(&i1, id)
 	fmt.Printf("%+v\n", i1)
 	if i1.ID == 0 {
