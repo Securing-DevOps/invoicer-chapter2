@@ -22,13 +22,13 @@ jobs:
    - run: mkdir -p "${GOPATH_HEAD}/bin"
    - run: go get github.com/govend/govend
 
-   - run:
-       name: Build application container
-       command: |
-         go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
-         [ ! -e bin ] && mkdir bin;
-         cp "${GOPATH_HEAD}/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
-         docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
+   # - run:
+   #     name: Build application container
+   #     command: |
+   #       go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
+   #       [ ! -e bin ] && mkdir bin;
+   #       cp "${GOPATH_HEAD}/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
+   #       docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
 
    # - run:
    #     name: Run application in background
@@ -52,11 +52,11 @@ jobs:
    #     name: Test dependencies are up to date
    #     command: 'GOPATH="${GOPATH_HEAD}"; ( cd ${GOPATH_BASE}/${CIRCLE_PROJECT_REPONAME} && govend -u --prune && git diff --quiet )'
    #
-   # - run:
-   #    name: Testing application
-   #    command: |
-   #        go test \
-   #        github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+   - run:
+      name: Testing application
+      command: |
+          go test \
+          github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
    - deploy:
        # Push application container to dockerhub
