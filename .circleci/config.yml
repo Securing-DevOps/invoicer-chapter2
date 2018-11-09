@@ -21,7 +21,7 @@ jobs:
    - run: mkdir -p "${GOPATH_BASE}"
    - run: mkdir -p "${GOPATH_HEAD}/bin"
    - run: go get github.com/govend/govend
-       
+
    - run:
        name: Build application container
        command: |
@@ -30,33 +30,33 @@ jobs:
          cp "${GOPATH_HEAD}/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
          docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
 
-   - run:
-       name: Run application in background
-       command: |
-         docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}
-       background: true
+   # - run:
+   #     name: Run application in background
+   #     command: |
+   #       docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}
+   #     background: true
 
-   - run:
-       name: ZAP baseline test of application
-       # Only fail on error code 1, which indicates at least one FAIL was found.
-       # error codes 2 & 3 indicate WARN or other, and should not break the run
-       command: |
-         (
-         docker pull owasp/zap2docker-weekly && \
-         docker run -t owasp/zap2docker-weekly zap-baseline.py \
-             -u https://raw.githubusercontent.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/master/zap-baseline.conf \
-             -t http://172.17.0.2:8080/ || \
-         if [ $? -ne 1 ]; then exit 0; else exit 1; fi;
-         )
-   - run:
-       name: Test dependencies are up to date
-       command: 'GOPATH="${GOPATH_HEAD}"; ( cd ${GOPATH_BASE}/${CIRCLE_PROJECT_REPONAME} && govend -u --prune && git diff --quiet )'
-
-   - run:
-      name: Testing application
-      command: |
-          go test \
-          github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+   # - run:
+   #     name: ZAP baseline test of application
+   #     # Only fail on error code 1, which indicates at least one FAIL was found.
+   #     # error codes 2 & 3 indicate WARN or other, and should not break the run
+   #     command: |
+   #       (
+   #       docker pull owasp/zap2docker-weekly && \
+   #       docker run -t owasp/zap2docker-weekly zap-baseline.py \
+   #           -u https://raw.githubusercontent.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/master/zap-baseline.conf \
+   #           -t http://172.17.0.2:8080/ || \
+   #       if [ $? -ne 1 ]; then exit 0; else exit 1; fi;
+   #       )
+   # - run:
+   #     name: Test dependencies are up to date
+   #     command: 'GOPATH="${GOPATH_HEAD}"; ( cd ${GOPATH_BASE}/${CIRCLE_PROJECT_REPONAME} && govend -u --prune && git diff --quiet )'
+   #
+   # - run:
+   #    name: Testing application
+   #    command: |
+   #        go test \
+   #        github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
    - deploy:
        # Push application container to dockerhub
