@@ -271,11 +271,13 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 }`, version, commit)))
 }
 
+/*
 func httpError(w http.ResponseWriter, errorCode int, errorMessage string, args ...interface{}) {
 	log.Printf("%d: %s", errorCode, fmt.Sprintf(errorMessage, args...))
 	http.Error(w, fmt.Sprintf(errorMessage, args...), errorCode)
 	return
 }
+*/
 
 var CSRFKey []byte
 
