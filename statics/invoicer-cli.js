@@ -42,7 +42,7 @@ function getInvoice(invoiceid, CSRFToken) {
         beforeSend: function (request)
         {
             //request.setRequestHeader("X-CSRF-Token", CSRFToken);
-            request.setRequestHeader("CSRFToken", CSRFToken);
+            request.setRequestHeader("X-CSRF-Token", CSRFToken);
 
         },
         error: function (xhr, ajaxOptions, thrownError) {

@@ -210,7 +210,7 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 
 func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	if !checkCSRFToken(r.Header.Get("CSRFToken")) {
+	if !checkCSRFToken(r.Header.Get("X-CSRF-Token")) {
 		w.WriteHeader(http.StatusNotAcceptable)
 		w.Write([]byte("Invalid CSRF Token"))
 		return
