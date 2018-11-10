@@ -43,10 +43,21 @@ jobs:
        command: |
          (
          docker pull owasp/zap2docker-weekly && \
-         docker run -t owasp/zap2docker-weekly zap-baseline.py \
+         docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-baseline.py \
              -u https://raw.githubusercontent.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/mybranch/zap-baseline.conf \
-             -t http://172.17.0.2:8080/ || \
-         if [ $? -ne 1 ]; then exit 0; else exit 1; fi;
+             -t http://172.17.0.2:8080/ -r $(pwd)/zap_scan_report.html || \
+         if [ $? -ne 1 ];
+            then
+                git add zap_scan_report.html;
+                git commit -m "scan report";
+                git push origin $CIRCLE_BRANCH;
+                exit 0;
+            else
+                git add zap_scan_report.html;
+                git commit -m "scan report";
+                git push origin $CIRCLE_BRANCH;
+                exit 1; 
+         fi;
          )
    - run:
        name: Test dependencies are up to date
