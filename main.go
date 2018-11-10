@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
-	//"io/ioutil"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -68,13 +68,11 @@ func main() {
 	r.HandleFunc("/", iv.getIndex).Methods("GET")
 	r.HandleFunc("/__heartbeat__", getHeartbeat).Methods("GET")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.getInvoice).Methods("GET")
-	/*
 	r.HandleFunc("/invoice", iv.postInvoice).Methods("POST")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.putInvoice).Methods("PUT")
 	r.HandleFunc("/invoice/{id:[0-9]+}", iv.deleteInvoice).Methods("DELETE")
 	r.HandleFunc("/invoice/delete/{id:[0-9]+}", iv.deleteInvoice).Methods("GET")
 	r.HandleFunc("/__version__", getVersion).Methods("GET")
-	*/
 
 	// handle static files
 	r.Handle("/statics/{staticfile}",
@@ -127,14 +125,14 @@ func (iv *invoicer) getInvoice(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Add("Content-Type", "application/json")
 	w.Header().Add("Content-Security-Policy", "default-src 'self'; child-src 'self';")
-	w.Header().Add("X-XSS-Protection", "1")
+	w.Header().Add("X-XSS-Protection", "1;")
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonInvoice)
 	al := appLog{Message: fmt.Sprintf("retrieved invoice %d", i1.ID), Action: "get-invoice"}
 	al.log(r)
 }
-/*
+
 func (iv *invoicer) postInvoice(w http.ResponseWriter, r *http.Request) {
 	log.Println("posting new invoice")
 	body, err := ioutil.ReadAll(r.Body)
@@ -203,11 +201,11 @@ func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	al := appLog{Message: fmt.Sprintf("deleted invoice %d", i1.ID), Action: "delete-invoice"}
 	al.log(r)
 }
-*/
+
 func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
 	log.Println("serving index page")
 	w.Header().Add("Content-Security-Policy", "default-src 'self';child-src 'self';")
-	w.Header().Add("X-XSS-Protection", "1")
+	w.Header().Add("X-XSS-Protection", "1;")
 	w.Write([]byte(`
 <!DOCTYPE html>
 <html>
@@ -241,7 +239,6 @@ func getHeartbeat(w http.ResponseWriter, r *http.Request) {
 }
 
 // handleVersion returns the current version of the API
-/*
 func getVersion(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf(`{
 "source": "https://github.com/Securing-DevOps/invoicer",
@@ -250,4 +247,3 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 "build": "https://circleci.com/gh/Securing-DevOps/invoicer/"
 }`, version, commit)))
 }
-*/

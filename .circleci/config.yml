@@ -8,9 +8,9 @@ jobs:
    - image: circleci/golang:1.11.1
   environment:
     GO15VENDOREXPERIMENT: 1
-  branches:
-    only:
-      - master
+  # branches:
+  #   only:
+  #     - master
   steps:
    - checkout
    - setup_remote_docker
