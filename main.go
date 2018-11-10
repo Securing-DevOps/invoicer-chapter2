@@ -257,7 +257,7 @@ func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
         <form id="invoiceDeleter" method="DELETE">
             <label>Delete this invoice</label>
 						<input id="deleteInvoiceid" type="text" />
-						<input type="hidden" name="deleteCSRFToken" value="` + makeCSRFToken() + `">
+						<input type="hidden" name="CSRFToken" value="` + makeCSRFToken() + `">
             <input type="submit" />
         </form>
     </body>

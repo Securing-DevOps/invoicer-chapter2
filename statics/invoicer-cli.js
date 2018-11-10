@@ -31,7 +31,7 @@ $(document).ready(function() {
 $(document).ready(function() {
   $("form#invoiceDeleter").submit(function(event) {
         event.preventDefault();
-        deleteInvoice($("#deleteInvoiceid").val(), $("#deleteCSRFToken").val());
+        deleteInvoice($("#deleteInvoiceid").val(), $("#CSRFToken").val());
   });
 });
 
