@@ -57,7 +57,7 @@ function getInvoice(invoiceid, CSRFToken) {
 function deleteInvoice(invoiceid, CSRFToken) {
     $('.desc-invoice').html("<p>Showing invoice ID " + invoiceid + "</p>");
     $.ajax({
-        url: "/invoice/delete" + invoiceid,
+        url: "/invoice/delete/" + invoiceid,
         beforeSend: function (request)
         {
             request.setRequestHeader("X-CSRF-Token", CSRFToken);
