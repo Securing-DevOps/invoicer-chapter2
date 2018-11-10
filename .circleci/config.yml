@@ -3,8 +3,8 @@ jobs:
  build:
   # Variable expansion in working_directory not supported at this time
   # You will need to modify the code below to reflect your github account/repo setup
-  #working_directory: /go/src/github.com/nrmoorthy/invoicer-chapter2
-  working_directory:: ~/repo
+  working_directory: /go/src/github.com/nrmoorthy/invoicer-chapter2
+  #working_directory:: ~/repo
   docker:
    - image: circleci/golang:1.11.1
   environment:
@@ -14,7 +14,7 @@ jobs:
   #     - master
   steps:
    - checkout
-      path: ~/repo
+      #path: ~/repo
    - setup_remote_docker
 
    - run: echo 'export GOPATH_HEAD="$(echo ${GOPATH}|cut -d ':' -f 1)"' >> $BASH_ENV
@@ -44,18 +44,20 @@ jobs:
        # error codes 2 & 3 indicate WARN or other, and should not break the run
        command: |
          (
+         echo ${pwd};
+         echo ${ls -la};
          docker pull owasp/zap2docker-weekly && \
          docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-baseline.py \
              -u https://raw.githubusercontent.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/mybranch/zap-baseline.conf \
-             -t http://172.17.0.2:8080/ -r ~/repo/zap_scan_report.html || \
+             -t http://172.17.0.2:8080/ -r ${pwd}/zap_scan_report.html || \
          if [ $? -ne 1 ];
             then
-                git add ~/repo/zap_scan_report.html;
+                git add ${pwd}/zap_scan_report.html;
                 git commit -m "scan report";
                 git push origin $CIRCLE_BRANCH;
                 exit 0;
             else
-                git add ~/repo/zap_scan_report.html;
+                git add ${pwd}/zap_scan_report.html;
                 git commit -m "scan report";
                 git push origin $CIRCLE_BRANCH;
                 exit 1;
