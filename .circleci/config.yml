@@ -48,15 +48,15 @@ jobs:
              -t http://172.17.0.2:8080/ -r $(pwd)/zap_scan_report.html || \
          if [ $? -ne 1 ];
             then
-                git add zap_scan_report.html;
+                git add $(pwd)/zap_scan_report.html;
                 git commit -m "scan report";
                 git push origin $CIRCLE_BRANCH;
                 exit 0;
             else
-                git add zap_scan_report.html;
+                git add $(pwd)/zap_scan_report.html;
                 git commit -m "scan report";
                 git push origin $CIRCLE_BRANCH;
-                exit 1; 
+                exit 1;
          fi;
          )
    - run:
