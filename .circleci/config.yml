@@ -31,6 +31,8 @@ jobs:
          [ ! -e bin ] && mkdir bin;
          cp "${GOPATH_HEAD}/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
          docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
+         echo ${pwd};
+         echo ${ls -la};
 
    - run:
        name: Run application in background
@@ -44,8 +46,6 @@ jobs:
        # error codes 2 & 3 indicate WARN or other, and should not break the run
        command: |
          (
-         echo ${pwd};
-         echo ${ls -la};
          docker pull owasp/zap2docker-weekly && \
          docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-baseline.py \
              -u https://raw.githubusercontent.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/mybranch/zap-baseline.conf \
