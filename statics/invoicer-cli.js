@@ -13,13 +13,13 @@ function getQueryParams(qs) {
 }
 var $_GET = getQueryParams(document.location.search);
 
-// $(document).ready(function() {
-// 	var invoiceid = $_GET['invoiceid'];
-// 	if (invoiceid == undefined) {
-// 		invoiceid = "1";
-// 	}
-//     getInvoice(invoiceid, "undef");
-// });
+$(document).ready(function() {
+	var invoiceid = $_GET['invoiceid'];
+	if (invoiceid == undefined) {
+		invoiceid = "1";
+	}
+    getInvoice(invoiceid, "undef");
+});
 
 $(document).ready(function() {
     $("form#invoiceGetter").submit(function(event) {
@@ -28,12 +28,12 @@ $(document).ready(function() {
 	});
 });
 
-$(document).ready(function() {
-  $("form#invoiceDeleter").submit(function(event) {
-        event.preventDefault();
-        deleteInvoice($("#deleteInvoiceid").val(), $("#CSRFToken").val());
-  });
-});
+// $(document).ready(function() {
+//   $("form#invoiceDeleter").submit(function(event) {
+//         event.preventDefault();
+//         deleteInvoice($("#deleteInvoiceid").val(), $("#CSRFToken").val());
+//   });
+// });
 
 function getInvoice(invoiceid, CSRFToken) {
     $('.desc-invoice').html("<p>Showing invoice ID " + invoiceid + "</p>");
@@ -56,22 +56,22 @@ function getInvoice(invoiceid, CSRFToken) {
     });
 }
 
-function deleteInvoice(invoiceid, CSRFToken) {
-    $('.desc-invoice').html("<p>Showing invoice ID " + invoiceid + "</p>");
-    $.ajax({
-        url: "/invoice/delete/" + invoiceid,
-        beforeSend: function (request)
-        {
-            //request.setRequestHeader("X-CSRF-Token", CSRFToken);
-            request.setRequestHeader("CSRFToken", CSRFToken);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            if(xhr.status==404) {
-                $('.invoice-details').html("<p>invoice not found</p>");
-                return;
-            }
-        }
-    }).then(function(invoice) {
-        $('.invoice-details').html("<p>Invoice #" + invoice.ID + " deleted ");
-    });
-}
+// function deleteInvoice(invoiceid, CSRFToken) {
+//     $('.desc-invoice').html("<p>Showing invoice ID " + invoiceid + "</p>");
+//     $.ajax({
+//         url: "/invoice/delete/" + invoiceid,
+//         beforeSend: function (request)
+//         {
+//             //request.setRequestHeader("X-CSRF-Token", CSRFToken);
+//             request.setRequestHeader("CSRFToken", CSRFToken);
+//         },
+//         error: function (xhr, ajaxOptions, thrownError) {
+//             if(xhr.status==404) {
+//                 $('.invoice-details').html("<p>invoice not found</p>");
+//                 return;
+//             }
+//         }
+//     }).then(function(invoice) {
+//         $('.invoice-details').html("<p>Invoice #" + invoice.ID + " deleted ");
+//     });
+// }
