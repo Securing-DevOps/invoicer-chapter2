@@ -59,7 +59,7 @@ jobs:
           github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
    - deploy:
-       Push application container to dockerhub
+       #Push application container to dockerhub
        command: |
          if [ "${CIRCLE_BRANCH}" == "master" ]; then
              docker login -u ${DOCKER_USER} -p ${DOCKER_PASS};
