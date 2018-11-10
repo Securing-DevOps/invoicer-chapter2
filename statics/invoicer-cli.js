@@ -13,19 +13,22 @@ function getQueryParams(qs) {
 }
 var $_GET = getQueryParams(document.location.search);
 
-$(document).ready(function() {
-	var invoiceid = $_GET['invoiceid'];
-	if (invoiceid == undefined) {
-		invoiceid = "1";
-	}
-    getInvoice(invoiceid, "undef");
-});
+// $(document).ready(function() {
+// 	var invoiceid = $_GET['invoiceid'];
+// 	if (invoiceid == undefined) {
+// 		invoiceid = "1";
+// 	}
+//     getInvoice(invoiceid, "undef");
+// });
 
 $(document).ready(function() {
     $("form#invoiceGetter").submit(function(event) {
         event.preventDefault();
         getInvoice($("#invoiceid").val(), $("#CSRFToken").val());
 	});
+});
+
+$(document).ready(function() {
   $("form#invoiceDeleter").submit(function(event) {
         event.preventDefault();
         deleteInvoice($("#deleteInvoiceid").val(), $("#deleteCSRFToken").val());
