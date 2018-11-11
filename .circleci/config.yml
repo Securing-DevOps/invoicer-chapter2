@@ -27,12 +27,13 @@ jobs:
    - run:
        name: Build application container
        command: |
+         echo ${pwd};
+         echo ${ls};
          go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
          [ ! -e bin ] && mkdir bin;
          cp "${GOPATH_HEAD}/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
          docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
-         echo ${pwd};
-         echo ${"ls -la"};
+
 
    - run:
        name: Run application in background
