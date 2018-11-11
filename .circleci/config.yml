@@ -51,9 +51,9 @@ jobs:
        command: |
          (
          docker pull owasp/zap2docker-weekly && \
-         docker run --mount "source=myvol,target=/zap/wrk" -t owasp/zap2docker-weekly zap-baseline.py \
+         docker run --mount "source=myvol,target=/go/src/github.com/nrmoorthy/invoicer-chapter2/" -t owasp/zap2docker-weekly zap-baseline.py \
              -u https://raw.githubusercontent.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/mybranch/zap-baseline.conf \
-             -t http://172.17.0.2:8080/ -r /go/src/github.com/nrmoorthy/invoicer-chapter2/zap_scan_report.html || \
+             -t http://172.17.0.2:8080/ -r zap_scan_report.html || \
          if [ $? -ne 1 ];
             then
                 pwd;
