@@ -32,7 +32,7 @@ jobs:
          cp "${GOPATH_HEAD}/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
          docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
          echo ${pwd};
-         echo ${ls -la};
+         echo ${"ls -la"};
 
    - run:
        name: Run application in background
