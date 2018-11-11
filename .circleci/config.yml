@@ -17,6 +17,8 @@ jobs:
       #path: ~/repo
    - setup_remote_docker
 
+   - run: echo ${pwd}
+   - run: echo ${ls};
    - run: echo 'export GOPATH_HEAD="$(echo ${GOPATH}|cut -d ':' -f 1)"' >> $BASH_ENV
    - run: echo 'export GOPATH_BASE="${GOPATH_HEAD}/src/github.com/${CIRCLE_PROJECT_USERNAME}"' >> $BASH_ENV
    - run: echo 'export DOCKER_REPO="$(if [ ${CIRCLE_PROJECT_USERNAME} == 'Securing-DevOps' ]; then echo securingdevops; else echo $DOCKER_USER; fi)"' >> $BASH_ENV
@@ -27,8 +29,6 @@ jobs:
    - run:
        name: Build application container
        command: |
-         echo ${pwd};
-         echo ${ls};
          go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
          [ ! -e bin ] && mkdir bin;
          cp "${GOPATH_HEAD}/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
