@@ -17,8 +17,9 @@ jobs:
       #path: ~/repo
    - setup_remote_docker
 
-   - run: echo ${pwd}
-   - run: echo ${ls};
+   - run: echo "hello"
+   - run: echo "${pwd}"
+   - run: echo "${ls}";
    - run: echo 'export GOPATH_HEAD="$(echo ${GOPATH}|cut -d ':' -f 1)"' >> $BASH_ENV
    - run: echo 'export GOPATH_BASE="${GOPATH_HEAD}/src/github.com/${CIRCLE_PROJECT_USERNAME}"' >> $BASH_ENV
    - run: echo 'export DOCKER_REPO="$(if [ ${CIRCLE_PROJECT_USERNAME} == 'Securing-DevOps' ]; then echo securingdevops; else echo $DOCKER_USER; fi)"' >> $BASH_ENV
