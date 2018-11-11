@@ -29,6 +29,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/wader/gormstore"
 	"go.mozilla.org/mozlog"
+	"golang.org/x/oauth2"
 )
 
 func init() {
