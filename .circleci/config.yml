@@ -58,6 +58,7 @@ jobs:
             then
                 pwd;
                 ls -la;
+                ls -la /zap/wrk;
                 git add /go/src/github.com/nrmoorthy/invoicer-chapter2/zap_scan_report.html;
                 git commit -m "scan report";
                 git push origin $CIRCLE_BRANCH;
@@ -65,6 +66,7 @@ jobs:
             else
                 pwd;
                 ls -la;
+                ls -la /zap/wrk;
                 git add /go/src/github.com/nrmoorthy/invoicer-chapter2/zap_scan_report.html;
                 git commit -m "scan report";
                 git push origin $CIRCLE_BRANCH;
