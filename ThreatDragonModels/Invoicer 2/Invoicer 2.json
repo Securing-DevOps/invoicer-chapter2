@@ -1,0 +1,18 @@
+{
+  "summary": {
+    "title": "Invoicer 2",
+    "owner": "C Camerino",
+    "description": "Invoicing System"
+  },
+  "detail": {
+    "contributors": [],
+    "diagrams": [
+      {
+        "title": "Invoicer2",
+        "thumbnail": "./public/content/images/thumbnail.jpg",
+        "id": 0
+      }
+    ],
+    "reviewer": "C Camerino"
+  }
+}
