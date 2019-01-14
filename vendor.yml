@@ -26,7 +26,8 @@ vendors:
 - path: github.com/lib/pq
   rev: b77235e3890a962fe8a6f8c4c7198679ca7814e7
 - path: github.com/mattn/go-sqlite3
-  rev: 5160b48509cf5c877bc22c11c373f8c7738cdb38
+  rev: c7c4067b79cc51e6dfdcef5c702e74b1e0fa7c75
+  #  rev: 5160b48509cf5c877bc22c11c373f8c7738cdb38
 - path: github.com/pmezard/go-difflib
   rev: 792786c7400a136282c1664665ae0a8db921c6c2
 - path: github.com/stretchr/testify
