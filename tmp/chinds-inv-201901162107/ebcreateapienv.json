@@ -1,0 +1,18 @@
+{
+    "ApplicationName": "chinds-inv-201901162107", 
+    "EnvironmentName": "chinds-inv-201901162107-invoicer-api", 
+    "Status": "Launching", 
+    "Description": "Invoicer API environment", 
+    "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:634989232804:environment/chinds-inv-201901162107/chinds-inv-201901162107-invoicer-api", 
+    "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Preconfigured Docker - GlassFish 5.0 with Java 8 running on 64bit Amazon Linux/2.12.6", 
+    "SolutionStackName": "64bit Amazon Linux 2018.03 v2.12.6 running GlassFish 5.0 Java 8 (Preconfigured - Docker)", 
+    "EnvironmentId": "e-3kiejjdvvh", 
+    "Health": "Grey", 
+    "Tier": {
+        "Version": "1.0", 
+        "Type": "Standard", 
+        "Name": "WebServer"
+    }, 
+    "DateUpdated": "2019-01-17T02:10:25.007Z", 
+    "DateCreated": "2019-01-17T02:10:25.007Z"
+}

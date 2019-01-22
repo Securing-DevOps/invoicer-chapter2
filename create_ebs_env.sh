@@ -13,7 +13,7 @@ fail() {
 export AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
 
 datetag=$(date +%Y%m%d%H%M)
-identifier=$(whoami)-invoicer-$datetag
+identifier=$(whoami)-inv-$datetag
 mkdir -p tmp/$identifier
 
 echo "Creating EBS application $identifier"

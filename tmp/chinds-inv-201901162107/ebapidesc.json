@@ -1,0 +1,28 @@
+{
+    "EnvironmentResources": {
+        "EnvironmentName": "chinds-inv-201901162107-invoicer-api", 
+        "AutoScalingGroups": [
+            {
+                "Name": "awseb-e-3kiejjdvvh-stack-AWSEBAutoScalingGroup-1LO3SX441IYO7"
+            }
+        ], 
+        "LoadBalancers": [
+            {
+                "Name": "awseb-e-3-AWSEBLoa-1WYHCPI4P6H53"
+            }
+        ], 
+        "Queues": [], 
+        "Triggers": [], 
+        "Instances": [
+            {
+                "Id": "i-03de3bb7f0d0d4182"
+            }
+        ], 
+        "LaunchConfigurations": [
+            {
+                "Name": "awseb-e-3kiejjdvvh-stack-AWSEBAutoScalingLaunchConfiguration-172J82KXDUKAM"
+            }
+        ], 
+        "LaunchTemplates": []
+    }
+}
