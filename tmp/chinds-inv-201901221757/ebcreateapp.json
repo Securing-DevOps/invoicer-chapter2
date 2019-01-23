@@ -1,0 +1,24 @@
+{
+    "Application": {
+        "ApplicationName": "chinds-inv-201901221757", 
+        "Description": "Invoicer  201901221757", 
+        "DateCreated": "2019-01-22T23:01:05.396Z", 
+        "ConfigurationTemplates": [], 
+        "DateUpdated": "2019-01-22T23:01:05.396Z", 
+        "ResourceLifecycleConfig": {
+            "VersionLifecycleConfig": {
+                "MaxCountRule": {
+                    "DeleteSourceFromS3": false, 
+                    "Enabled": false, 
+                    "MaxCount": 200
+                }, 
+                "MaxAgeRule": {
+                    "DeleteSourceFromS3": false, 
+                    "Enabled": false, 
+                    "MaxAgeInDays": 180
+                }
+            }
+        }, 
+        "ApplicationArn": "arn:aws:elasticbeanstalk:us-east-1:634989232804:application/chinds-inv-201901221757"
+    }
+}

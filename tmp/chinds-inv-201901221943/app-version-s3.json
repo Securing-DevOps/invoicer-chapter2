@@ -1,0 +1,14 @@
+{
+    "ApplicationVersion": {
+        "ApplicationName": "chinds-inv-201901221943", 
+        "Status": "UNPROCESSED", 
+        "VersionLabel": "invoicer-api", 
+        "ApplicationVersionArn": "arn:aws:elasticbeanstalk:us-east-1:634989232804:applicationversion/chinds-inv-201901221943/invoicer-api", 
+        "DateCreated": "2019-01-23T00:48:46.616Z", 
+        "DateUpdated": "2019-01-23T00:48:46.616Z", 
+        "SourceBundle": {
+            "S3Bucket": "chinds-inv-201901221943", 
+            "S3Key": "app-version.json"
+        }
+    }
+}
