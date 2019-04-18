@@ -28,7 +28,7 @@ jobs:
    - run: mkdir -p "${GOPATH_HEAD}/bin"
        
    - run:
-      name: Testing application
+      name: Testing application2
       command: |
           go test \
           github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
