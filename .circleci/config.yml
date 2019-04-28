@@ -46,3 +46,7 @@ jobs:
              sudo tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt;
            docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME};
          fi
+git checkout -b featbr1
+git add .circleci/config.yml
+git commit -m "initial circleci conf"
+git push origin featbr1
