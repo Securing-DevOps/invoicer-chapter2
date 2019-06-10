@@ -46,3 +46,6 @@ jobs:
              sudo tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt;
            docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME};
          fi
+
+   - store_test_results:
+         path: test-results
