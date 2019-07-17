@@ -10,7 +10,7 @@ jobs:
    - checkout
    - setup_remote_docker
 
-   - run: 
+   - run:
       name: Setup environment
       command: |
        gb="/src/github.com/${CIRCLE_PROJECT_USERNAME}";
@@ -26,13 +26,13 @@ jobs:
        EOF
    - run: mkdir -p "${GOPATH_BASE}"
    - run: mkdir -p "${GOPATH_HEAD}/bin"
-       
+
    - run:
       name: Testing application
       command: |
           go test \
           github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
-
+# docker variables added circleCI project settings
    - deploy:
        command: |
          if [ "${CIRCLE_BRANCH}" == "master" ]; then
