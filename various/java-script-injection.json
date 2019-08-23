@@ -1,0 +1,12 @@
+{
+  "is_paid": false,
+  "amount": 51,
+  "due_date": "2016-05-07T23:00:00Z",
+  "charges": [
+    {
+      "type": "physical checkup",
+      "amount": 51,
+      "description": "<script type='text/javascript'>alert('xss');</script>"
+    }
+  ]
+}
