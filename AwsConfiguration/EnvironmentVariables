@@ -1,0 +1,23 @@
+[
+    {
+        "Namespace": "aws:elasticbeanstalk:application:environment",
+        "OptionName": "INVOICER_POSTGRES_USER",
+        "Value": "invoicer"
+    },
+    {
+        "Namespace": "aws:elasticbeanstalk:application:environment",
+        "OptionName": "INVOICER_POSTGRES_PASSWORD",
+        "Value": "kcuKZemmZZo5MZQt"
+    },
+    {
+        "Namespace": "aws:elasticbeanstalk:application:environment",
+        "OptionName": "INVOICER_POSTGRES_DB",
+        "Value": "invoicer"
+    },
+    {
+        "Namespace": "aws:elasticbeanstalk:application:environment",
+        "OptionName": "INVOICER_POSTGRES_HOST",
+        "Value": "invoicer-db.cjtxi9uamsrf.eu-central-1.rds.amazonaws.com"
+    }
+]
+

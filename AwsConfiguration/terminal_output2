@@ -1,0 +1,808 @@
+➜  ~ mkdir .aws
+➜  ~ vim .aws/credentials
+➜  ~ sudo pip3 install -U awscli
+[sudo] password for wowa: 
+sudo: pip3: command not found
+➜  ~ pip --version
+zsh: command not found: pip
+➜  ~ sudo apt update
+Get:1 http://security.ubuntu.com/ubuntu bionic-security InRelease [88,7 kB]
+Hit:2 http://de.archive.ubuntu.com/ubuntu bionic InRelease                                           
+Hit:3 https://download.docker.com/linux/ubuntu bionic InRelease                                      
+Get:4 http://de.archive.ubuntu.com/ubuntu bionic-updates InRelease [88,7 kB]        
+Get:5 http://de.archive.ubuntu.com/ubuntu bionic-backports InRelease [74,6 kB]                 
+Get:6 http://security.ubuntu.com/ubuntu bionic-security/main amd64 Packages [465 kB]
+Get:7 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 Packages [697 kB]
+Get:8 http://security.ubuntu.com/ubuntu bionic-security/main i386 Packages [346 kB]        
+Get:9 http://de.archive.ubuntu.com/ubuntu bionic-updates/main i386 Packages [566 kB]
+Get:10 http://security.ubuntu.com/ubuntu bionic-security/main amd64 DEP-11 Metadata [22,7 kB]
+Get:11 http://security.ubuntu.com/ubuntu bionic-security/main DEP-11 48x48 Icons [10,4 kB]          
+Get:12 http://security.ubuntu.com/ubuntu bionic-security/main DEP-11 64x64 Icons [31,7 kB]           
+Get:13 http://security.ubuntu.com/ubuntu bionic-security/universe i386 Packages [570 kB]           
+Get:14 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 DEP-11 Metadata [282 kB]
+Get:15 http://de.archive.ubuntu.com/ubuntu bionic-updates/main DEP-11 48x48 Icons [66,7 kB]        
+Get:16 http://security.ubuntu.com/ubuntu bionic-security/universe amd64 Packages [578 kB]            
+Get:17 http://de.archive.ubuntu.com/ubuntu bionic-updates/main DEP-11 64x64 Icons [134 kB]          
+Get:18 http://de.archive.ubuntu.com/ubuntu bionic-updates/universe amd64 Packages [984 kB]        
+Get:19 http://security.ubuntu.com/ubuntu bionic-security/universe Translation-en [190 kB]   
+Get:20 http://security.ubuntu.com/ubuntu bionic-security/universe amd64 DEP-11 Metadata [42,1 kB]  
+Get:21 http://security.ubuntu.com/ubuntu bionic-security/universe DEP-11 48x48 Icons [16,4 kB]       
+Get:22 http://security.ubuntu.com/ubuntu bionic-security/universe DEP-11 64x64 Icons [116 kB]  
+Get:23 http://security.ubuntu.com/ubuntu bionic-security/multiverse amd64 DEP-11 Metadata [2.464 B]  
+Get:24 http://de.archive.ubuntu.com/ubuntu bionic-updates/universe i386 Packages [965 kB]            
+Get:25 http://de.archive.ubuntu.com/ubuntu bionic-updates/universe Translation-en [300 kB]
+Get:26 http://de.archive.ubuntu.com/ubuntu bionic-updates/universe amd64 DEP-11 Metadata [252 kB]
+Get:27 http://de.archive.ubuntu.com/ubuntu bionic-updates/universe DEP-11 48x48 Icons [201 kB]
+Get:28 http://de.archive.ubuntu.com/ubuntu bionic-updates/universe DEP-11 64x64 Icons [434 kB]
+Get:29 http://de.archive.ubuntu.com/ubuntu bionic-updates/multiverse amd64 DEP-11 Metadata [2.464 B] 
+Get:30 http://de.archive.ubuntu.com/ubuntu bionic-backports/universe amd64 DEP-11 Metadata [7.712 B] 
+Fetched 7.534 kB in 6s (1.243 kB/s)                                                                  
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+8 packages can be upgraded. Run 'apt list --upgradable' to see them.
+➜  ~ sudo apt install python3-pip
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following additional packages will be installed:
+  build-essential dh-python dpkg-dev fakeroot g++ g++-7 libalgorithm-diff-perl
+  libalgorithm-diff-xs-perl libalgorithm-merge-perl libexpat1-dev libfakeroot libpython3-dev
+  libpython3.6-dev libstdc++-7-dev make python-pip-whl python3-dev python3-distutils python3-lib2to3
+  python3-setuptools python3-wheel python3.6-dev
+Suggested packages:
+  debian-keyring g++-multilib g++-7-multilib gcc-7-doc libstdc++6-7-dbg libstdc++-7-doc make-doc
+  python-setuptools-doc
+The following NEW packages will be installed:
+  build-essential dh-python dpkg-dev fakeroot g++ g++-7 libalgorithm-diff-perl
+  libalgorithm-diff-xs-perl libalgorithm-merge-perl libexpat1-dev libfakeroot libpython3-dev
+  libpython3.6-dev libstdc++-7-dev make python-pip-whl python3-dev python3-distutils python3-lib2to3
+  python3-pip python3-setuptools python3-wheel python3.6-dev
+0 upgraded, 23 newly installed, 0 to remove and 8 not upgraded.
+Need to get 57,8 MB of archives.
+After this operation, 128 MB of additional disk space will be used.
+Do you want to continue? [Y/n] Y
+Get:1 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 libstdc++-7-dev amd64 7.4.0-1ubuntu1~18.04.1 [1.468 kB]
+Get:2 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 g++-7 amd64 7.4.0-1ubuntu1~18.04.1 [7.574 kB]
+Get:3 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 g++ amd64 4:7.4.0-1ubuntu2.3 [1.568 B]
+Get:4 http://de.archive.ubuntu.com/ubuntu bionic/main amd64 make amd64 4.1-9.1ubuntu1 [154 kB]       
+Get:5 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 dpkg-dev all 1.19.0.5ubuntu2.1 [608 kB]
+Get:6 http://de.archive.ubuntu.com/ubuntu bionic/main amd64 build-essential amd64 12.4ubuntu1 [4.758 B]
+Get:7 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 python3-lib2to3 all 3.6.8-1~18.04 [76,5 kB]
+Get:8 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 python3-distutils all 3.6.8-1~18.04 [141 kB]
+Get:9 http://de.archive.ubuntu.com/ubuntu bionic/main amd64 dh-python all 3.20180325ubuntu2 [89,2 kB]
+Get:10 http://de.archive.ubuntu.com/ubuntu bionic/main amd64 libfakeroot amd64 1.22-2ubuntu1 [25,9 kB]
+Get:11 http://de.archive.ubuntu.com/ubuntu bionic/main amd64 fakeroot amd64 1.22-2ubuntu1 [62,3 kB]  
+Get:12 http://de.archive.ubuntu.com/ubuntu bionic/main amd64 libalgorithm-diff-perl all 1.19.03-1 [47,6 kB]
+Get:13 http://de.archive.ubuntu.com/ubuntu bionic/main amd64 libalgorithm-diff-xs-perl amd64 0.04-5 [11,1 kB]
+Get:14 http://de.archive.ubuntu.com/ubuntu bionic/main amd64 libalgorithm-merge-perl all 0.08-3 [12,0 kB]
+Get:15 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 libexpat1-dev amd64 2.2.5-3ubuntu0.1 [122 kB]
+Get:16 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 libpython3.6-dev amd64 3.6.8-1~18.04.1 [44,8 MB]
+Get:17 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 libpython3-dev amd64 3.6.7-1~18.04 [7.328 B]
+Get:18 http://de.archive.ubuntu.com/ubuntu bionic-updates/universe amd64 python-pip-whl all 9.0.1-2.3~ubuntu1.18.04.1 [1.653 kB]
+Get:19 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 python3.6-dev amd64 3.6.8-1~18.04.1 [508 kB]
+Get:20 http://de.archive.ubuntu.com/ubuntu bionic-updates/main amd64 python3-dev amd64 3.6.7-1~18.04 [1.288 B]
+Get:21 http://de.archive.ubuntu.com/ubuntu bionic-updates/universe amd64 python3-pip all 9.0.1-2.3~ubuntu1.18.04.1 [114 kB]
+Get:22 http://de.archive.ubuntu.com/ubuntu bionic/main amd64 python3-setuptools all 39.0.1-2 [248 kB]
+Get:23 http://de.archive.ubuntu.com/ubuntu bionic/universe amd64 python3-wheel all 0.30.0-0.2 [36,5 kB]
+Fetched 57,8 MB in 34s (1.684 kB/s)                                                                  
+Selecting previously unselected package libstdc++-7-dev:amd64.
+(Reading database ... 173528 files and directories currently installed.)
+Preparing to unpack .../00-libstdc++-7-dev_7.4.0-1ubuntu1~18.04.1_amd64.deb ...
+Unpacking libstdc++-7-dev:amd64 (7.4.0-1ubuntu1~18.04.1) ...
+Selecting previously unselected package g++-7.
+Preparing to unpack .../01-g++-7_7.4.0-1ubuntu1~18.04.1_amd64.deb ...
+Unpacking g++-7 (7.4.0-1ubuntu1~18.04.1) ...
+Selecting previously unselected package g++.
+Preparing to unpack .../02-g++_4%3a7.4.0-1ubuntu2.3_amd64.deb ...
+Unpacking g++ (4:7.4.0-1ubuntu2.3) ...
+Selecting previously unselected package make.
+Preparing to unpack .../03-make_4.1-9.1ubuntu1_amd64.deb ...
+Unpacking make (4.1-9.1ubuntu1) ...
+Selecting previously unselected package dpkg-dev.
+Preparing to unpack .../04-dpkg-dev_1.19.0.5ubuntu2.1_all.deb ...
+Unpacking dpkg-dev (1.19.0.5ubuntu2.1) ...
+Selecting previously unselected package build-essential.
+Preparing to unpack .../05-build-essential_12.4ubuntu1_amd64.deb ...
+Unpacking build-essential (12.4ubuntu1) ...
+Selecting previously unselected package python3-lib2to3.
+Preparing to unpack .../06-python3-lib2to3_3.6.8-1~18.04_all.deb ...
+Unpacking python3-lib2to3 (3.6.8-1~18.04) ...
+Selecting previously unselected package python3-distutils.
+Preparing to unpack .../07-python3-distutils_3.6.8-1~18.04_all.deb ...
+Unpacking python3-distutils (3.6.8-1~18.04) ...
+Selecting previously unselected package dh-python.
+Preparing to unpack .../08-dh-python_3.20180325ubuntu2_all.deb ...
+Unpacking dh-python (3.20180325ubuntu2) ...
+Selecting previously unselected package libfakeroot:amd64.
+Preparing to unpack .../09-libfakeroot_1.22-2ubuntu1_amd64.deb ...
+Unpacking libfakeroot:amd64 (1.22-2ubuntu1) ...
+Selecting previously unselected package fakeroot.
+Preparing to unpack .../10-fakeroot_1.22-2ubuntu1_amd64.deb ...
+Unpacking fakeroot (1.22-2ubuntu1) ...
+Selecting previously unselected package libalgorithm-diff-perl.
+Preparing to unpack .../11-libalgorithm-diff-perl_1.19.03-1_all.deb ...
+Unpacking libalgorithm-diff-perl (1.19.03-1) ...
+Selecting previously unselected package libalgorithm-diff-xs-perl.
+Preparing to unpack .../12-libalgorithm-diff-xs-perl_0.04-5_amd64.deb ...
+Unpacking libalgorithm-diff-xs-perl (0.04-5) ...
+Selecting previously unselected package libalgorithm-merge-perl.
+Preparing to unpack .../13-libalgorithm-merge-perl_0.08-3_all.deb ...
+Unpacking libalgorithm-merge-perl (0.08-3) ...
+Selecting previously unselected package libexpat1-dev:amd64.
+Preparing to unpack .../14-libexpat1-dev_2.2.5-3ubuntu0.1_amd64.deb ...
+Unpacking libexpat1-dev:amd64 (2.2.5-3ubuntu0.1) ...
+Selecting previously unselected package libpython3.6-dev:amd64.
+Preparing to unpack .../15-libpython3.6-dev_3.6.8-1~18.04.1_amd64.deb ...
+Unpacking libpython3.6-dev:amd64 (3.6.8-1~18.04.1) ...
+Selecting previously unselected package libpython3-dev:amd64.
+Preparing to unpack .../16-libpython3-dev_3.6.7-1~18.04_amd64.deb ...
+Unpacking libpython3-dev:amd64 (3.6.7-1~18.04) ...
+Selecting previously unselected package python-pip-whl.
+Preparing to unpack .../17-python-pip-whl_9.0.1-2.3~ubuntu1.18.04.1_all.deb ...
+Unpacking python-pip-whl (9.0.1-2.3~ubuntu1.18.04.1) ...
+Selecting previously unselected package python3.6-dev.
+Preparing to unpack .../18-python3.6-dev_3.6.8-1~18.04.1_amd64.deb ...
+Unpacking python3.6-dev (3.6.8-1~18.04.1) ...
+Selecting previously unselected package python3-dev.
+Preparing to unpack .../19-python3-dev_3.6.7-1~18.04_amd64.deb ...
+Unpacking python3-dev (3.6.7-1~18.04) ...
+Selecting previously unselected package python3-pip.
+Preparing to unpack .../20-python3-pip_9.0.1-2.3~ubuntu1.18.04.1_all.deb ...
+Unpacking python3-pip (9.0.1-2.3~ubuntu1.18.04.1) ...
+Selecting previously unselected package python3-setuptools.
+Preparing to unpack .../21-python3-setuptools_39.0.1-2_all.deb ...
+Unpacking python3-setuptools (39.0.1-2) ...
+Selecting previously unselected package python3-wheel.
+Preparing to unpack .../22-python3-wheel_0.30.0-0.2_all.deb ...
+Unpacking python3-wheel (0.30.0-0.2) ...
+Setting up python-pip-whl (9.0.1-2.3~ubuntu1.18.04.1) ...
+Setting up make (4.1-9.1ubuntu1) ...
+Setting up python3-wheel (0.30.0-0.2) ...
+Setting up libstdc++-7-dev:amd64 (7.4.0-1ubuntu1~18.04.1) ...
+Setting up dpkg-dev (1.19.0.5ubuntu2.1) ...
+Processing triggers for libc-bin (2.27-3ubuntu1) ...
+Setting up libfakeroot:amd64 (1.22-2ubuntu1) ...
+Setting up libalgorithm-diff-perl (1.19.03-1) ...
+Setting up libexpat1-dev:amd64 (2.2.5-3ubuntu0.1) ...
+Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
+Setting up python3-lib2to3 (3.6.8-1~18.04) ...
+Setting up python3-distutils (3.6.8-1~18.04) ...
+Setting up g++-7 (7.4.0-1ubuntu1~18.04.1) ...
+Setting up fakeroot (1.22-2ubuntu1) ...
+update-alternatives: using /usr/bin/fakeroot-sysv to provide /usr/bin/fakeroot (fakeroot) in auto mode
+Setting up libpython3.6-dev:amd64 (3.6.8-1~18.04.1) ...
+Setting up libalgorithm-merge-perl (0.08-3) ...
+Setting up libalgorithm-diff-xs-perl (0.04-5) ...
+Setting up python3-pip (9.0.1-2.3~ubuntu1.18.04.1) ...
+Setting up g++ (4:7.4.0-1ubuntu2.3) ...
+update-alternatives: using /usr/bin/g++ to provide /usr/bin/c++ (c++) in auto mode
+Setting up python3-setuptools (39.0.1-2) ...
+Setting up python3.6-dev (3.6.8-1~18.04.1) ...
+Setting up dh-python (3.20180325ubuntu2) ...
+Setting up libpython3-dev:amd64 (3.6.7-1~18.04) ...
+Setting up build-essential (12.4ubuntu1) ...
+Setting up python3-dev (3.6.7-1~18.04) ...
+Processing triggers for libc-bin (2.27-3ubuntu1) ...
+➜  ~ pip --version               
+zsh: command not found: pip
+➜  ~ pip3 --version
+pip 9.0.1 from /usr/lib/python3/dist-packages (python 3.6)
+➜  ~ sudo pip3 install -U awscli 
+The directory '/home/wowa/.cache/pip/http' or its parent directory is not owned by the current user and the cache has been disabled. Please check the permissions and owner of that directory. If executing pip with sudo, you may want sudo's -H flag.
+The directory '/home/wowa/.cache/pip' or its parent directory is not owned by the current user and caching wheels has been disabled. check the permissions and owner of that directory. If executing pip with sudo, you may want sudo's -H flag.
+Collecting awscli
+  Downloading https://files.pythonhosted.org/packages/78/2e/21e6ab93b4a6099deb1b90afed2662f459b0a50dd800aab1d337df010dda/awscli-1.16.216-py2.py3-none-any.whl (1.9MB)
+    100% |████████████████████████████████| 1.9MB 603kB/s 
+Collecting botocore==1.12.206 (from awscli)
+  Downloading https://files.pythonhosted.org/packages/26/39/85a6d35ad2925c6402011ec3dc7afa23fff7ab98a6c62d0013592dcc753b/botocore-1.12.206-py2.py3-none-any.whl (5.7MB)
+    100% |████████████████████████████████| 5.7MB 258kB/s 
+Collecting colorama<=0.3.9,>=0.2.5 (from awscli)
+  Downloading https://files.pythonhosted.org/packages/db/c8/7dcf9dbcb22429512708fe3a547f8b6101c0d02137acbd892505aee57adf/colorama-0.3.9-py2.py3-none-any.whl
+Collecting PyYAML<=5.1,>=3.10; python_version != "2.6" (from awscli)
+  Downloading https://files.pythonhosted.org/packages/9f/2c/9417b5c774792634834e730932745bc09a7d36754ca00acf1ccd1ac2594d/PyYAML-5.1.tar.gz (274kB)
+    100% |████████████████████████████████| 276kB 1.1MB/s 
+Collecting docutils<0.15,>=0.10 (from awscli)
+  Downloading https://files.pythonhosted.org/packages/36/fa/08e9e6e0e3cbd1d362c3bbee8d01d0aedb2155c4ac112b19ef3cae8eed8d/docutils-0.14-py3-none-any.whl (543kB)
+    100% |████████████████████████████████| 552kB 1.0MB/s 
+Collecting s3transfer<0.3.0,>=0.2.0 (from awscli)
+  Downloading https://files.pythonhosted.org/packages/16/8a/1fc3dba0c4923c2a76e1ff0d52b305c44606da63f718d14d3231e21c51b0/s3transfer-0.2.1-py2.py3-none-any.whl (70kB)
+    100% |████████████████████████████████| 71kB 1.4MB/s 
+Collecting rsa<=3.5.0,>=3.1.2 (from awscli)
+  Downloading https://files.pythonhosted.org/packages/e1/ae/baedc9cb175552e95f3395c43055a6a5e125ae4d48a1d7a924baca83e92e/rsa-3.4.2-py2.py3-none-any.whl (46kB)
+    100% |████████████████████████████████| 51kB 849kB/s 
+Collecting jmespath<1.0.0,>=0.7.1 (from botocore==1.12.206->awscli)
+  Downloading https://files.pythonhosted.org/packages/83/94/7179c3832a6d45b266ddb2aac329e101367fbdb11f425f13771d27f225bb/jmespath-0.9.4-py2.py3-none-any.whl
+Collecting python-dateutil<3.0.0,>=2.1; python_version >= "2.7" (from botocore==1.12.206->awscli)
+  Downloading https://files.pythonhosted.org/packages/41/17/c62faccbfbd163c7f57f3844689e3a78bae1f403648a6afb1d0866d87fbb/python_dateutil-2.8.0-py2.py3-none-any.whl (226kB)
+    100% |████████████████████████████████| 235kB 1.3MB/s 
+Collecting urllib3<1.26,>=1.20; python_version >= "3.4" (from botocore==1.12.206->awscli)
+  Downloading https://files.pythonhosted.org/packages/e6/60/247f23a7121ae632d62811ba7f273d0e58972d75e58a94d329d51550a47d/urllib3-1.25.3-py2.py3-none-any.whl (150kB)
+    100% |████████████████████████████████| 153kB 1.5MB/s 
+Collecting pyasn1>=0.1.3 (from rsa<=3.5.0,>=3.1.2->awscli)
+  Downloading https://files.pythonhosted.org/packages/6a/6e/209351ec34b7d7807342e2bb6ff8a96eef1fd5dcac13bdbadf065c2bb55c/pyasn1-0.4.6-py2.py3-none-any.whl (75kB)
+    100% |████████████████████████████████| 81kB 1.8MB/s 
+Collecting six>=1.5 (from python-dateutil<3.0.0,>=2.1; python_version >= "2.7"->botocore==1.12.206->awscli)
+  Downloading https://files.pythonhosted.org/packages/73/fb/00a976f728d0d1fecfe898238ce23f502a721c0ac0ecfedb80e0d88c64e9/six-1.12.0-py2.py3-none-any.whl
+Installing collected packages: jmespath, docutils, six, python-dateutil, urllib3, botocore, colorama, PyYAML, s3transfer, pyasn1, rsa, awscli
+  Found existing installation: six 1.11.0
+    Not uninstalling six at /usr/lib/python3/dist-packages, outside environment /usr
+  Found existing installation: python-dateutil 2.6.1
+    Not uninstalling python-dateutil at /usr/lib/python3/dist-packages, outside environment /usr
+  Found existing installation: urllib3 1.22
+    Not uninstalling urllib3 at /usr/lib/python3/dist-packages, outside environment /usr
+  Found existing installation: PyYAML 3.12
+    Not uninstalling pyyaml at /usr/lib/python3/dist-packages, outside environment /usr
+  Running setup.py install for PyYAML ... done
+Successfully installed PyYAML-5.1 awscli-1.16.216 botocore-1.12.206 colorama-0.3.9 docutils-0.14 jmespath-0.9.4 pyasn1-0.4.6 python-dateutil-2.8.0 rsa-3.4.2 s3transfer-0.2.1 six-1.12.0 urllib3-1.25.3
+➜  ~ 
+➜  ~ aws ec2 describe-vpcs
+{
+    "Vpcs": [
+        {
+            "CidrBlock": "172.31.0.0/16",
+            "DhcpOptionsId": "dopt-303f9b59",
+            "State": "available",
+            "VpcId": "vpc-e6e68d8f",
+            "OwnerId": "530798195059",
+            "InstanceTenancy": "default",
+            "CidrBlockAssociationSet": [
+                {
+                    "AssociationId": "vpc-cidr-assoc-d359afba",
+                    "CidrBlock": "172.31.0.0/16",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                },
+                {
+                    "AssociationId": "vpc-cidr-assoc-2756774f",
+                    "CidrBlock": "93.230.0.0/16",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "IsDefault": true,
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "default-vpc"
+                }
+            ]
+        }
+    ]
+}
+➜  ~ aws ec2 create-security-group --group-name invoicer_db --description "Securing DevOps - Invocer database security group" --vps-id vpc-e6e68d8f
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+
+Unknown options: --vps-id, vpc-e6e68d8f
+➜  ~ aws ec2 create-security-group help
+➜  ~ aws ec2 create-security-group --group-name invoicer_db --description "Securing DevOps - Invocer database security group" --vpc-id vpc-e6e68d8f
+{
+    "GroupId": "sg-0870cc66811d2713f"
+}
+➜  ~ aws rds create-db-instance --db-name invoicer --db-instance-identifier invoicer-db --vpc-security-group-ids sg-0870cc66811d2713f --allocated-storage "1" --db-instance-class "db.t2.micro" --engine postgres --engine-version 9.6.2 --auto-minor-version-upgrade --public-accessible --master-username invoicer --master-user-password 'kcuKZemmZZo5MZQt' --no-muti-az
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+
+Unknown options: --public-accessible, --no-muti-az
+➜  ~ aws rds create-db-instance --db-name invoicer --db-instance-identifier invoicer-db --vpc-security-group-ids sg-0870cc66811d2713f --allocated-storage "1" --db-instance-class "db.t2.micro" --engine postgres --engine-version 9.6.2 --auto-minor-version-upgrade --publicly-accessible --master-username invoicer --master-user-password 'kcuKZemmZZo5MZQt' --no-multi-az
+
+An error occurred (InvalidParameterCombination) when calling the CreateDBInstance operation: Invalid storage size for engine name postgres and storage type gp2: 1
+➜  ~ aws rds create-db-instance --db-name invoicer --db-instance-identifier invoicer-db --vpc-security-group-ids sg-0870cc66811d2713f --allocated-storage "5" --db-instance-class "db.t2.micro" --engine postgres --engine-version 9.6.2 --auto-minor-version-upgrade --publicly-accessible --master-username invoicer --master-user-password 'kcuKZemmZZo5MZQt' --no-multi-az
+{
+    "DBInstance": {
+        "DBInstanceIdentifier": "invoicer-db",
+        "DBInstanceClass": "db.t2.micro",
+        "Engine": "postgres",
+        "DBInstanceStatus": "creating",
+        "MasterUsername": "invoicer",
+        "DBName": "invoicer",
+        "AllocatedStorage": 5,
+        "PreferredBackupWindow": "00:58-01:28",
+        "BackupRetentionPeriod": 1,
+        "DBSecurityGroups": [],
+        "VpcSecurityGroups": [
+            {
+                "VpcSecurityGroupId": "sg-0870cc66811d2713f",
+                "Status": "active"
+            }
+        ],
+        "DBParameterGroups": [
+            {
+                "DBParameterGroupName": "default.postgres9.6",
+                "ParameterApplyStatus": "in-sync"
+            }
+        ],
+        "DBSubnetGroup": {
+            "DBSubnetGroupName": "default",
+            "DBSubnetGroupDescription": "default",
+            "VpcId": "vpc-e6e68d8f",
+            "SubnetGroupStatus": "Complete",
+            "Subnets": [
+                {
+                    "SubnetIdentifier": "subnet-b8fc9bc3",
+                    "SubnetAvailabilityZone": {
+                        "Name": "eu-central-1b"
+                    },
+                    "SubnetStatus": "Active"
+                },
+                {
+                    "SubnetIdentifier": "subnet-4fe4a426",
+                    "SubnetAvailabilityZone": {
+                        "Name": "eu-central-1a"
+                    },
+                    "SubnetStatus": "Active"
+                },
+                {
+                    "SubnetIdentifier": "subnet-482d0302",
+                    "SubnetAvailabilityZone": {
+                        "Name": "eu-central-1c"
+                    },
+                    "SubnetStatus": "Active"
+                }
+            ]
+        },
+        "PreferredMaintenanceWindow": "fri:21:51-fri:22:21",
+        "PendingModifiedValues": {
+            "MasterUserPassword": "****"
+        },
+        "MultiAZ": false,
+        "EngineVersion": "9.6.2",
+        "AutoMinorVersionUpgrade": true,
+        "ReadReplicaDBInstanceIdentifiers": [],
+        "LicenseModel": "postgresql-license",
+        "OptionGroupMemberships": [
+            {
+                "OptionGroupName": "default:postgres-9-6",
+                "Status": "in-sync"
+            }
+        ],
+        "PubliclyAccessible": true,
+        "StorageType": "gp2",
+        "DbInstancePort": 0,
+        "StorageEncrypted": false,
+        "DbiResourceId": "db-6PGR7IJV2ADJEGVYWNSWARCITM",
+        "CACertificateIdentifier": "rds-ca-2015",
+        "DomainMemberships": [],
+        "CopyTagsToSnapshot": false,
+        "MonitoringInterval": 0,
+        "DBInstanceArn": "arn:aws:rds:eu-central-1:530798195059:db:invoicer-db",
+        "IAMDatabaseAuthenticationEnabled": false,
+        "PerformanceInsightsEnabled": false,
+        "DeletionProtection": false,
+        "AssociatedRoles": []
+    }
+}
+➜  ~ aws elasticbeanstalk create-application --application-name invoicer --description "Securing DevOps Invoicer application"
+{
+    "Application": {
+        "ApplicationArn": "arn:aws:elasticbeanstalk:eu-central-1:530798195059:application/invoicer",
+        "ApplicationName": "invoicer",
+        "Description": "Securing DevOps Invoicer application",
+        "DateCreated": "2019-08-13T08:13:06.875Z",
+        "DateUpdated": "2019-08-13T08:13:06.875Z",
+        "ConfigurationTemplates": [],
+        "ResourceLifecycleConfig": {
+            "VersionLifecycleConfig": {
+                "MaxCountRule": {
+                    "Enabled": false,
+                    "MaxCount": 200,
+                    "DeleteSourceFromS3": false
+                },
+                "MaxAgeRule": {
+                    "Enabled": false,
+                    "MaxAgeInDays": 180,
+                    "DeleteSourceFromS3": false
+                }
+            }
+        }
+    }
+}
+➜  ~ aws elasticbeanstalk list-available-solution-stacks | \    jq -r '.SolutionStacks[]' | \    ①      grep -P '.+Amazon Linux.+Docker.+' \    ①      | head -1
+zsh: command not found:  
+zsh: command not found:  
+➜  ~ jq --version                                                                                     zsh: command not found: jq
+➜  ~ sudo apt-get install jq
+[sudo] password for wowa: 
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following additional packages will be installed:
+  libjq1 libonig4
+The following NEW packages will be installed:
+  jq libjq1 libonig4
+0 upgraded, 3 newly installed, 0 to remove and 8 not upgraded.
+Need to get 276 kB of archives.
+After this operation, 930 kB of additional disk space will be used.
+Do you want to continue? [Y/n] Y
+Get:1 http://de.archive.ubuntu.com/ubuntu bionic/universe amd64 libonig4 amd64 6.7.0-1 [119 kB]
+Get:2 http://de.archive.ubuntu.com/ubuntu bionic/universe amd64 libjq1 amd64 1.5+dfsg-2 [111 kB]
+Get:3 http://de.archive.ubuntu.com/ubuntu bionic/universe amd64 jq amd64 1.5+dfsg-2 [45,6 kB]
+Fetched 276 kB in 0s (569 kB/s)
+Selecting previously unselected package libonig4:amd64.
+(Reading database ... 175388 files and directories currently installed.)
+Preparing to unpack .../libonig4_6.7.0-1_amd64.deb ...
+Unpacking libonig4:amd64 (6.7.0-1) ...
+Selecting previously unselected package libjq1:amd64.
+Preparing to unpack .../libjq1_1.5+dfsg-2_amd64.deb ...
+Unpacking libjq1:amd64 (1.5+dfsg-2) ...
+Selecting previously unselected package jq.
+Preparing to unpack .../jq_1.5+dfsg-2_amd64.deb ...
+Unpacking jq (1.5+dfsg-2) ...
+Setting up libonig4:amd64 (6.7.0-1) ...
+Setting up libjq1:amd64 (1.5+dfsg-2) ...
+Processing triggers for libc-bin (2.27-3ubuntu1) ...
+Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
+Setting up jq (1.5+dfsg-2) ...
+➜  ~ aws elasticbeanstalk list-available-solution-stacks | \    jq -r '.SolutionStacks[]' | \    ①      grep -P '.+Amazon Linux.+Docker.+' \    ①      | head -1
+zsh: command not found:  
+zsh: command not found:  
+➜  ~ aws elasticbeanstalk list-available-solution-stacks | jq -r '.SolutionStacks[]                   pipe quote> '
+64bit Amazon Linux 2018.03 v2.12.1 running Go 1.12.7
+64bit Amazon Linux 2018.03 v4.10.1 running Node.js
+64bit Amazon Linux 2016.09 v4.0.0 running Node.js
+64bit Amazon Linux 2018.03 v2.8.14 running PHP 5.4
+64bit Amazon Linux 2018.03 v2.8.14 running PHP 5.5
+64bit Amazon Linux 2018.03 v2.8.14 running PHP 5.6
+64bit Amazon Linux 2018.03 v2.8.14 running PHP 7.0
+64bit Amazon Linux 2018.03 v2.8.14 running PHP 7.1
+64bit Amazon Linux 2018.03 v2.8.14 running PHP 7.2
+64bit Amazon Linux 2017.09 v2.6.6 running PHP 7.1
+64bit Amazon Linux 2018.03 v2.9.1 running Python 3.6
+64bit Amazon Linux 2018.03 v2.9.1 running Python 3.4
+64bit Amazon Linux 2018.03 v2.9.1 running Python
+64bit Amazon Linux 2018.03 v2.9.1 running Python 2.7
+64bit Amazon Linux 2018.03 v2.8.0 running Python 3.6
+64bit Amazon Linux 2017.03 v2.5.2 running Python 2.7
+64bit Amazon Linux 2017.03 v2.4.0 running Python 3.4
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.6 (Passenger Standalone)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.5 (Passenger Standalone)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.4 (Passenger Standalone)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.3 (Passenger Standalone)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.2 (Passenger Standalone)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.1 (Passenger Standalone)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.0 (Passenger Standalone)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 1.9.3
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.6 (Puma)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.5 (Puma)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.4 (Puma)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.3 (Puma)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.2 (Puma)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.1 (Puma)
+64bit Amazon Linux 2018.03 v2.10.1 running Ruby 2.0 (Puma)
+64bit Amazon Linux 2018.03 v3.2.1 running Tomcat 8.5 Java 8
+64bit Amazon Linux 2018.03 v3.2.1 running Tomcat 8 Java 8
+64bit Amazon Linux 2018.03 v3.2.1 running Tomcat 7 Java 7
+64bit Amazon Linux 2018.03 v3.2.1 running Tomcat 7 Java 6
+64bit Amazon Linux 2018.03 v3.0.3 running Tomcat 8.5 Java 8
+64bit Windows Server Core 2016 v2.2.0 running IIS 10.0
+64bit Windows Server 2016 v2.2.0 running IIS 10.0
+64bit Windows Server Core 2012 R2 v2.2.0 running IIS 8.5
+64bit Windows Server 2012 R2 v2.2.0 running IIS 8.5
+64bit Windows Server Core 2016 v1.2.0 running IIS 10.0
+64bit Windows Server 2016 v1.2.0 running IIS 10.0
+64bit Windows Server Core 2012 R2 v1.2.0 running IIS 8.5
+64bit Windows Server 2012 R2 v1.2.0 running IIS 8.5
+64bit Windows Server 2012 v1.2.0 running IIS 8
+64bit Windows Server 2008 R2 v1.2.0 running IIS 7.5
+64bit Windows Server Core 2012 R2 running IIS 8.5
+64bit Windows Server 2012 R2 running IIS 8.5
+64bit Windows Server 2012 running IIS 8
+64bit Windows Server 2008 R2 running IIS 7.5
+64bit Amazon Linux 2018.03 v2.12.16 running Docker 18.06.1-ce
+64bit Amazon Linux 2018.03 v2.12.12 running Docker 18.06.1-ce
+64bit Amazon Linux 2018.03 v2.12.11 running Docker 18.06.1-ce
+64bit Amazon Linux 2018.03 v2.12.10 running Docker 18.06.1-ce
+64bit Amazon Linux 2017.09 v2.9.2 running Docker 17.12.0-ce
+64bit Amazon Linux 2018.03 v2.15.2 running Multi-container Docker 18.06.1-ce (Generic)
+64bit Debian jessie v2.9.2 running GlassFish 4.1 Java 8 (Preconfigured - Docker)
+64bit Debian jessie v2.7.4 running GlassFish 4.1 Java 8 (Preconfigured - Docker)
+64bit Debian jessie v2.12.16 running Go 1.4 (Preconfigured - Docker)
+64bit Debian jessie v2.12.16 running Go 1.3 (Preconfigured - Docker)
+64bit Debian jessie v2.12.16 running Python 3.4 (Preconfigured - Docker)
+64bit Amazon Linux 2018.03 v2.9.1 running Java 8
+64bit Amazon Linux 2018.03 v2.9.1 running Java 7
+64bit Amazon Linux 2018.03 v2.7.4 running Java 8
+64bit Amazon Linux 2017.09 v2.6.5 running Java 8
+64bit Amazon Linux 2018.03 v2.6.14 running Packer 1.0.3
+64bit Amazon Linux 2018.03 v2.12.16 running GlassFish 5.0 Java 8 (Preconfigured - Docker)
+➜  ~ aws elasticbeanstalk list-available-solution-stacks | jq -r '.SolutionStacks[]' | grep -P Docker
+64bit Amazon Linux 2018.03 v2.12.16 running Docker 18.06.1-ce
+64bit Amazon Linux 2018.03 v2.12.12 running Docker 18.06.1-ce
+64bit Amazon Linux 2018.03 v2.12.11 running Docker 18.06.1-ce
+64bit Amazon Linux 2018.03 v2.12.10 running Docker 18.06.1-ce
+64bit Amazon Linux 2017.09 v2.9.2 running Docker 17.12.0-ce
+64bit Amazon Linux 2018.03 v2.15.2 running Multi-container Docker 18.06.1-ce (Generic)
+64bit Debian jessie v2.9.2 running GlassFish 4.1 Java 8 (Preconfigured - Docker)
+64bit Debian jessie v2.7.4 running GlassFish 4.1 Java 8 (Preconfigured - Docker)
+64bit Debian jessie v2.12.16 running Go 1.4 (Preconfigured - Docker)
+64bit Debian jessie v2.12.16 running Go 1.3 (Preconfigured - Docker)
+64bit Debian jessie v2.12.16 running Python 3.4 (Preconfigured - Docker)
+64bit Amazon Linux 2018.03 v2.12.16 running GlassFish 5.0 Java 8 (Preconfigured - Docker)
+➜  ~ aws rds describe-db-instances
+{
+    "DBInstances": [
+        {
+            "DBInstanceIdentifier": "invoicer-db",
+            "DBInstanceClass": "db.t2.micro",
+            "Engine": "postgres",
+            "DBInstanceStatus": "available",
+            "MasterUsername": "invoicer",
+            "DBName": "invoicer",
+            "Endpoint": {
+                "Address": "invoicer-db.cjtxi9uamsrf.eu-central-1.rds.amazonaws.com",
+                "Port": 5432,
+                "HostedZoneId": "Z1RLNUO7B9Q6NB"
+            },
+            "AllocatedStorage": 5,
+            "InstanceCreateTime": "2019-08-13T08:10:17.503Z",
+            "PreferredBackupWindow": "00:58-01:28",
+            "BackupRetentionPeriod": 1,
+            "DBSecurityGroups": [],
+            "VpcSecurityGroups": [
+                {
+                    "VpcSecurityGroupId": "sg-0870cc66811d2713f",
+                    "Status": "active"
+                }
+            ],
+            "DBParameterGroups": [
+                {
+                    "DBParameterGroupName": "default.postgres9.6",
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ],
+            "AvailabilityZone": "eu-central-1b",
+            "DBSubnetGroup": {
+                "DBSubnetGroupName": "default",
+                "DBSubnetGroupDescription": "default",
+                "VpcId": "vpc-e6e68d8f",
+                "SubnetGroupStatus": "Complete",
+                "Subnets": [
+                    {
+                        "SubnetIdentifier": "subnet-b8fc9bc3",
+                        "SubnetAvailabilityZone": {
+                            "Name": "eu-central-1b"
+                        },
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-4fe4a426",
+                        "SubnetAvailabilityZone": {
+                            "Name": "eu-central-1a"
+                        },
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetIdentifier": "subnet-482d0302",
+                        "SubnetAvailabilityZone": {
+                            "Name": "eu-central-1c"
+                        },
+                        "SubnetStatus": "Active"
+                    }
+                ]
+            },
+            "PreferredMaintenanceWindow": "fri:21:51-fri:22:21",
+            "PendingModifiedValues": {},
+            "LatestRestorableTime": "2019-08-13T08:11:27Z",
+            "MultiAZ": false,
+            "EngineVersion": "9.6.2",
+            "AutoMinorVersionUpgrade": true,
+            "ReadReplicaDBInstanceIdentifiers": [],
+            "LicenseModel": "postgresql-license",
+            "OptionGroupMemberships": [
+                {
+                    "OptionGroupName": "default:postgres-9-6",
+                    "Status": "in-sync"
+                }
+            ],
+            "PubliclyAccessible": true,
+            "StorageType": "gp2",
+            "DbInstancePort": 0,
+            "StorageEncrypted": false,
+            "DbiResourceId": "db-6PGR7IJV2ADJEGVYWNSWARCITM",
+            "CACertificateIdentifier": "rds-ca-2015",
+            "DomainMemberships": [],
+            "CopyTagsToSnapshot": false,
+            "MonitoringInterval": 0,
+            "DBInstanceArn": "arn:aws:rds:eu-central-1:530798195059:db:invoicer-db",
+            "IAMDatabaseAuthenticationEnabled": false,
+            "PerformanceInsightsEnabled": false,
+            "DeletionProtection": false,
+            "AssociatedRoles": []
+        }
+    ]
+}
+➜  ~ aws rds describe-db-instances | grep Address 
+                "Address": "invoicer-db.cjtxi9uamsrf.eu-central-1.rds.amazonaws.com",
+➜  ~ aws elasticbeanstalk create-environment --application-name invoicer --environment-name invoicer-api --description "Invoicer APP" --solution-stack-name "64bit Amazon Linux 2018.03 v2.12.16 running Docker 18.06.1-ce" --option-settings file:///home/wowa/Projects/SecuringDevOps/AwsConfiguration/ebs-options.json --tier "Name=WebServer,Type=Standard,Version=''"
+{
+    "EnvironmentName": "invoicer-api",
+    "EnvironmentId": "e-whpxdkscvv",
+    "ApplicationName": "invoicer",
+    "SolutionStackName": "64bit Amazon Linux 2018.03 v2.12.16 running Docker 18.06.1-ce",
+    "PlatformArn": "arn:aws:elasticbeanstalk:eu-central-1::platform/Docker running on 64bit Amazon Linux/2.12.16",
+    "Description": "Invoicer APP",
+    "DateCreated": "2019-08-13T08:27:22.843Z",
+    "DateUpdated": "2019-08-13T08:27:22.843Z",
+    "Status": "Launching",
+    "Health": "Grey",
+    "Tier": {
+        "Name": "WebServer",
+        "Type": "Standard",
+        "Version": "1.0"
+    },
+    "EnvironmentArn": "arn:aws:elasticbeanstalk:eu-central-1:530798195059:environment/invoicer/invoicer-api"
+}
+➜  ~ aws describe-environments
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+aws: error: argument command: Invalid choice, valid choices are:
+
+acm                                      | acm-pca                                 
+alexaforbusiness                         | amplify                                 
+apigateway                               | apigatewaymanagementapi                 
+apigatewayv2                             | application-autoscaling                 
+application-insights                     | appmesh                                 
+appstream                                | appsync                                 
+athena                                   | autoscaling                             
+autoscaling-plans                        | backup                                  
+batch                                    | budgets                                 
+ce                                       | chime                                   
+cloud9                                   | clouddirectory                          
+cloudformation                           | cloudfront                              
+cloudhsm                                 | cloudhsmv2                              
+cloudsearch                              | cloudsearchdomain                       
+cloudtrail                               | cloudwatch                              
+codebuild                                | codecommit                              
+codepipeline                             | codestar                                
+cognito-identity                         | cognito-idp                             
+cognito-sync                             | comprehend                              
+comprehendmedical                        | connect                                 
+cur                                      | datapipeline                            
+datasync                                 | dax                                     
+devicefarm                               | directconnect                           
+discovery                                | dlm                                     
+dms                                      | docdb                                   
+ds                                       | dynamodb                                
+dynamodbstreams                          | ec2                                     
+ec2-instance-connect                     | ecr                                     
+ecs                                      | efs                                     
+eks                                      | elasticache                             
+elasticbeanstalk                         | elastictranscoder                       
+elb                                      | elbv2                                   
+emr                                      | es                                      
+events                                   | firehose                                
+fms                                      | fsx                                     
+gamelift                                 | glacier                                 
+globalaccelerator                        | glue                                    
+greengrass                               | groundstation                           
+guardduty                                | health                                  
+iam                                      | importexport                            
+inspector                                | iot                                     
+iot-data                                 | iot-jobs-data                           
+iot1click-devices                        | iot1click-projects                      
+iotanalytics                             | iotevents                               
+iotevents-data                           | iotthingsgraph                          
+kafka                                    | kinesis                                 
+kinesis-video-archived-media             | kinesis-video-media                     
+kinesisanalytics                         | kinesisanalyticsv2                      
+kinesisvideo                             | kms                                     
+lakeformation                            | lambda                                  
+lex-models                               | lex-runtime                             
+license-manager                          | lightsail                               
+logs                                     | machinelearning                         
+macie                                    | managedblockchain                       
+marketplace-entitlement                  | marketplacecommerceanalytics            
+mediaconnect                             | mediaconvert                            
+medialive                                | mediapackage                            
+mediapackage-vod                         | mediastore                              
+mediastore-data                          | mediatailor                             
+meteringmarketplace                      | mgh                                     
+mobile                                   | mq                                      
+mturk                                    | neptune                                 
+opsworks                                 | opsworkscm                              
+organizations                            | personalize                             
+personalize-events                       | personalize-runtime                     
+pi                                       | pinpoint                                
+pinpoint-email                           | pinpoint-sms-voice                      
+polly                                    | pricing                                 
+quicksight                               | ram                                     
+rds                                      | rds-data                                
+redshift                                 | rekognition                             
+resource-groups                          | resourcegroupstaggingapi                
+robomaker                                | route53                                 
+route53domains                           | route53resolver                         
+s3control                                | sagemaker                               
+sagemaker-runtime                        | sdb                                     
+secretsmanager                           | securityhub                             
+serverlessrepo                           | service-quotas                          
+servicecatalog                           | servicediscovery                        
+ses                                      | shield                                  
+signer                                   | sms                                     
+sms-voice                                | snowball                                
+sns                                      | sqs                                     
+ssm                                      | stepfunctions                           
+storagegateway                           | sts                                     
+support                                  | swf                                     
+textract                                 | transcribe                              
+transfer                                 | translate                               
+waf                                      | waf-regional                            
+workdocs                                 | worklink                                
+workmail                                 | workspaces                              
+xray                                     | s3api                                   
+s3                                       | configure                               
+deploy                                   | configservice                           
+opsworks-cm                              | runtime.sagemaker                       
+history                                  | help                                    
+➜  ~ aws elasticbeanstalk describe-environments --environment-names invoicer-api | jq -r '.Environments[0].CNAME'
+null
+➜  ~ aws elasticbeanstalk describe-environments --environment-names invoicer-api | jq -r '.Environments[0].CNAME'
+null
+➜  ~ aws elasticbeanstalk describe-environments --environment-names invoicer-api | jq -r '.Environments[0].CNAME'
+null
+➜  ~ aws elasticbeanstalk describe-environments --environment-names invoicer-api                     
+{
+    "Environments": [
+        {
+            "EnvironmentName": "invoicer-api",
+            "EnvironmentId": "e-whpxdkscvv",
+            "ApplicationName": "invoicer",
+            "SolutionStackName": "64bit Amazon Linux 2018.03 v2.12.16 running Docker 18.06.1-ce",
+            "PlatformArn": "arn:aws:elasticbeanstalk:eu-central-1::platform/Docker running on 64bit Amazon Linux/2.12.16",
+            "Description": "Invoicer APP",
+            "DateCreated": "2019-08-13T08:27:22.825Z",
+            "DateUpdated": "2019-08-13T08:27:31.268Z",
+            "Status": "Terminated",
+            "AbortableOperationInProgress": false,
+            "Health": "Grey",
+            "Tier": {
+                "Name": "WebServer",
+                "Type": "Standard",
+                "Version": "1.0"
+            },
+            "EnvironmentLinks": [],
+            "EnvironmentArn": "arn:aws:elasticbeanstalk:eu-central-1:530798195059:environment/invoicer/invoicer-api"
+        }
+    ]
+}
+➜  ~ aws elasticbeanstalk describe-environments --environment-names invoicer-api
+{
+    "Environments": [
+        {
+            "EnvironmentName": "invoicer-api",
+            "EnvironmentId": "e-whpxdkscvv",
+            "ApplicationName": "invoicer",
+            "SolutionStackName": "64bit Amazon Linux 2018.03 v2.12.16 running Docker 18.06.1-ce",
+            "PlatformArn": "arn:aws:elasticbeanstalk:eu-central-1::platform/Docker running on 64bit Amazon Linux/2.12.16",
+            "Description": "Invoicer APP",
+            "DateCreated": "2019-08-13T08:27:22.825Z",
+            "DateUpdated": "2019-08-13T08:27:31.268Z",
+            "Status": "Terminated",
+            "AbortableOperationInProgress": false,
+            "Health": "Grey",
+            "Tier": {
+                "Name": "WebServer",
+                "Type": "Standard",
+                "Version": "1.0"
+            },
+            "EnvironmentLinks": [],
+            "EnvironmentArn": "arn:aws:elasticbeanstalk:eu-central-1:530798195059:environment/invoicer/invoicer-api"
+        }
+    ]
+}
+➜  ~ 
+
