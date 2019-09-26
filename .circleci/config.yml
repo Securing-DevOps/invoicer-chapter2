@@ -27,11 +27,11 @@ jobs:
    - run: mkdir -p "${GOPATH_BASE}"
    - run: mkdir -p "${GOPATH_HEAD}/bin"
        
-   - run:
-      name: Testing application
-      command: |
-          go test -v
-          #github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+  #  - run:
+  #     name: Testing application
+  #     command: |
+  #         go test -v
+  #         #github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
    - deploy:
        command: |
