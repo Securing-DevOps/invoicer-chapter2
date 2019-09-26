@@ -3,7 +3,7 @@ jobs:
  build:
   # Variable expansion in working_directory not supported at this time
   # You will need to modify the code below to reflect your github account/repo setup
-  working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
+  working_directory: /go/src/github.com/hercules08/invoicer-chapter2
   docker:
    - image: circleci/golang:1.10
   steps:
@@ -30,8 +30,8 @@ jobs:
    - run:
       name: Testing application
       command: |
-          go test \
-          github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+          go test -v
+          #github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
    - deploy:
        command: |
