@@ -36,7 +36,7 @@ jobs:
    - deploy:
        command: |
          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-           docker login -u ${DOCKER_USER} -p ${DOCKER_PASS};
+           docker login secdevops.azurecr.io -u ${DOCKER_USER} -p ${DOCKER_PASS};
            go install --ldflags '-extldflags "-static"' \
            github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
            mkdir bin;
