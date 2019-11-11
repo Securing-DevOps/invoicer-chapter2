@@ -43,11 +43,19 @@ These variable will allow CircleCI to upload the docker container of the
 invoicer into your own account. Once added, trigger a rebuild of the CircleCI
 job and it should succeed and upload the container without issue.
 
-You can then pull and run the container from your repository as follows:
+You can then pull and run the container from your repository and run it locally.  The `-it` flag keeps the log for the container open in the terminal window.  The `-p 8080:8080` flag connects the host port 8080 to the container port 8080.  Note in the `main.go` file on line 81 that the go microservice calls `ListenAndServe` on port 8080.
 
 ```bash
-$ docker run -it <MyGitHubUser>/invoicer
+$ docker run -it -p 8080:8080 <MyGitHubUser>/invoicer
 ```
+
+Once the container is running open another terminal window and test that the heartbeat is returned from the application by calling the heartbeat API endpoint.
+
+```
+curl localhost:8080/__heartbeat__
+```
+
+Now you know the container will properly build and that the invoicer is ready to work.  So let's move to deploying it into the cloud.
 
 Build the AWS infrastructure
 ----------------------------
