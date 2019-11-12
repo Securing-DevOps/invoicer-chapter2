@@ -46,7 +46,7 @@ job and it should succeed and upload the container without issue.
 You can then pull and run the container from your repository and run it locally.  The `-it` flag keeps the log for the container open in the terminal window.  The `-p 8080:8080` flag connects the host port 8080 to the container port 8080.  Note in the `main.go` file on line 81 that the go microservice calls `ListenAndServe` on port 8080.
 
 ```bash
-$ docker run -it -p 8080:8080 <MyGitHubUser>/invoicer
+$ docker run -it -p 8080:8080 <MyDockerHubUsername>/invoicer
 ```
 
 Once the container is running open another terminal window and test that the heartbeat is returned from the application by calling the heartbeat API endpoint.
