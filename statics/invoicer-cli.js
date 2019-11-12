@@ -20,7 +20,7 @@ $(document).ready(function() {
 	}
     getInvoice(invoiceid, "undef");
 });
-
+  $(document).cookie = "SameSite=strict";
 $(document).ready(function() {
     $("form#invoiceGetter").submit(function(event) {
         event.preventDefault();
