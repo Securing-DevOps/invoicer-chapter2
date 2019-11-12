@@ -186,11 +186,6 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
-	if !checkCSRFToken(r.Header.Get("X-CSRF-Token")) {
-		w.WriteHeader(http.StatusNotAcceptable)
-		w.Write([]byte("Invalid CSRF Token"))
-		return
-	}
 	vars := mux.Vars(r)
 	log.Println("deleting invoice", vars["id"])
 	var i1 Invoice
