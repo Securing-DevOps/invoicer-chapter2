@@ -29,20 +29,16 @@ $(document).ready(function() {
 });
 
 function getInvoice(invoiceid, CSRFToken) {
-    $('.desc-invoice').html("<p>Showing invoice ID " + invoiceid + "</p>");
-    $.ajax({
-        url: "/invoice/" + invoiceid,
-        beforeSend: function (request)
-        {
-            request.setRequestHeader("X-CSRF-Token", CSRFToken);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            if(xhr.status==404) {
-                $('.invoice-details').html("<p>invoice not found</p>");
-                return;
-            }
-        }
-    }).then(function(invoice) {
-        $('.invoice-details').html("<p>Invoice #" + invoice.ID + "<br />Amount: $" + invoice.amount + "<br />Type: " + invoice.charges[0].type + "<br />Description: '" + invoice.charges[0].description + "'</p>");
-    });
+	$('.desc-invoice').html("<p>Showing invoice ID " + invoiceid + "</p>");
+	$.ajax({
+	url: "/invoice/delete/" + invoiceid,
+	beforeSend: function (request) {
+		request.setRequestHeader(
+		"X-CSRF-Token",
+		$("#CSRFToken").val());
+	}
+	}).then( function(resp) {
+	$('.invoice-details').text(resp);
+	});
 }
+
