@@ -3,7 +3,7 @@ jobs:
  build:
   # Variable expansion in working_directory not supported at this time
   # You will need to modify the code below to reflect your github account/repo setup
-  working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
+  working_directory: /go/src/github.com/DoaaAssaf/invoicer-chapter2
   docker:
    - image: circleci/golang:1.10
   steps:
@@ -27,22 +27,50 @@ jobs:
    - run: mkdir -p "${GOPATH_BASE}"
    - run: mkdir -p "${GOPATH_HEAD}/bin"
        
+#    - run:
+#       name: Testing application
+#       command: |
+#           go test \
+#           github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+          
+#    - deploy:
+#        command: |
+#          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+#            docker login -u ${DOCKER_USER} -p ${DOCKER_PASS};
+#            go install --ldflags '-extldflags "-static"' \
+#            github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
+#            mkdir bin;
+#            cp "$GOPATH_HEAD/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
+#            docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
+#            docker images --no-trunc | awk '/^app/ {print $3}' | \
+#              sudo tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt;
+#            docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME};
+#          fi
+       
    - run:
-      name: Testing application
+      name: Build application container
       command: |
-          go test \
-          github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+          go install --ldflags '-extldflags "-static"' \
+          github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
+          [ ! -e bin ] && mkdir bin;
+          cp "${GOPATH_HEAD}/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
+          docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
+   - run:
+      name: Run application in background
+      command: |
+          docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}
+      background: true
+   - run:
+      name: ZAP baseline scan of application
+      # Only fail on error code 1, which indicates at least one FAIL was found.
+      # error codes 2 & 3 indicate WARN or other, and should not break the run
+      command: |
+          (
+          docker pull owasp/zap2docker-weekly && \
+          docker run -t owasp/zap2docker-weekly zap-baseline.py \
+          -u https://raw.githubusercontent.com/doaaAssaf/invoicer-chapter2/master/zap-baseline.conf \
+          -t http://172.17.0.2:8080/ || \
+          if [ $? -ne 1 ]; then exit 0; else exit 1; fi;
+          )
+      
 
-   - deploy:
-       command: |
-         if [ "${CIRCLE_BRANCH}" == "master" ]; then
-           docker login -u ${DOCKER_USER} -p ${DOCKER_PASS};
-           go install --ldflags '-extldflags "-static"' \
-           github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
-           mkdir bin;
-           cp "$GOPATH_HEAD/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
-           docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
-           docker images --no-trunc | awk '/^app/ {print $3}' | \
-             sudo tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt;
-           docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME};
-         fi

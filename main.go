@@ -201,6 +201,9 @@ func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 
 func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
 	log.Println("serving index page")
+	w.Header().Add("Content-Security-Policy", "default-src 'self'; child-src 'self;")
+        w.Header().Add("X-Frame-Options", "SAMEORIGIN")
+	w.Header().Add("SameSit", "Strict")
 	w.Write([]byte(`
 <!DOCTYPE html>
 <html>
@@ -216,11 +219,18 @@ func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
         <div class="invoice-details">
         </div>
         <h3>Request an invoice by ID</h3>
-        <form id="invoiceGetter" method="GET">
-            <label>ID :</label>
-            <input id="invoiceid" type="text" />
-            <input type="submit" />
-        </form>
+	
+	
+	<form id="invoiceGetter" method="GET">
+		<label>ID :</label>
+		<input id="invoiceid" type="text" />
+		<input type="hidden" name="CSRFToken" value="S1tzo02vhdM
+		CqqkN3jFpFt/BnB0R/N6QGM764sz/oOY=$7P/PosE58XEnbzsKAWswKqMU
+		UPxbo+9BM9m0IvbHv+s=">
+		<input type="submit" />
+		</form>
+	
+	
         <form id="invoiceDeleter" method="DELETE">
             <label>Delete this invoice</label>
             <input type="submit" />
