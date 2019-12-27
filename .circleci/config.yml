@@ -47,8 +47,8 @@ jobs:
    - run:
       name: Run application in background
       command: |
-       docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} &
-      # background: true
+       docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}
+      background: true
 
    - run:
       name: ZAP baseline scan of application
