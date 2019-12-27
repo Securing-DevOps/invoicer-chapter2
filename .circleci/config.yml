@@ -56,9 +56,7 @@ jobs:
       # error codes 2 & 3 indicate WARN or other, and should not break the run
       command: |
        (
-       docker pull owasp/zap2docker-weekly && \
-       docker run -t owasp/zap2docker-weekly zap-baseline.py \
-        -u https://raw.githubusercontent.com/${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}/master/zap-baseline.conf -t http://172.17.0.2:8080/ || if [ $? -ne 1 ]; then exit 0; else exit 1; fi;
+       docker pull owasp/zap2docker-weekly && docker run -t owasp/zap2docker-weekly zap-baseline.py -u https://raw.githubusercontent.com/${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}/master/zap-baseline.conf -t http://172.17.0.2:8080/ || if [ $? -ne 1 ]; then exit 0; else exit 1; fi;
        )   
 
    - deploy:
