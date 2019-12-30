@@ -205,11 +205,11 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 
 func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	//if !checkCSRFToken(r.Header.Get("X-CSRF-Token")) {
-	//	w.WriteHeader(http.StatusNotAcceptable)
-	//	w.Write([]byte("Missing CSRF Token"))
-	//	return
-	//}
+	if !checkCSRFToken(r.Header.Get("X-CSRF-Token")) {
+		w.WriteHeader(http.StatusNotAcceptable)
+		w.Write([]byte("Missing CSRF Token"))
+		return
+	}
 	log.Println("deleting invoice", vars["id"])
 	var i1 Invoice
 	id, _ := strconv.Atoi(vars["id"])
@@ -242,7 +242,7 @@ func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
         <form id="invoiceGetter" method="GET">
             <label>ID :</label>
             <input id="invoiceid" type="text" />
-	    <input type="hidden" name="CSRFToken" value="` + makeCSRFToken() + `">
+	    <input type="hidden" id="CSRFToken" value="` + makeCSRFToken() + `">
             <input type="submit" />
         </form>
         <form id="invoiceDeleter" method="DELETE">
