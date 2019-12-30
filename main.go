@@ -186,17 +186,19 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	log.Println("deleting invoice", vars["id"])
-	var i1 Invoice
-	id, _ := strconv.Atoi(vars["id"])
-	iv.db.Where("invoice_id = ?", id).Delete(Charge{})
-	i1.ID = uint(id)
-	iv.db.Delete(&i1)
-	w.WriteHeader(http.StatusAccepted)
-	w.Write([]byte(fmt.Sprintf("deleted invoice %d", i1.ID)))
-	al := appLog{Message: fmt.Sprintf("deleted invoice %d", i1.ID), Action: "delete-invoice"}
-	al.log(r)
+	if !checkCSRFToken(r.Header.Get("X-CSRF-Token")) {
+		vars := mux.Vars(r)
+		log.Println("deleting invoice", vars["id"])
+		var i1 Invoice
+		id, _ := strconv.Atoi(vars["id"])
+		iv.db.Where("invoice_id = ?", id).Delete(Charge{})
+		i1.ID = uint(id)
+		iv.db.Delete(&i1)
+		w.WriteHeader(http.StatusAccepted)
+		w.Write([]byte(fmt.Sprintf("deleted invoice %d", i1.ID)))
+		al := appLog{Message: fmt.Sprintf("deleted invoice %d", i1.ID), Action: "delete-invoice"}
+		al.log(r)
+	}
 }
 
 func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
