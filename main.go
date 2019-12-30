@@ -9,6 +9,7 @@ package main
 
 import (
 	"crypto/hmac"
+	"crypto/rand"
 	"strings"
 	"crypto/sha256"
 	"encoding/base64"
