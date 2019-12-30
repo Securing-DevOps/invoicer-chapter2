@@ -9,7 +9,7 @@ package main
 
 import (
 	"crypto/hmac"
-	"crypto/rand"
+	"strings"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
@@ -247,6 +247,16 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 "commit": "%s",
 "build": "https://circleci.com/gh/Securing-DevOps/invoicer/"
 }`, version, commit)))
+}
+
+var CSRFKey []byte
+
+func makeCSRFToken() string {
+	msg := make([]byte, 32)
+	rand.Read(msg)
+	mac := hmac.New(sha256.New, CSRFKey)
+	mac.Write(msg)
+	return base64.StdEncoding.EncodeToString(msg) + `$` + base64.StdEncoding.EncodeToString(mac.Sum(nil))
 }
 
 func checkCSRFToken(token string) bool {
