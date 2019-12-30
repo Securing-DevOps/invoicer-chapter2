@@ -8,6 +8,10 @@ package main
 //go:generate ./version.sh
 
 import (
+	"crypto/hmac"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -243,4 +247,17 @@ func getVersion(w http.ResponseWriter, r *http.Request) {
 "commit": "%s",
 "build": "https://circleci.com/gh/Securing-DevOps/invoicer/"
 }`, version, commit)))
+}
+
+func checkCSRFToken(token string) bool {
+	mac := hmac.New(sha256.New, CSRFKey)
+	tokenParts := strings.Split(token, "$")
+	if len(tokenParts) != 2 {
+		return false
+	}
+	msg, _ := base64.StdEncoding.DecodeString(tokenParts[0])
+	messageMAC, _ := base64.StdEncoding.DecodeString(tokenParts[1])
+	mac.Write([]byte(msg))
+	expectedMAC := mac.Sum(nil)
+	return hmac.Equal(messageMAC, expectedMAC)
 }
