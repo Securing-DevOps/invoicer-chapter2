@@ -64,6 +64,13 @@ func main() {
 		panic("failed to connect database")
 	}
 
+	//initialize CSRF Token
+	CSRFKey = make([]byte, 128)
+	_, err = rand.Read(CSRFKey)
+	if err != nil {
+		log.Fatal("error initializing CSRF Key:", err)
+	}
+
 	iv.db = db
 	iv.db.AutoMigrate(&Invoice{}, &Charge{})
 
@@ -191,19 +198,22 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
 	if !checkCSRFToken(r.Header.Get("X-CSRF-Token")) {
-		vars := mux.Vars(r)
-		log.Println("deleting invoice", vars["id"])
-		var i1 Invoice
-		id, _ := strconv.Atoi(vars["id"])
-		iv.db.Where("invoice_id = ?", id).Delete(Charge{})
-		i1.ID = uint(id)
-		iv.db.Delete(&i1)
-		w.WriteHeader(http.StatusAccepted)
-		w.Write([]byte(fmt.Sprintf("deleted invoice %d", i1.ID)))
-		al := appLog{Message: fmt.Sprintf("deleted invoice %d", i1.ID), Action: "delete-invoice"}
-		al.log(r)
+		w.WriteHeader(http.StatusNotAcceptable)
+		w.Write([]byte("Missing CSRF Token"))
+		return
 	}
+	log.Println("deleting invoice", vars["id"])
+	var i1 Invoice
+	id, _ := strconv.Atoi(vars["id"])
+	iv.db.Where("invoice_id = ?", id).Delete(Charge{})
+	i1.ID = uint(id)
+	iv.db.Delete(&i1)
+	w.WriteHeader(http.StatusAccepted)
+	w.Write([]byte(fmt.Sprintf("deleted invoice %d", i1.ID)))
+	al := appLog{Message: fmt.Sprintf("deleted invoice %d", i1.ID), Action: "delete-invoice"}
+	al.log(r)
 }
 
 func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
@@ -226,6 +236,7 @@ func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
         <form id="invoiceGetter" method="GET">
             <label>ID :</label>
             <input id="invoiceid" type="text" />
+	    <input type="hidden" name="CSRFToken" value="` + makeCSRFToken() + `">
             <input type="submit" />
         </form>
         <form id="invoiceDeleter" method="DELETE">
