@@ -35,8 +35,14 @@ function getInvoice(invoiceid, CSRFToken) {
         beforeSend: function (request)
         {
             request.setRequestHeader("X-CSRF-Token", $("#CSRFToken").val());
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            if(xhr.status==404) {
+                $('.invoice-details').html("<p>invoice not found</p>");
+                return;
+            }
         }
-    }).then(function(resp) {
-        $('.invoice-details').text(resp);
+    }).then(function(invoice) {
+        $('.invoice-details').html("<p>Invoice #" + invoice.ID + "<br />Amount: $" + invoice.amount + "<br />Type: " + invoice.charges[0].type + "<br />Description: '" + invoice.charges[0].description + "'</p>");
     });
 }
