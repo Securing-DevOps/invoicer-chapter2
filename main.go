@@ -205,11 +205,11 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 
 func (iv *invoicer) deleteInvoice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	if !checkCSRFToken(r.Header.Get("X-CSRF-Token")) {
-		w.WriteHeader(http.StatusNotAcceptable)
-		w.Write([]byte("Missing CSRF Token"))
-		return
-	}
+	//if !checkCSRFToken(r.Header.Get("X-CSRF-Token")) {
+	//	w.WriteHeader(http.StatusNotAcceptable)
+	//	w.Write([]byte("Missing CSRF Token"))
+	//	return
+	//}
 	log.Println("deleting invoice", vars["id"])
 	var i1 Invoice
 	id, _ := strconv.Atoi(vars["id"])
@@ -260,10 +260,10 @@ func getHeartbeat(w http.ResponseWriter, r *http.Request) {
 // handleVersion returns the current version of the API
 func getVersion(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf(`{
-"source": "https://github.com/Securing-DevOps/invoicer",
+"source": "https://github.com/jparnaut/invoicer-chapter2",
 "version": "%s",
 "commit": "%s",
-"build": "https://circleci.com/gh/Securing-DevOps/invoicer/"
+"build": "https://circleci.com/gh/jparnaut/invoicer-chapter2/"
 }`, version, commit)))
 }
 
