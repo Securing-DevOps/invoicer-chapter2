@@ -64,15 +64,21 @@ func main() {
 		panic("failed to connect database")
 	}
 
+	// initialize the session store
+	iv.store = gormstore.New(db, CSRFKey)
+	quit := make(chan struct{})
+	go iv.store.PeriodicCleanup(1*time.Hour, quit)
+
+	iv.db = db
+	iv.db.AutoMigrate(&Invoice{}, &Charge{})
+	iv.db.LogMode(true)
+
 	//initialize CSRF Token
 	CSRFKey = make([]byte, 128)
 	_, err = rand.Read(CSRFKey)
 	if err != nil {
 		log.Fatal("error initializing CSRF Key:", err)
 	}
-
-	iv.db = db
-	iv.db.AutoMigrate(&Invoice{}, &Charge{})
 
 	// register routes
 	r := mux.NewRouter()
