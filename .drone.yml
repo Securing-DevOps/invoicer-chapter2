@@ -1,0 +1,13 @@
+kind: pipeline
+name: default
+
+workspace:
+  base: /go
+  path: src/github.com/jparnaut/invoicer-chapter2
+
+steps:
+- name: test
+  image: golang
+  commands:
+  - go get jparnaut/invoicer-chapter2
+  - go test
