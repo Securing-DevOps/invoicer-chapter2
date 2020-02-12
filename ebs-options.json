@@ -22,7 +22,7 @@
     {
         "Namespace": "aws:elasticbeanstalk:application:environment", 
         "OptionName": "INVOICER_POSTGRES_HOST", 
-        "Value": "POSTGRESHOSTREPLACEME"
+        "Value": "invoicer-db.cq2bvzpm5bso.eu-west-1.rds.amazonaws.com"
     },
     {
         "Namespace": "aws:elasticbeanstalk:application:environment", 
