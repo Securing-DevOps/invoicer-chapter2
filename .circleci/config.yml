@@ -15,7 +15,7 @@ jobs:
       command: |
        gb="/src/github.com/${CIRCLE_PROJECT_USERNAME}";
        if [ ${CIRCLE_PROJECT_USERNAME} == 'larue3000' ]; then
-         dr="securingdevops"
+         dr="larue3000"
        else
          dr=$DOCKER_USER
        fi
@@ -36,6 +36,7 @@ jobs:
    - deploy:
        command: |
          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+           echo "${DOCKER_USER} ${DOCKER_PASS}"
            docker login -u ${DOCKER_USER} -p ${DOCKER_PASS};
            go install --ldflags '-extldflags "-static"' \
            github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
