@@ -1,9 +1,9 @@
 version: 2
 jobs:
  build:
-  # Variable expansion in working_directory not supported at this time
+  # A Variable expansion in working_directory not supported at this time
   # You will need to modify the code below to reflect your github account/repo setup
-  working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
+  working_directory: /go/src/github.com/larue3000/invoicer-chapter2
   docker:
    - image: circleci/golang:1.10
   steps:
@@ -14,8 +14,8 @@ jobs:
       name: Setup environment
       command: |
        gb="/src/github.com/${CIRCLE_PROJECT_USERNAME}";
-       if [ ${CIRCLE_PROJECT_USERNAME} == 'Securing-DevOps' ]; then
-         dr="securingdevops"
+       if [ ${CIRCLE_PROJECT_USERNAME} == 'larue3000' ]; then
+         dr="larue3000"
        else
          dr=$DOCKER_USER
        fi
@@ -36,6 +36,7 @@ jobs:
    - deploy:
        command: |
          if [ "${CIRCLE_BRANCH}" == "master" ]; then
+           echo "${DOCKER_USER} ${DOCKER_PASS}"
            docker login -u ${DOCKER_USER} -p ${DOCKER_PASS};
            go install --ldflags '-extldflags "-static"' \
            github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
