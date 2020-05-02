@@ -1,5 +1,5 @@
-Securing DevOps's invoicer
-==========================
+Securing DevOps's invoicer - version 1.0
+========================================
 
 A simple REST API that manages invoices.
 
