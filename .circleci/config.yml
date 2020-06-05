@@ -29,9 +29,7 @@ jobs:
    - run:
       name: Testing application
       command: |
-          go get
-          go test \
-          github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+          go test 
 
    - deploy:
        command: |
