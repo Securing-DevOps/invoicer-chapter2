@@ -1,7 +1,7 @@
 pipeline {
 	agent {
 		any
-	}
+	
 	stages {
 		stage(' GET CODE ') {
 			steps{
@@ -13,4 +13,5 @@ pipeline {
 		'''	
 			}
 	}
+}
 }
