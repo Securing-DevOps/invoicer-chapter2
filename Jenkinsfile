@@ -1,7 +1,5 @@
 pipeline {
-	agent {
-		docker {image 'golang:1.8'}
-	}
+	agent any
 	stages {
 		stage(' GET CODE ') {
 			steps{
@@ -9,8 +7,11 @@ pipeline {
 			}
 		}
 		stage(' BUILD SHIT ') {
+			agent {
+			docker {image 'golang:1.8'}
+		}
 			steps{
-			sh 'docker build -t INVOICER .'
+			sh 'go build'
 				}
 		}
 	}
