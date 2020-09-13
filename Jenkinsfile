@@ -9,8 +9,10 @@ pipeline {
 			}
 		}
 		stage(' BUILD SHIT ') {
+			steps{
 		'''sh docker build -t invoicer .
-		'''	
+		'''	}
 			}
+
 	}
 }
