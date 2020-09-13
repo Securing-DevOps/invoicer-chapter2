@@ -8,5 +8,9 @@ pipeline {
 			checkout scm
 			}
 		}
+		stage(' BUILD SHIT ') {
+		'''sh docker build -t invoicer .
+		'''	
+			}
 	}
 }
