@@ -15,7 +15,7 @@ pipeline {
 			      export GOPATH_BASE="$(echo ${GOPATH}|cut -d ':' -f 1)${gb}"
 				mkdir -p "${GOPATH_BASE}"
 				mkdir -p "${GOPATH_HEAD}/bin"
-				go build
+				go build'''
 				}
 		}
 	}
