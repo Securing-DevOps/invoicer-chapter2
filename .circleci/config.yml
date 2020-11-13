@@ -12,7 +12,7 @@ jobs:
 
    - run:
       name: Build application container
-       command: |
+      command: |
         go install --ldflags '-extldflags "-static"' github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
         [ ! -e bin ] && mkdir bin;
         cp "${GOPATH_HEAD}/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
