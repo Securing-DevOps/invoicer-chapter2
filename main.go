@@ -73,10 +73,12 @@ func main() {
 	r.HandleFunc("/invoice/delete/{id:[0-9]+}", iv.deleteInvoice).Methods("GET")
 	r.HandleFunc("/__version__", getVersion).Methods("GET")
 
-	// handle static files
+	/* handle static files
 	r.Handle("/statics/{staticfile}",
 		http.StripPrefix("/statics/", http.FileServer(http.Dir("./statics"))),
-	).Methods("GET")
+	).Methods("GET") */
+
+	r.HandleFunc("/statics/{staticfile}", iv.getStatic).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080",
 		HandleMiddlewares(
@@ -104,6 +106,13 @@ type Charge struct {
 	Amount      float64 `json:"amount"`
 	Description string  `json:"description"`
 }
+
+func (iv *invoicer) getStatic(w http.ResponseWriter, r *http.Request) {
+	fs :=  http.StripPrefix("/statics/", http.FileServer(http.Dir("./statics")))
+	w.Header().Add("X-Content-Type-Options", "nosniff;")
+	fs.ServeHTTP(w, r)
+}
+
 
 func (iv *invoicer) getInvoice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
