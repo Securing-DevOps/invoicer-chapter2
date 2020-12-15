@@ -1,0 +1,1 @@
+curl -X POST --data '{ "is_paid": false, "amount": 888, "due_date": "2021-01-10T23:00:00Z", "charges" : [{ "type": "bloodwork",  "amount" : 888,  "description": "blood work"}]}'  http://invoicer-api.eba-msepn9e2.ap-southeast-1.elasticbeanstalk.com/invoice

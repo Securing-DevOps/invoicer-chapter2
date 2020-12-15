@@ -1,0 +1,91 @@
+---
+- hosts: localhost
+  gather_facts: False
+  connection: local
+  vars:
+    vault_db_password: !vault |
+          $ANSIBLE_VAULT;1.2;AES256;dev
+          39666264366464656137653233663134313635373066613832333435626539393230306564336561
+          3864333239316532396630613638386663656531336666620a633434663333363161396230383538
+          62626536376264326466333263626261326561303639313766346466323861333839613564626232
+          3632613238353736620a656232303166366232613331623463313163623038313038366339343237
+          32363366643031373432643837333036326137383764333364386231383162366663303033363235
+          6266616433633766323664356639636339633234386139303038
+    identifier: invoicer
+    region: ap-southeast-1
+  tasks:
+    - name: Get VPC info
+      register: vpcinfo
+      ec2_vpc_net_info:
+        filters:
+          "isDefault": "true"
+    
+    - name: Set VPC ID
+      set_fact: 
+        vpc_id: '{{ vpcinfo.vpcs[0].vpc_id }}'
+
+    - name: Create Postgres security group
+      register: dbsg
+      ec2_group:
+        name: "{{ identifier }}"
+        description: Access control for Postgres DB
+        vpc_id: "{{ vpc_id }}"
+    
+    - name: Create RDS
+      rds:
+        command: create
+        instance_name: "{{ identifier }}"
+        db_name: "{{ identifier }}"
+        vpc_security_groups: "{{ dbsg.group_id }}"
+        size: 5
+        db_engine: postgres
+        engine_version: 9.6.2
+        license_model: postgresql-license 
+        instance_type: db.t2.micro
+        multi_zone: no
+        publicly_accessible: yes
+        upgrade: yes
+        username: invoicer
+        password: "{{ vault_db_password }}"
+        region: "{{ region }}"
+        tags:
+          environment-name: invoicer-api
+          owner: math
+
+    - rds_instance_info:
+        db_instance_identifier: "{{ identifier }}"
+      register: rds
+      retries: 50
+      delay: 10
+      until: rds.instances[0].db_instance_status == 'available'
+    
+    - set_fact:
+        postgres_host: "{{ rds.instances[0].endpoint.address }}"
+
+    - aws_elasticbeanstalk_app:
+        app_name: "{{ identifier }}"
+        description: "Invoicer app for Securing Devops book"
+
+    - template:
+        src: ebs-options.json.j2
+        dest: /tmp/ebs-options.json 
+      
+    - name: Create a bucket 
+      amazon.aws.s3_bucket:
+        name: "{{ identifier }}-mathdube"
+        state: present
+    
+    - name: put app-version
+      aws_s3:
+        bucket: "{{ identifier }}-mathdube"
+        mode: put
+        object: app-version.json
+        src: app-version.json
+        region: "{{ region }}"
+
+
+    - name: Set elastic beanstalk to one
+      command: aws elasticbeanstalk update-environment --application-name invoicer --environment-name invoicer-api --option-settings file://ebs_one.json
+
+    - name: Allow connection from EC2 to DB
+      command: aws ec2 authorize-security-group-ingress --group-name {{ identifier }} --source-group sg-01b9b35a79a11152b --protocol tcp --port 5432 

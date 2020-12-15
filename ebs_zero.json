@@ -1,0 +1,17 @@
+[
+    {
+        "Namespace": "aws:autoscaling:asg",
+        "OptionName": "MinSize",
+        "Value": "0"
+    },
+    {
+        "Namespace": "aws:autoscaling:asg",
+        "OptionName": "MaxSize",
+        "Value": "0"
+    },
+    {
+        "Namespace": "aws:autoscaling:updatepolicy:rollingupdate",
+        "OptionName": "RollingUpdateEnabled",
+        "Value": "false"
+    }
+]

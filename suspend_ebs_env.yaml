@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  gather_facts: False
+  connection: local
+  vars:
+    identifier: invoicer
+    region: ap-southeast-1
+  tasks:
+
+    # - name: Get VPC info
+    #   register: vpcinfo
+    #   ec2_vpc_net_info:
+    #     filters:
+    #       "isDefault": "true"
+    
+    - name: Delete RDS
+      rds:
+        command: delete
+        instance_name: "{{ identifier }}"
+        region: "{{ region }}"
+
+    - name: Set elastic beanstalk to zero
+      command: aws elasticbeanstalk update-environment --application-name invoicer --environment-name invoicer-api --option-settings file://ebs_zero.json

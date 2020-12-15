@@ -10,10 +10,10 @@ fail() {
     exit 1
 }
 
-export AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
+export AWS_DEFAULT_REGION=${AWS_REGION:-ap-southeast-1}
 
 datetag=$(date +%Y%m%d%H%M)
-identifier=$(whoami)ivcr$datetag
+identifier=invoicer
 mkdir -p tmp/$identifier
 
 echo "Creating EBS application $identifier"
@@ -83,12 +83,12 @@ dockerstack="$(aws elasticbeanstalk list-available-solution-stacks | \
 sed "s/POSTGRESPASSREPLACEME/$dbpass/" ebs-options.json > tmp/$identifier/ebs-options.json || fail
 sed -i "s/POSTGRESHOSTREPLACEME/$dbhost/" tmp/$identifier/ebs-options.json || fail
 aws elasticbeanstalk create-environment \
-    --application-name $identifier \
-    --environment-name $identifier-invoicer-api \
+    --application-name invoicer \
+    --environment-name invoicer-invoicer-api \
     --description "Invoicer API environment" \
     --tags "Key=Owner,Value=$(whoami)" \
-    --solution-stack-name "$dockerstack" \
-    --option-settings file://tmp/$identifier/ebs-options.json \
+    --solution-stack-name "64bit Amazon Linux 2018.03 v2.24.0 running Multi-container Docker 19.03.13-ce (Generic)" \
+    --option-settings file:///tmp/ebs-options.json \
     --tier "Name=WebServer,Type=Standard,Version=''" > tmp/$identifier/ebcreateapienv.json || fail
 apieid=$(jq -r '.EnvironmentId' tmp/$identifier/ebcreateapienv.json)
 echo "API environment $apieid is being created"
@@ -96,7 +96,7 @@ echo "API environment $apieid is being created"
 # grab the instance ID of the API environment, then its security group, and add that to the RDS security group
 while true;
 do
-    aws elasticbeanstalk describe-environment-resources --environment-id $apieid > tmp/$identifier/ebapidesc.json || fail
+    aws elasticbeanstalk describe-environment-resources --environment-name invoicer-api > tmp/$identifier/ebapidesc.json || fail
     ec2id=$(jq -r '.EnvironmentResources.Instances[0].Id' tmp/$identifier/ebapidesc.json)
     if [ "$ec2id" != "null" ]; then break; fi
     echo -n '.'
