@@ -20,4 +20,8 @@
         region: "{{ region }}"
 
     - name: Set elastic beanstalk to zero
-      command: aws elasticbeanstalk update-environment --application-name invoicer --environment-name invoicer-api --option-settings file://ebs_zero.json
+      command: "aws elasticbeanstalk update-environment --application-name {{ item }} 
+      --environment-name {{ item }}-api --option-settings file://ebs_zero.json"
+      with_items:
+        - invoicer
+        - deployer

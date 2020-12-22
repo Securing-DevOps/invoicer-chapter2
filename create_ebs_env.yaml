@@ -85,7 +85,11 @@
 
 
     - name: Set elastic beanstalk to one
-      command: aws elasticbeanstalk update-environment --application-name invoicer --environment-name invoicer-api --option-settings file://ebs_one.json
+      command: "aws elasticbeanstalk update-environment --application-name {{ item }} 
+      --environment-name {{ item }}-api --option-settings file://ebs_one.json"
+      with_items:
+        - deployer
+        - invoicer
 
     - name: Allow connection from EC2 to DB
       command: aws ec2 authorize-security-group-ingress --group-name {{ identifier }} --source-group sg-01b9b35a79a11152b --protocol tcp --port 5432 
