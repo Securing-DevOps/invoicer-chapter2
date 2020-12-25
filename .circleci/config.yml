@@ -2,7 +2,7 @@ version: 2
 jobs:
  build:
   working_directory: 
-➥/go/src/github.com/pademin/invoicer-chapter2    
+  /go/src/github.com/pademin/invoicer-chapter2    
   docker:
  - image: circleci/golang:1.8    
   steps:
