@@ -1,48 +1,13 @@
-version: 2
-jobs:
- build:
-  # Variable expansion in working_directory not supported at this time
-  # You will need to modify the code below to reflect your github account/repo setup
-  working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
-  docker:
-   - image: circleci/golang:1.10
-  steps:
-   - checkout
-   - setup_remote_docker
-
-   - run: 
-      name: Setup environment
-      command: |
-       gb="/src/github.com/${CIRCLE_PROJECT_USERNAME}";
-       if [ ${CIRCLE_PROJECT_USERNAME} == 'Securing-DevOps' ]; then
-         dr="securingdevops"
-       else
-         dr=$DOCKER_USER
-       fi
-       cat >> $BASH_ENV << EOF
-       export GOPATH_HEAD="$(echo ${GOPATH}|cut -d ':' -f 1)"
-       export GOPATH_BASE="$(echo ${GOPATH}|cut -d ':' -f 1)${gb}"
-       export DOCKER_REPO="$dr"
-       EOF
-   - run: mkdir -p "${GOPATH_BASE}"
-   - run: mkdir -p "${GOPATH_HEAD}/bin"
-       
-   - run:
-      name: Testing application
-      command: |
-          go test \
-          github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
-
-   - deploy:
-       command: |
-         if [ "${CIRCLE_BRANCH}" == "master" ]; then
-           docker login -u ${DOCKER_USER} -p ${DOCKER_PASS};
-           go install --ldflags '-extldflags "-static"' \
-           github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME};
-           mkdir bin;
-           cp "$GOPATH_HEAD/bin/${CIRCLE_PROJECT_REPONAME}" bin/invoicer;
-           docker build -t ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME} .;
-           docker images --no-trunc | awk '/^app/ {print $3}' | \
-             sudo tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt;
-           docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME};
-         fi
+# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+# Use a package of configuration called an orb.
+orbs:
+  # Declare a dependency on the welcome-orb
+  welcome: circleci/welcome-orb@0.4.1
+# Orchestrate or schedule a set of jobs
+workflows:
+  # Name the workflow "welcome"
+  welcome:
+    # Run the welcome/run job in its own container
+    jobs:
+      - welcome/run
