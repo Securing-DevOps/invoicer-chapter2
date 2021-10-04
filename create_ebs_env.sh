@@ -12,7 +12,8 @@ fail() {
 
 export AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
 
-datetag=$(date +%Y%m%d%H%M)
+#datetag=$(date +%Y%m%d%H%M) #too long for api env name later on
+datetag=$(date +%Y%m%d%H)
 identifier=$(whoami)ivcr$datetag
 mkdir -p tmp/$identifier
 
@@ -32,7 +33,8 @@ dbsg=$(jq -r '.GroupId' tmp/$identifier/dbsg.json)
 echo "DB security group is $dbsg"
 
 # Create the database
-dbinstclass="db.t2.micro"
+#dbinstclass="db.t2.micro"
+dbinstclass="db.t2.small"
 dbstorage=5
 dbpass=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null| tr -dc _A-Z-a-z-0-9)
 aws rds create-db-instance \
