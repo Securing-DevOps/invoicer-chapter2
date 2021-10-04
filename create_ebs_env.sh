@@ -78,8 +78,12 @@ aws elasticbeanstalk create-application \
 echo "ElasticBeanTalk application created"
 
 # Get the name of the latest Docker solution stack
+#dockerstack="$(aws elasticbeanstalk list-available-solution-stacks | \
+#    jq -r '.SolutionStacks[]' | grep -P '.+Amazon Linux.+running Docker.+' | head -1)"
+# this query gives "64bit Amazon Linux 2018.03 v2.16.12 running Docker 19.03.13-ce" - aws threw error saying depricated. so need to find the latest version
+# the latest platform is "64bit Amazon Linux 2 v3.4.6 running Docker" so need to change regular expression, and it's listed after the "64bit Amazon Linux 2018.03 v2.16.12 running Docker 19.03.13-ce" so use tail instead of head
 dockerstack="$(aws elasticbeanstalk list-available-solution-stacks | \
-    jq -r '.SolutionStacks[]' | grep -P '.+Amazon Linux.+running Docker.+' | head -1)"
+    jq -r '.SolutionStacks[]' | grep -P '.+Amazon Linux.+running Docker' | tail -1)"
 
 # Create the EB API environment
 sed "s/POSTGRESPASSREPLACEME/$dbpass/" ebs-options.json > tmp/$identifier/ebs-options.json || fail
