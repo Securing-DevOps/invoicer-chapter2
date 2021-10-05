@@ -1,0 +1,170 @@
+{
+    "Reservations": [
+        {
+            "Groups": [],
+            "Instances": [
+                {
+                    "AmiLaunchIndex": 0,
+                    "ImageId": "ami-08da208f95f9db2d7",
+                    "InstanceId": "i-021775b77a8aa9f08",
+                    "InstanceType": "t2.micro",
+                    "LaunchTime": "2021-10-05T10:08:29+00:00",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "Placement": {
+                        "AvailabilityZone": "us-east-1c",
+                        "GroupName": "",
+                        "Tenancy": "default"
+                    },
+                    "PrivateDnsName": "ip-172-31-11-115.ec2.internal",
+                    "PrivateIpAddress": "172.31.11.115",
+                    "ProductCodes": [],
+                    "PublicDnsName": "ec2-3-228-15-186.compute-1.amazonaws.com",
+                    "PublicIpAddress": "3.228.15.186",
+                    "State": {
+                        "Code": 0,
+                        "Name": "pending"
+                    },
+                    "StateTransitionReason": "",
+                    "SubnetId": "subnet-c892f1ae",
+                    "VpcId": "vpc-52922d2f",
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [
+                        {
+                            "DeviceName": "/dev/xvda",
+                            "Ebs": {
+                                "AttachTime": "2021-10-05T10:08:30+00:00",
+                                "DeleteOnTermination": true,
+                                "Status": "attaching",
+                                "VolumeId": "vol-08a4107990bd826d4"
+                            }
+                        }
+                    ],
+                    "ClientToken": "0a05f13f-b42c-355d-b0c7-7607d1bf1f64",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::269266462523:instance-profile/aws-elasticbeanstalk-ec2-role",
+                        "Id": "AIPAT5MMIE457PTHW7OTD"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Association": {
+                                "IpOwnerId": "amazon",
+                                "PublicDnsName": "ec2-3-228-15-186.compute-1.amazonaws.com",
+                                "PublicIp": "3.228.15.186"
+                            },
+                            "Attachment": {
+                                "AttachTime": "2021-10-05T10:08:29+00:00",
+                                "AttachmentId": "eni-attach-03a11164ebba42cf1",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attaching",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupName": "awseb-e-inmcczwd3u-stack-AWSEBSecurityGroup-11IHB0LS5FQE0",
+                                    "GroupId": "sg-073d0c256e7b49ecf"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "02:d8:33:0b:68:b7",
+                            "NetworkInterfaceId": "eni-02202f10205b59606",
+                            "OwnerId": "269266462523",
+                            "PrivateDnsName": "ip-172-31-11-115.ec2.internal",
+                            "PrivateIpAddress": "172.31.11.115",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Association": {
+                                        "IpOwnerId": "amazon",
+                                        "PublicDnsName": "ec2-3-228-15-186.compute-1.amazonaws.com",
+                                        "PublicIp": "3.228.15.186"
+                                    },
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-172-31-11-115.ec2.internal",
+                                    "PrivateIpAddress": "172.31.11.115"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-c892f1ae",
+                            "VpcId": "vpc-52922d2f",
+                            "InterfaceType": "interface"
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupName": "awseb-e-inmcczwd3u-stack-AWSEBSecurityGroup-11IHB0LS5FQE0",
+                            "GroupId": "sg-073d0c256e7b49ecf"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "aws:cloudformation:logical-id",
+                            "Value": "AWSEBAutoScalingGroup"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "wingcommanderivcr2021100511-invoicer-api"
+                        },
+                        {
+                            "Key": "aws:autoscaling:groupName",
+                            "Value": "awseb-e-inmcczwd3u-stack-AWSEBAutoScalingGroup-1EX3ZR3YF07A1"
+                        },
+                        {
+                            "Key": "aws:cloudformation:stack-id",
+                            "Value": "arn:aws:cloudformation:us-east-1:269266462523:stack/awseb-e-inmcczwd3u-stack/18ee4950-25c4-11ec-a86e-129bc5417673"
+                        },
+                        {
+                            "Key": "aws:cloudformation:stack-name",
+                            "Value": "awseb-e-inmcczwd3u-stack"
+                        },
+                        {
+                            "Key": "Owner",
+                            "Value": "wingcommander"
+                        },
+                        {
+                            "Key": "elasticbeanstalk:environment-id",
+                            "Value": "e-inmcczwd3u"
+                        },
+                        {
+                            "Key": "elasticbeanstalk:environment-name",
+                            "Value": "wingcommanderivcr2021100511-invoicer-api"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 1
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "pending",
+                        "HttpTokens": "optional",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    }
+                }
+            ],
+            "OwnerId": "269266462523",
+            "RequesterId": "940372691376",
+            "ReservationId": "r-0c49adb158cf9a86e"
+        }
+    ]
+}

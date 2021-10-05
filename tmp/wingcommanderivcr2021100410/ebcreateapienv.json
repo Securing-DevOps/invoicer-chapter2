@@ -1,0 +1,18 @@
+{
+    "EnvironmentName": "wingcommanderivcr2021100410-invoicer-api",
+    "EnvironmentId": "e-akya3cpfpk",
+    "ApplicationName": "wingcommanderivcr2021100410",
+    "SolutionStackName": "64bit Amazon Linux 2018.03 v2.16.12 running Docker 19.03.13-ce",
+    "PlatformArn": "arn:aws:elasticbeanstalk:us-east-1::platform/Docker running on 64bit Amazon Linux/2.16.12",
+    "Description": "Invoicer API environment",
+    "DateCreated": "2021-10-04T09:46:20.688000+00:00",
+    "DateUpdated": "2021-10-04T09:46:20.688000+00:00",
+    "Status": "Launching",
+    "Health": "Grey",
+    "Tier": {
+        "Name": "WebServer",
+        "Type": "Standard",
+        "Version": "1.0"
+    },
+    "EnvironmentArn": "arn:aws:elasticbeanstalk:us-east-1:269266462523:environment/wingcommanderivcr2021100410/wingcommanderivcr2021100410-invoicer-api"
+}

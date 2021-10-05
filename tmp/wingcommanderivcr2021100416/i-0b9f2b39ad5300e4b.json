@@ -1,0 +1,149 @@
+{
+    "Reservations": [
+        {
+            "Groups": [],
+            "Instances": [
+                {
+                    "AmiLaunchIndex": 0,
+                    "ImageId": "ami-08da208f95f9db2d7",
+                    "InstanceId": "i-0b9f2b39ad5300e4b",
+                    "InstanceType": "t2.micro",
+                    "LaunchTime": "2021-10-04T15:18:43+00:00",
+                    "Monitoring": {
+                        "State": "disabled"
+                    },
+                    "Placement": {
+                        "AvailabilityZone": "us-east-1a",
+                        "GroupName": "",
+                        "Tenancy": "default"
+                    },
+                    "PrivateDnsName": "ip-172-31-17-128.ec2.internal",
+                    "PrivateIpAddress": "172.31.17.128",
+                    "ProductCodes": [],
+                    "PublicDnsName": "",
+                    "State": {
+                        "Code": 0,
+                        "Name": "pending"
+                    },
+                    "StateTransitionReason": "",
+                    "SubnetId": "subnet-959daed8",
+                    "VpcId": "vpc-52922d2f",
+                    "Architecture": "x86_64",
+                    "BlockDeviceMappings": [],
+                    "ClientToken": "e185f12f-8ad6-aa2b-20cd-80b2207b1646",
+                    "EbsOptimized": false,
+                    "EnaSupport": true,
+                    "Hypervisor": "xen",
+                    "IamInstanceProfile": {
+                        "Arn": "arn:aws:iam::269266462523:instance-profile/aws-elasticbeanstalk-ec2-role",
+                        "Id": "AIPAT5MMIE457PTHW7OTD"
+                    },
+                    "NetworkInterfaces": [
+                        {
+                            "Attachment": {
+                                "AttachTime": "2021-10-04T15:18:43+00:00",
+                                "AttachmentId": "eni-attach-0f53cb62eba2504c0",
+                                "DeleteOnTermination": true,
+                                "DeviceIndex": 0,
+                                "Status": "attaching",
+                                "NetworkCardIndex": 0
+                            },
+                            "Description": "",
+                            "Groups": [
+                                {
+                                    "GroupName": "awseb-e-a3rn2ny9aj-stack-AWSEBSecurityGroup-1QJKB98M5CEK",
+                                    "GroupId": "sg-03e0fc86bf2c86482"
+                                }
+                            ],
+                            "Ipv6Addresses": [],
+                            "MacAddress": "0a:a1:40:e5:4b:31",
+                            "NetworkInterfaceId": "eni-058f4e15a2c323269",
+                            "OwnerId": "269266462523",
+                            "PrivateDnsName": "ip-172-31-17-128.ec2.internal",
+                            "PrivateIpAddress": "172.31.17.128",
+                            "PrivateIpAddresses": [
+                                {
+                                    "Primary": true,
+                                    "PrivateDnsName": "ip-172-31-17-128.ec2.internal",
+                                    "PrivateIpAddress": "172.31.17.128"
+                                }
+                            ],
+                            "SourceDestCheck": true,
+                            "Status": "in-use",
+                            "SubnetId": "subnet-959daed8",
+                            "VpcId": "vpc-52922d2f",
+                            "InterfaceType": "interface"
+                        }
+                    ],
+                    "RootDeviceName": "/dev/xvda",
+                    "RootDeviceType": "ebs",
+                    "SecurityGroups": [
+                        {
+                            "GroupName": "awseb-e-a3rn2ny9aj-stack-AWSEBSecurityGroup-1QJKB98M5CEK",
+                            "GroupId": "sg-03e0fc86bf2c86482"
+                        }
+                    ],
+                    "SourceDestCheck": true,
+                    "Tags": [
+                        {
+                            "Key": "elasticbeanstalk:environment-id",
+                            "Value": "e-a3rn2ny9aj"
+                        },
+                        {
+                            "Key": "Name",
+                            "Value": "wingcommanderivcr2021100416-invoicer-api"
+                        },
+                        {
+                            "Key": "Owner",
+                            "Value": "wingcommander"
+                        },
+                        {
+                            "Key": "aws:cloudformation:stack-id",
+                            "Value": "arn:aws:cloudformation:us-east-1:269266462523:stack/awseb-e-a3rn2ny9aj-stack/448a9300-2526-11ec-a356-0a955b06f781"
+                        },
+                        {
+                            "Key": "elasticbeanstalk:environment-name",
+                            "Value": "wingcommanderivcr2021100416-invoicer-api"
+                        },
+                        {
+                            "Key": "aws:cloudformation:stack-name",
+                            "Value": "awseb-e-a3rn2ny9aj-stack"
+                        },
+                        {
+                            "Key": "aws:autoscaling:groupName",
+                            "Value": "awseb-e-a3rn2ny9aj-stack-AWSEBAutoScalingGroup-URMWRTK26J40"
+                        },
+                        {
+                            "Key": "aws:cloudformation:logical-id",
+                            "Value": "AWSEBAutoScalingGroup"
+                        }
+                    ],
+                    "VirtualizationType": "hvm",
+                    "CpuOptions": {
+                        "CoreCount": 1,
+                        "ThreadsPerCore": 1
+                    },
+                    "CapacityReservationSpecification": {
+                        "CapacityReservationPreference": "open"
+                    },
+                    "HibernationOptions": {
+                        "Configured": false
+                    },
+                    "MetadataOptions": {
+                        "State": "pending",
+                        "HttpTokens": "optional",
+                        "HttpPutResponseHopLimit": 1,
+                        "HttpEndpoint": "enabled",
+                        "HttpProtocolIpv6": "disabled"
+                    },
+                    "EnclaveOptions": {
+                        "Enabled": false
+                    }
+                }
+            ],
+            "OwnerId": "269266462523",
+            "RequesterId": "940372691376",
+            "ReservationId": "r-0ae7454f0a54b700d"
+        }
+    ]
+}

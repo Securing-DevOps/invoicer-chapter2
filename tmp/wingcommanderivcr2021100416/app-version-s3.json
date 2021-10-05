@@ -1,0 +1,14 @@
+{
+    "ApplicationVersion": {
+        "ApplicationVersionArn": "arn:aws:elasticbeanstalk:us-east-1:269266462523:applicationversion/wingcommanderivcr2021100416/invoicer-api",
+        "ApplicationName": "wingcommanderivcr2021100416",
+        "VersionLabel": "invoicer-api",
+        "SourceBundle": {
+            "S3Bucket": "wingcommanderivcr2021100416",
+            "S3Key": "app-version.json"
+        },
+        "DateCreated": "2021-10-04T15:18:54.980000+00:00",
+        "DateUpdated": "2021-10-04T15:18:54.980000+00:00",
+        "Status": "UNPROCESSED"
+    }
+}
