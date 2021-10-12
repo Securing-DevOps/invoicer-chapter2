@@ -1,3 +1,9 @@
+Deon: 
+various modification was made in order to make the pipeline work with AWS (Oct 2021)
+Particularly 
+create_ebs_env.sh, app-version.json, ebs-options.json
+==========================
+
 Securing DevOps's invoicer
 ==========================
 
