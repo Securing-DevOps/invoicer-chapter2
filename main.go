@@ -2,7 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// Contributor: Julien Vehent jvehent@mozilla.com [:ulfr]
+// Contributor: Julien Vehent jvehent@mozilla.com [:ulfr], Deon Guo
 package main
 
 //go:generate ./version.sh
@@ -211,7 +211,7 @@ func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
         <link href="statics/style.css" rel="stylesheet">
     </head>
     <body>
-	<h1>Wingcommander's Invoicer Web</h1>
+	<h1>Apfel's Invoicer Web</h1>
         <p class="desc-invoice"></p>
         <div class="invoice-details">
         </div>
