@@ -205,7 +205,7 @@ func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Invoicer Web</title>
+        <title>Invoicer Web 1.0</title>
         <script src="statics/jquery-1.12.4.min.js"></script>
         <script src="statics/invoicer-cli.js"></script>
         <link href="statics/style.css" rel="stylesheet">
