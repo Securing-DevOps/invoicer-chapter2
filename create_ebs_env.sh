@@ -7,10 +7,11 @@
 
 fail() {
     echo configuration failed
-    exit 1
+    #exit 1
 }
 
-export AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
+# export AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
+export AWS_DEFAULT_REGION=${AWS_REGION:-eu-west-2}
 
 #datetag=$(date +%Y%m%d%H%M) #too long for api env name later on
 datetag=$(date +%Y%m%d%H)
