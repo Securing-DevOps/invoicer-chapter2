@@ -211,7 +211,7 @@ func (iv *invoicer) getIndex(w http.ResponseWriter, r *http.Request) {
         <link href="statics/style.css" rel="stylesheet">
     </head>
     <body>
-	<h1>Apfel's Invoicer Web</h1>
+	<h1>Apfel's Invoicer Web app</h1>
         <p class="desc-invoice"></p>
         <div class="invoice-details">
         </div>
