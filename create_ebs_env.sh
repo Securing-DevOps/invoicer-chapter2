@@ -13,8 +13,8 @@ fail() {
 # export AWS_DEFAULT_REGION=${AWS_REGION:-us-east-1}
 export AWS_DEFAULT_REGION=${AWS_REGION:-eu-west-2}
 
-#datetag=$(date +%Y%m%d%H%M) #too long for api env name later on
-datetag=$(date +%Y%m%d%H)
+#datetag=$(date +%Y%m%d%H%M) # could be too long for api env name later on
+datetag=$(date +%Y%m%d%H%M)
 identifier=$(whoami)ivcr$datetag
 mkdir -p tmp/$identifier
 
@@ -35,7 +35,8 @@ echo "DB security group is $dbsg"
 
 # Create the database
 #dbinstclass="db.t2.micro"
-dbinstclass="db.t2.small"
+# the original db version: --engine-version 9.6.2 \
+dbinstclass="db.t2.micro"
 dbstorage=5
 dbpass=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null| tr -dc _A-Z-a-z-0-9)
 aws rds create-db-instance \
@@ -45,7 +46,7 @@ aws rds create-db-instance \
     --allocated-storage "$dbstorage" \
     --db-instance-class "$dbinstclass" \
     --engine postgres \
-    --engine-version 9.6.2 \
+    --engine-version 12.9 \
     --auto-minor-version-upgrade \
     --publicly-accessible \
     --master-username invoicer \
