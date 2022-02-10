@@ -12,3 +12,4 @@ USER app
 EXPOSE 8080
 WORKDIR /app
 ENTRYPOINT /app/invoicer
+HEALTHCHECK CMD curl --fail http://localhost:8080 || exit 1 
