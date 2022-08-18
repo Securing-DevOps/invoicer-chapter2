@@ -1,31 +1,40 @@
 version: 2.1
 
-# Define the jobs we want to run for this project
-jobs:
-  build:
+executors:
+  xenial:
+    parameters:
+      some-value:
+        type: string
+        default: foo
+    environment:
+      SOME_VAR: << parameters.some-value >>
     docker:
-      - image: cimg/<language>:<version TAG>
+      - image: ubuntu:xenial
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
-    steps:
-      - checkout
-      - run: echo "this is the build job"
-  test:
+  bionic:
     docker:
-      - image: cimg/<language>:<version TAG>
+      - image: ubuntu:bionic
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
-    steps:
-      - checkout
-      - run: echo "this is the test job"
 
-# Orchestrate our job run sequence
+jobs:
+  test:
+    parameters:
+      e:
+        type: executor
+    executor: << parameters.e >>
+    steps:
+      - run: some-tests
+
 workflows:
-  build_and_test:
+  workflow:
     jobs:
-      - build
       - test:
-          requires:
-            - build
+          e: bionic
+      - test:
+          e:
+            name: xenial
+            some-value: foobar
