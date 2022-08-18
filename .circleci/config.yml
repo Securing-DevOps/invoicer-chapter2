@@ -14,8 +14,8 @@ jobs:
       name: Setup environment
       command: |
        gb="/src/github.com/${CIRCLE_PROJECT_USERNAME}";
-       if [ ${CIRCLE_PROJECT_USERNAME} == 'Securing-DevOps' ]; then
-         dr="securingdevops"
+       if [ ${CIRCLE_PROJECT_USERNAME} == 'siyavashshams' ]; then
+         dr="siyavashshams"
        else
          dr=$DOCKER_USER
        fi
