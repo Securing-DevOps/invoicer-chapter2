@@ -6,6 +6,9 @@ jobs:
 
   docker:
    - image: cimg/go:1.19.0
+     auth:
+          username: siyavashshams
+          password: lasTampa34?m 
   steps:
    - checkout
    - setup_remote_docker
