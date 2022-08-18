@@ -5,7 +5,7 @@ jobs:
   # You will need to modify the code below to reflect your github account/repo setup
   working_directory: /go/src/github.com/Siyavashshams/invoicer-chapter2
   docker:
-   - image: cimg/golang:1.10
+   - image: cimg/go:1.10
   steps:
    - checkout
    - setup_remote_docker
