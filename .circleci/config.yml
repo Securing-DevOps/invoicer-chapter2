@@ -1,7 +1,7 @@
 version: 2
 jobs:
  build:
-  working_directory: git@github.com:Siyavashshams/invoicer-chapter2.git
+  working_directory: ~/go/src/github.com/Siyavashsham/invoicer-chapter2
   docker:
    - image: cimg/go:1.19.0
      auth:
