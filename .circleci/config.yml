@@ -8,6 +8,8 @@ jobs:
           username: "siyavashshams"  # can specify string literal values
           password: "lasTampa34?m"  # or project environment variable 
     steps:
+      - checkout
+      - setup_remote_docker
       - run:
           name: The First Step
           command: |
