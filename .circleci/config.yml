@@ -2,7 +2,7 @@ version: 2
 jobs:
  build:
   # 123
-  working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
+ 
   docker:
    - image: cimg/go:1.19.0
      auth:
