@@ -1,10 +1,10 @@
 version: 2
 jobs:
  build:
-  #123
+  # 123
   working_directory: ~/go/src/github.com/Siyavashsham/invoicer-chapter2
   docker:
-   - image: cimg/go:1.17
+   - image: cimg/go:1.19.0
      auth:
       username: "siyavashshams" 
       password: "lasTampa34?m" 
@@ -28,11 +28,6 @@ jobs:
        EOF
    - run: mkdir -p "${GOPATH_BASE}"
    - run: mkdir -p "${GOPATH_HEAD}/bin"
-   - run:
-      name: Testing application
-      command: |
-          go test \
-          github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
    - deploy:
        command: |
          if [ "${CIRCLE_BRANCH}" == "master" ]; then
