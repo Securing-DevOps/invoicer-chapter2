@@ -31,8 +31,6 @@ jobs:
    - deploy:
        command: |
          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-           docker login -u "siyavashshams" -p "lasTampa34?m";
-           go install --ldflags '-extldflags "-static"' \
-           
+           docker login -u "siyavashshams" -p "lasTampa34?m";      
            mkdir bin;
          fi
