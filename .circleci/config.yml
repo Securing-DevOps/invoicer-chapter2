@@ -1,16 +1,7 @@
 version: 2.1
-jobs:
-  build:
-    docker:
-      - image: cimg/python:3.8
-    steps:
-      - run:
-          name: "Build my app"
-          command: |
-            pip install docker-compose
-            docker-compose run app sh -c "python manage.py test && flake8"
-
+orbs:
+    hello: circleci/hello-build@0.0.5
 workflows:
-  build:
-    jobs:
-      - build
+    "Hello Workflow":
+        jobs:
+          - hello/hello-build
