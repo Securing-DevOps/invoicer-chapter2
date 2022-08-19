@@ -1,27 +1,7 @@
-version: 2
+# CircleCI configuration file
+version: 2.1
 jobs:
- build:
-  working_directory: /go/src/github.com/siyavashshams/invoicer-chapter2
-  docker:
-   - image: cimg/go:1.19.0
-     auth:
-      username: "siyavashshams" 
-      password: "lasTampa34?m" 
-  steps:
-   - checkout
-   - setup_remote_docker
-
-   - run: 
-      name: Setup environment
-      command: |
-       gb="/src/github.com/${CIRCLE_PROJECT_USERNAME}";
-       if [ ${CIRCLE_PROJECT_USERNAME} == 'Securing-DevOps' ]; then
-         dr="securingdevops"
-       else
-         dr=$DOCKER_USER
-       fi
-       cat >> $BASH_ENV << EOF
-       export GOPATH_HEAD="$(echo ${GOPATH}|cut -d ':' -f 1)"
-       export GOPATH_BASE="$(echo ${GOPATH}|cut -d ':' -f 1)${gb}"
-       export DOCKER_REPO="$dr"
-       EOF
+  build:
+    docker:
+    # Primary container image where all steps run
+     - image: cimg/base:2022.05
