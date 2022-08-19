@@ -4,7 +4,7 @@ jobs:
   # 123
   working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
   docker:
-   - image: cimg/go:1.19.0
+   - image: circleci/golang:1.10
      auth:
       username: "siyavashshams" 
       password: "lasTampa34?m" 
