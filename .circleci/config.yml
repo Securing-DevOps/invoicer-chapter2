@@ -1,8 +1,9 @@
-version: 2.1
+version: 2
 jobs:
   build:
+    working_directory: /go/src/github.com/siyavashshams/invoicer-chapter2
     docker:
-      - image: alpine:3.15
+      - image: cimg/go:1.19.0
     steps:
       - run:
           name: The First Step
