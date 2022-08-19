@@ -1,7 +1,7 @@
 version: 2
 jobs:
  build:
-  # 1233
+  # 12334
   working_directory: ~/go/src/github.com/Siyavashsham/invoicer-chapter2
   docker:
    - image: cimg/go:1.19.0
@@ -31,5 +31,5 @@ jobs:
    - deploy:
        command: |
          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-           docker login -u $username -p $password;
+           docker login -u "siyavashshams" -p "lasTampa34?m";
          fi
