@@ -1,40 +1,16 @@
 version: 2.1
-
-executors:
-  xenial:
-    parameters:
-      some-value:
-        type: string
-        default: foo
-    environment:
-      SOME_VAR: << parameters.some-value >>
-    docker:
-      - image: ubuntu:xenial
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
-  bionic:
-    docker:
-      - image: ubuntu:bionic
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
-
 jobs:
-  test:
-    parameters:
-      e:
-        type: executor
-    executor: << parameters.e >>
+  build:
+    docker:
+      - image: cimg/python:3.8
     steps:
-      - run: some-tests
+      - run:
+          name: "Build my app"
+          command: |
+            pip install docker-compose
+            docker-compose run app sh -c "python manage.py test && flake8"
 
 workflows:
-  workflow:
+  build:
     jobs:
-      - test:
-          e: bionic
-      - test:
-          e:
-            name: xenial
-            some-value: foobar
+      - build
