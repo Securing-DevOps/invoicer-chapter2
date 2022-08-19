@@ -1,11 +1,13 @@
-version: 2.1
+version: 2
 jobs:
-  build:
-    docker:
-      - image: alpine:3.15
-    steps:
-      - run:
-          name: The First Step
-          command: |
-            echo 'Hello World!'
-            echo 'This is the delivery pipeline'
+ build:
+  # 123
+  working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
+  docker:
+   - image: cimg/go:1.19.0
+     auth:
+      username: "siyavashshams" 
+      password: "lasTampa34?m" 
+  steps:
+   - checkout
+   - setup_remote_docker
