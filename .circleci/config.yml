@@ -3,7 +3,7 @@ jobs:
  build:
   working_directory: ~/go/src/github.com/Siyavashsham/invoicer-chapter2
   docker:
-   - image: cimg/go:1.19.0
+   - image: cimg/go:1.17
      auth:
       username: "siyavashshams" 
       password: "lasTampa34?m" 
