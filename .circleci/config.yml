@@ -1,10 +1,10 @@
 version: 2
 jobs:
  build:
-  # Variable expansion in working_directory not supported at this time
-  # You will need to modify the code below to reflect your github account/repo setup
+# Configures a working directory to build the Docker container of the application
   working_directory: /go/src/github.com/gushu-learn/invoicer-chapter2
   docker:
+# Declares the environment the job will run on
    - image: circleci/golang:1.10
   steps:
    - checkout
