@@ -1,15 +1,16 @@
 version: 2
 jobs:
  build:
-# Configures a working directory to build the Docker container of the application
-  working_directory: /go/src/github.com/gushu-learn/invoicer-chapter2
+  # Variable expansion in working_directory not supported at this time
+  # You will need to modify the code below to reflect your github account/repo setup
+  working_directory: /go/src/github.com/gushu-learner/invoicer-chapter2
   docker:
    - image: circleci/golang:1.10
   steps:
    - checkout
    - setup_remote_docker
 
-   -- run: 
+   - run: 
       name: Setup environment
       command: |
        gb="/src/github.com/${CIRCLE_PROJECT_USERNAME}";
@@ -31,6 +32,7 @@ jobs:
       command: |
           go test \
           github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+
    - deploy:
        command: |
          if [ "${CIRCLE_BRANCH}" == "master" ]; then
