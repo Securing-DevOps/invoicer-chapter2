@@ -5,7 +5,7 @@ jobs:
   working_directory: /go/src/github.com/gushu-learn/invoicer-chapter2
   docker:
 # Declares the environment the job will run on
-   - image: circleci/golang:1.10
+   - image: cimg/go:1.10
   steps:
    - checkout
    - setup_remote_docker
