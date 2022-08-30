@@ -35,7 +35,6 @@ echo "DB security group is $dbsg"
 dbinstclass="db.t3.micro"
 dbstorage=5
 dbpass=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null| tr -dc _A-Z-a-z-0-9)
-#dbpass=$(openssl rand -base64 10)
 echo "Password is $dbpass eom"
 aws rds create-db-instance \
     --db-name invoicer \
