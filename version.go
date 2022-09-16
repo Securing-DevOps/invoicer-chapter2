@@ -1,3 +1,3 @@
 package main
-const version = "20180614.0-92f47c3"
-const commit = "92f47c3d3dd24e41c8b38adbb86b2407143c9dc9"
+const version = "20220830.0-22420e3"
+const commit = "22420e38ea5cec3fc12c7525006d51723eb71973"
