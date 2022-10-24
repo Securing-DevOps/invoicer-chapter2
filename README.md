@@ -8,6 +8,8 @@ This is the code for Chapter 2 of Securing DevOps. It only contains the code and
 scripts relevant to the basic setup of the invoicer application and
 infrastructure.
 
+o
+
 The master branch is kept at https://securing-devops.com/invoicer but if you are
 interested in chapter-specific versions of the invoicer.
 
