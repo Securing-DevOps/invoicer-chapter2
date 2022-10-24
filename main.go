@@ -7,6 +7,7 @@ package main
 
 //go:generate ./version.sh
 
+
 import (
 	"encoding/json"
 	"fmt"
