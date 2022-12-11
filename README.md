@@ -1,11 +1,18 @@
 Securing DevOps's invoicer
 ==========================
 
+
 A simple REST API that manages invoices.
 
 This is the code for Chapter 2 of Securing DevOps. It only contains the code and
 scripts relevant to the basic setup of the invoicer application and
 infrastructure.
+
+o
+
+o
+
+ooooo
 
 The master branch is kept at https://securing-devops.com/invoicer but if you are
 interested in chapter-specific versions of the invoicer.
@@ -184,3 +191,6 @@ $ curl http://172.17.0.2:8080/invoice/1
 {"ID":1,"CreatedAt":"2016-05-21T15:33:21.855874Z","UpdatedAt":"2016-05-21T15:33:21.855874Z","DeletedAt":null,"is_paid":false,"amount":1664,"payment_date":"0001-01-01T00:00:00Z","due_date":"2016-05-07T23:00:00Z","charges":[{"ID":1,"CreatedAt":"2016-05-21T15:33:21.8637Z","UpdatedAt":"2016-05-21T15:33:21.8637Z","DeletedAt":null,"invoice_id":1,"type":"blood
 work","amount":1664,"description":"blood work"}]}
 ```
+
+
+Thanks
