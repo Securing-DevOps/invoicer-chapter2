@@ -9,7 +9,6 @@ jobs:
   steps:
    - checkout
    - setup_remote_docker
-
    - run: 
       name: Setup environment
       command: |
@@ -61,7 +60,7 @@ jobs:
        command: |
          docker run ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME}
            background: true
-   
+
    -run:
       name: ZAP baseline scan of application
       command: |
