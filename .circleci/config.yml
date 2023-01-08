@@ -1,4 +1,4 @@
-version: 2
+version: 3
 jobs:
  build:
   # Variable expansion in working_directory not supported at this time
