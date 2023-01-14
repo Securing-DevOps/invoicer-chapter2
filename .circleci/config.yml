@@ -33,6 +33,7 @@ jobs:
           go test \
           github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
 
+
    - deploy:
        command: |
          if [ "${CIRCLE_BRANCH}" == "master" ]; then
