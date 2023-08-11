@@ -3,8 +3,7 @@ jobs:
  build:
   # Variable expansion in working_directory not supported at this time
   # You will need to modify the code below to reflect your github account/repo setup
-  whoami
-  working_directory: /Users/nikita/Documents/DevOps/invoicer-chapter2 
+  working_directory: /go/src/github.com/Securing-DevOps/invoicer-chapter2
   docker:
    - image: circleci/golang:1.10
   steps:
@@ -20,7 +19,6 @@ jobs:
        else
          dr=$DOCKER_USER
        fi
-       whoami
        cat >> $BASH_ENV << EOF
        export GOPATH_HEAD="$(echo ${GOPATH}|cut -d ':' -f 1)"
        export GOPATH_BASE="$(echo ${GOPATH}|cut -d ':' -f 1)${gb}"
