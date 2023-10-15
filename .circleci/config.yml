@@ -24,6 +24,7 @@ jobs:
        export GOPATH_HEAD="$(echo ${GOPATH}|cut -d ':' -f 1)"
        export GOPATH_BASE="$(echo ${GOPATH}|cut -d ':' -f 1)${gb}"
        export DOCKER_REPO="$dr"
+       export CIRCLE_PROJECT_REPONAME="invoicer-chapter2"
        EOF
    - run: mkdir -p "${GOPATH_BASE}"
    - run: mkdir -p "${GOPATH_HEAD}/bin"
