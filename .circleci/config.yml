@@ -23,7 +23,6 @@ jobs:
        export GOPATH_HEAD="$(echo ${GOPATH}|cut -d ':' -f 1)"
        export GOPATH_BASE="$(echo ${GOPATH}|cut -d ':' -f 1)${gb}"
        export DOCKER_REPO="$dr"
-       export CIRCLE_PROJECT_REPONAME="invoicer-chapter2"
        EOF
    - run: mkdir -p "${GOPATH_BASE}"
    - run: mkdir -p "${GOPATH_HEAD}/bin"
@@ -47,3 +46,9 @@ jobs:
              sudo tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt;
            docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME};
          fi
+
+workflows: # a single workflow with a single job called build
+  build:
+    jobs:
+      - build:
+          context: YarickContext
