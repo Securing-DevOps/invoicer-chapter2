@@ -1,6 +1,7 @@
 version: 2
 jobs:
  build:
+  context: YarickContext
   # Variable expansion in working_directory not supported at this timeeee
   # You will need to modify the code below to reflect your github account/repo setup
   working_directory: /go/src/github.com/0832cbe2-74b3-4df0-a2ac-e0f104839712/invoicer-chapter2
@@ -46,9 +47,3 @@ jobs:
              sudo tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt;
            docker push ${DOCKER_REPO}/${CIRCLE_PROJECT_REPONAME};
          fi
-
-workflows: # a single workflow with a single job called build
-  build:
-    jobs:
-      - build:
-          context: YarickContext
