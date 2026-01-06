@@ -1,0 +1,34 @@
+# Binaries
+bin/
+invoicer
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test and coverage
+*.test
+*.out
+coverage.out
+
+# Go workspace
+go.work
+go.work.sum
+
+# Temporary files
+tmp/
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application
+invoicer.db

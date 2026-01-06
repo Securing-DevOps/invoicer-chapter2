@@ -1,23 +1,20 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"time"
 )
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
 func newRequestID() string {
-	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-	b := make([]rune, 8)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+	b := make([]byte, 6)
+	if _, err := rand.Read(b); err != nil {
+		// Fallback to timestamp-based ID if crypto/rand fails
+		return fmt.Sprintf("%d", time.Now().UnixNano())
 	}
-	return string(b)
+	return base64.RawURLEncoding.EncodeToString(b)
 }
 
 func httpError(w http.ResponseWriter, r *http.Request, errorCode int, errorMessage string, args ...interface{}) {

@@ -23,30 +23,54 @@ aws ec2 describe-vpcs --filters Name=isDefault,Values=true > tmp/$identifier/def
 vpcid=$(jq -r '.Vpcs[0].VpcId' tmp/$identifier/defaultvpc.json)
 echo "default vpc is $vpcid"
 
+# Get all subnets in the default VPC for DB subnet group
+aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpcid" > tmp/$identifier/subnets.json || fail
+subnet_ids=$(jq -r '.Subnets[].SubnetId' tmp/$identifier/subnets.json | tr '\n' ' ')
+echo "subnets: $subnet_ids"
+
+# Create DB subnet group
+aws rds create-db-subnet-group \
+    --db-subnet-group-name "$identifier-db-subnet" \
+    --db-subnet-group-description "Subnet group for $identifier database" \
+    --subnet-ids $subnet_ids > tmp/$identifier/dbsubnetgroup.json || fail
+echo "DB subnet group created"
+
 # Create a security group for the database
 aws ec2 create-security-group \
-    --group-name $identifier \
-    --description "access control to Invoicer Postgres DB" \
+    --group-name $identifier-db \
+    --description "Security group for Invoicer PostgreSQL RDS Database - $identifier" \
     --vpc-id $vpcid > tmp/$identifier/dbsg.json || fail
 dbsg=$(jq -r '.GroupId' tmp/$identifier/dbsg.json)
+
+# Tag the security group
+aws ec2 create-tags \
+    --resources "$dbsg" \
+    --tags "Key=Name,Value=$identifier-db-sg" \
+           "Key=Environment,Value=invoicer-api" \
+           "Key=Owner,Value=$(whoami)" \
+           "Key=ManagedBy,Value=create_ebs_env.sh"
+
 echo "DB security group is $dbsg"
 
 # Create the database
-dbinstclass="db.t2.micro"
-dbstorage=5
+dbinstclass="db.t3.micro"
+dbstorage=20
 dbpass=$(dd if=/dev/urandom bs=128 count=1 2>/dev/null| tr -dc _A-Z-a-z-0-9)
 aws rds create-db-instance \
     --db-name invoicer \
     --db-instance-identifier "$identifier" \
     --vpc-security-group-ids "$dbsg" \
+    --db-subnet-group-name "$identifier-db-subnet" \
     --allocated-storage "$dbstorage" \
     --db-instance-class "$dbinstclass" \
     --engine postgres \
-    --engine-version 9.6.2 \
+    --engine-version 16.4 \
     --auto-minor-version-upgrade \
-    --publicly-accessible \
+    --no-publicly-accessible \
     --master-username invoicer \
     --master-user-password "$dbpass" \
+    --storage-encrypted \
+    --backup-retention-period 7 \
     --no-multi-az > tmp/$identifier/rds.json || fail
 echo "RDS Postgres database is being created. username=invoicer; password='$dbpass'"
 
@@ -75,9 +99,14 @@ aws elasticbeanstalk create-application \
     --description "Invoicer $env $datetag" > tmp/$identifier/ebcreateapp.json || fail
 echo "ElasticBeanTalk application created"
 
-# Get the name of the latest Docker solution stack
+# Get the name of the latest Docker solution stack (AL2023)
 dockerstack="$(aws elasticbeanstalk list-available-solution-stacks | \
-    jq -r '.SolutionStacks[]' | grep -P '.+Amazon Linux.+running Docker.+' | head -1)"
+    jq -r '.SolutionStacks[]' | grep -P '.+Amazon Linux 2023.+running Docker.+' | head -1)"
+# Fallback to AL2 if AL2023 is not available
+if [ -z "$dockerstack" ]; then
+    dockerstack="$(aws elasticbeanstalk list-available-solution-stacks | \
+        jq -r '.SolutionStacks[]' | grep -P '.+Amazon Linux 2 .+running Docker.+' | head -1)"
+fi
 
 # Create the EB API environment
 sed "s/POSTGRESPASSREPLACEME/$dbpass/" ebs-options.json > tmp/$identifier/ebs-options.json || fail

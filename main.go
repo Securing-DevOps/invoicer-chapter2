@@ -10,7 +10,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -18,11 +18,11 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/wader/gormstore"
+	"github.com/wader/gormstore/v2"
 	"go.mozilla.org/mozlog"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -44,19 +44,20 @@ func main() {
 	var db *gorm.DB
 	if os.Getenv("INVOICER_USE_POSTGRES") != "" {
 		log.Println("Opening postgres connection")
-		db, err = gorm.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s",
+		dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s",
+			os.Getenv("INVOICER_POSTGRES_HOST"),
 			os.Getenv("INVOICER_POSTGRES_USER"),
 			os.Getenv("INVOICER_POSTGRES_PASSWORD"),
-			os.Getenv("INVOICER_POSTGRES_HOST"),
 			os.Getenv("INVOICER_POSTGRES_DB"),
 			os.Getenv("INVOICER_POSTGRES_SSLMODE"),
-		))
+		)
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	} else {
 		log.Println("Opening sqlite connection")
-		db, err = gorm.Open("sqlite3", "invoicer.db")
+		db, err = gorm.Open(sqlite.Open("invoicer.db"), &gorm.Config{})
 	}
 	if err != nil {
-		panic("failed to connect database")
+		log.Fatalf("failed to connect database: %v", err)
 	}
 
 	iv.db = db
@@ -132,7 +133,7 @@ func (iv *invoicer) getInvoice(w http.ResponseWriter, r *http.Request) {
 
 func (iv *invoicer) postInvoice(w http.ResponseWriter, r *http.Request) {
 	log.Println("posting new invoice")
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		httpError(w, r, http.StatusBadRequest, "failed to read request body: %s", err)
 		return
@@ -166,7 +167,7 @@ func (iv *invoicer) putInvoice(w http.ResponseWriter, r *http.Request) {
 		httpError(w, r, http.StatusNotFound, "No invoice id %s", vars["id"])
 		return
 	}
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		httpError(w, r, http.StatusBadRequest, "failed to read request body: %s", err)
 		return
